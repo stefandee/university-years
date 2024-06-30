@@ -13,6 +13,8 @@ This is the practical work accompanying the dissertation paper, [a server and a 
 
 It's very much WIP, but it should give an idea of how to approach the problem.
 
+Fun fact: 48 hours before presenting the program (and the paper) to the jury, I've decided to re-write it from scratch. Finished it few hours before the presentation, caught a bit of sleep, then went to show it off. It went smoothly, but then again, teachers weren't that interested in the practical work, but rather in the paper and how you presented it.
+
 Lots of thanks for my late teacher, Sorin Babii (PhD), for the support.
 
 ## ALEX
