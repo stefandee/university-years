@@ -1,0 +1,167 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = N2Client.exe
+OBJFILES = N2Client.obj Main.obj about.obj RemoteMachine.obj Console.obj Servers.obj \
+  ..\COMMON\Basepath.obj ..\COMMON\Defs.obj
+RESFILES = N2Client.res
+RESDEPEN = $(RESFILES) Main.dfm about.dfm Console.dfm Servers.dfm
+LIBFILES =
+LIBRARIES = VCLX35.lib bcbsmp35.lib VCL35.lib
+SPARELIBS = VCL35.lib bcbsmp35.lib VCLX35.lib
+DEFFILE =
+PACKAGES = VCLX35.bpi VCL35.bpi VCLDB35.bpi VCLDBX35.bpi bcbsmp35.bpi dclocx35.bpi \
+  QRPT35.bpi ppower.bpi
+# ---------------------------------------------------------------------------
+PATHCPP = .;..\COMMON
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -Od -Hc -w -Ve -r- -k -y -v -vi- -c -b- -w-par -w-inl -Vx -tW
+CFLAG2 = -I..\common;..\server;..\..\..\..\..\bin\borland\cbuilder3\bin;$(BCB)\include;$(BCB)\include\vcl \
+  -H=$(BCB)\lib\vcl35.csm
+CFLAG3 = -Tkh30000
+PFLAGS = -U..\common;..\server;..\..\..\..\..\bin\borland\cbuilder3\bin;..\..\..\..\ppower\comps;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -I..\common;..\server;..\..\..\..\..\bin\borland\cbuilder3\bin;$(BCB)\include;$(BCB)\include\vcl \
+  -$Y -$W -$O- -v -JPHN -M
+RFLAGS = -i..\common;..\server;..\..\..\..\..\bin\borland\cbuilder3\bin;$(BCB)\include;$(BCB)\include\vcl
+AFLAGS = /i..\common /i..\server /i..\..\..\..\..\bin\borland\cbuilder3\bin \
+  /i$(BCB)\include /i$(BCB)\include\vcl /mx /w2 /zd /d_RTLDLL /dUSEPACKAGES
+LFLAGS = -L..\common;..\server;..\..\..\..\..\bin\borland\cbuilder3\bin;..\..\..\..\ppower\comps;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -aa -Tpe -x -Gn -v
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0w32.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=1
+MajorVer=1
+MinorVer=0
+Release=0
+Build=19
+Debug=1
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=Karg's home
+FileDescription=Neural Network client
+FileVersion=1.0.0.19
+InternalName=N2Client
+LegalCopyright=(c) Karg 1999
+LegalTrademarks=
+OriginalFilename=N2Client
+ProductName=Neural Network Client
+ProductVersion=1.0.0.0
+Comments=The w95 client. Buy Pure Power from Piron !
+
+[Excluded Packages]
+C:\HOME\PPOWER\Comps\ppower.bpl=C:\HOME\PPOWER\Comps\ppower
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------

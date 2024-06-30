@@ -1,0 +1,360 @@
+                    Lucrarea nr.2
+
+               STRUCTURI DE DATE FUNDAMENTALE
+
+
+     1.Scopul lucrarii: ilustrarea principalelor tipuri de date 
+structurate: tabloul, articolul, multimea si secventa, precum si 
+a unor operatii definite asupra acestora.
+     
+     2. Aspecte teoretice
+     
+     2.a. Tipul de date abstract tablou
+     Tabloul reprezinta o secventa de elemente de acelasi tip, 
+numit tip de baza. Accesul la elemente se realizeaza cu ajutorul 
+unui index asociat, care trebuie sa apartina unui tip ordinal
+finit. Indexul precizeaza pozitia unui element in cadrul tablo-
+ului.
+     Notatii utilizate:
+     TipElement - tipul fiecarui element al tabloului (tipul de
+baza);
+     a - tablou unidimensional;
+     i - index;
+     e - obiect (valoare) de tip TipElement.
+     Operatii elementare:
+     DepuneTablou(a,i,e) - procedura care depune valoarea lui e 
+in cel de-al i-lea element al lui a;
+     FurnizeazaTablou(a,i) - functie care returneaza valoarea
+celui de-al i-lea element al tabloului a.
+     Implementarea structurii si a operatiilor in Pascal:
+     CONST NumarMaxElem=10;
+     TYPE TipElement=...;
+          TipIndex=1..NumarMaxElem;
+     TipTablou=ARRAY[TipIndex] OF TipElement; {tipul
+                                                    tablou}
+     VAR i:TipIndex;
+         a:TipTablou; {structura de date de tip tablou}
+         e:TipElement;
+     DepuneTablou(a,i,e) - a[i]:=e;
+     FurnizeazaTablou(a,i) - a[i].
+     Tipul tablou este un tip structurat fundamental, deoarece 
+este definit direct in limbaj, avind ca suport hardware 
+adresarea indexata.
+     Una dintre operatiile cele mai frecvente care se executa 
+asupra tablourilor este cautarea, adica verificarea existentei 
+in tablou a unui element dat. In continuare vor fi descrise 
+citeva dintre tehnicile de cautare cele mai utiliza
+te.
+     Problema cautarii consta de fapt in a determina cel mai mic 
+indice i pentru care a[i]=x, unde x este o valoare apartinind 
+lui TipElement. In continuare vom considera ca TipIndex este
+tipul subdomeniu 1..N (N>0).
+
+     2.a.1. Cautarea liniara
+     Se compara pe rind elementele tabloului cu x pina cind, fie 
+se gaseste egalitatea a[i]=x, fie s-a ajuns la sfirsitul
+tabloului.
+     procedure CautareLiniara;
+       var i:1..N;
+       begin
+         i:=1;
+         while (a[i]<>x) and (i<N) do i:=i+1;
+         if a[i]<>x then {nu exista elementul cautat}
+         else {elementul cautat este pe pozitia i}
+       end;
+     
+     2.a.2. Tehnica fanionului
+     Tabloul a se prelungeste cu inca un element (fanion) caruia 
+i se asigneaza valoarea x, apoi se aplica metoda de cautare 
+liniara. Avantajul acestei metode consta in simplificarea condi-
+tiei de ciclare, in sensul ca nu mai este nevoie sa se verifice 
+daca indicele nu depaseste dimensiunea tabloului, deoarece in 
+tablou exista sigur cel putin un element cu valoarea cautata.
+     procedure Fanion;
+       var a:ARRAY [1..N+1] of TipElement;
+           i:1..N+1;
+       begin
+         i:=1;a[N+1]:=x;
+         while a[i]<>x do i:=i+1;
+         if i>N then {nu exista elementul cautat}
+         else {elementul cautat se afla pe pozitia i}
+       end;
+     
+     2.a.3. Cautarea binara (logaritmica)
+     Se aplica pentru tablouri ordonate, principiul ei constind 
+in injumatatirea repetata a intervalului in care se cauta 
+elementul dorit. Aceasta tehnica are avantajul rapiditatii: 
+numarul de comparatii necesare este cel mult log2(N).
+     procedure CautareBinara;
+       var s,d,m: Integer;
+       begin
+         s:=1; d:=N;
+         {if (x<=a[d]) and (x>=a[s]) then begin}
+         repeat
+           m:=(s+d) div 2;
+           if x>a[m] then s:=m+1
+                     else d:=m-1
+         until (a[m]=x) or (s>d);
+         if a[m]=x then {elementul cautat se afla pe pozitia
+                              m}
+         else {nu exista elementul cautat}
+       end;
+     Necesitatea ca tabloul sa fie ordonat implica faptul ca 
+elementele sale au o componenta (cheie) ce apartine unui tip 
+scalar, iar cautarea se face dupa aceasta componenta. Uneori     
+se foloseste un alt mod de calcul al lui d, astfel incit se 
+simplifica conditia de ciclare.
+
+     2.a.4.Cautare binara performanta
+     procedure CautareBinaraPerform;
+       begin
+         s:=1; d:=N+1;
+         repeat
+           m:=(s+d) div 2;
+           if x>a[m] then s:=m+1
+           else d:=m
+         until s>=d;
+         if d>N then {nu exista elementul cautat}
+         else if x=a[d] then {elementul cautat se afla pe
+          pozitia d}
+         else {nu exista elementul cautat}
+       end;
+     
+     2.a.5. Cautarea prin interpolare
+     Este similara cu cautarea binara, dar foloseste o alta 
+formula pentru calculul lui "m", si anume:
+     m:=s+(x-a[s])*(d-s) div (a[d]-a[s])
+ceea ce conduce la o delimitare mai rapida a zonei din tablou in 
+care s-ar putea gasi x. Ca principiu, metoda este inspirata dupa 
+procedeul cautarii intr-o carte de telefon.
+
+     procedure CautareInterpolare;
+       var s,d,m: Longint;
+       begin
+         s:=1; d:=N;
+         {if (x<=a[d]) and (x>=a[s]) then begin}
+         repeat
+           m:=s+(x-a[s])*(d-s) div (a[d]-a[s])
+           if x>a[m] then s:=m+1
+                     else d:=m-1
+         until (a[m]=x) or (s>=d) or (a[s]=a[d]) or (x<a[s]) or (x>a[d]);
+         if a[m]=x then {elementul cautat se afla pe pozitia
+                              m}
+         else {nu exista elementul cautat}
+       end;
+
+     Aceasta metoda este eficienta in cazul in care N este
+foarte mare si valorile elementelor tabloului au o distributie 
+uniforma in intervalul a[1],...,a[N]. Numarul de cautari in 
+acest caz este de ordinul lg(lgN).
+     Aplicarea cautarii prin interpolare necesita ca elementul 
+de cautat, x, sa se afle in interiorul intervalului a[1],..,a[N],
+altfel apare riscul ca valoarea calculata a lui "m" sa depaseas-
+ca N.
+
+     2.b. Tipul de date abstract articol
+     Articolul este o structura alcatuita dintr-o colectie 
+finita de elemente, numite cimpuri, care pot sa apartina unor 
+tipuri diferite. Accesul la cimpuri se realizeaza prin 
+intermediul identificatorilor acestora.
+     Notatii utilizate:
+     a - articol;
+     id - numele (identificatorul) unui cimp;
+     e - obiect care are acelasi tip cu cimpul id din articolul 
+a.
+     Operatii elementare:
+     DepuneArticol(a,id,e) - procedura care memoreaza valoarea 
+lui e in cimpul id al lui a;
+     FurnizeazaArticol(a,id) - functie care returneaza valoarea 
+cimpului id din a.
+     Implementarea structurii si a operatiilor in Pascal:
+     TYPE t1=...;
+          t2=...;
+             .
+                 {tipuri de cimpuri}
+          tn=...;
+     TipArticol=RECORD
+          i1:t1;
+          i2:t2;
+            .
+            .
+          in:tn
+         end;
+     VAR a:TipArticol;
+     DepuneArticol(a,id,e) - a.id:=e;
+     FurnizeazaArticol(a,id) - a.id
+     In practica apar situatii in care este convenabil ca doua 
+tipuri simple sa fie considerate variante ale aceluiasi tip. 
+Pentru identificarea variantei actuale se introduce o componenta 
+numita discriminator de tip sau cimp selector. Structura de date
+utilizata in acest caz este articolul cu variante.
+     Se recomanda ca operatiile de prelucrare a variantelor 
+individuale sa fie grupate cu ajutorul instructiunilor selective 
+"case".
+
+     2.c. Tipul de date abstract multime
+     Multimea este o structura alcatuita din elemente ce apartin 
+unui tip ordinal finit (tipul de baza) si sint membre ale unei 
+multimi matematice.
+     Notatii utilizate:
+     TipElement - tipul de baza;
+     S,T,V - multimi cu elemente de tip TipElement;
+     e - obiect (valoare) de tip TipElement;
+     b - valoare booleana.
+     Operatii elementare:
+     DepuneMultime(S,T) - procedura care copiaza multimea T      
+     EgalitateMultime(S,T) - functie care returneaza TRUE      
+daca S=T;
+     ApartineMultime(S,e) - functie care returneaza TRUE      
+daca e este membru al lui S;
+     Submultime(S,T) - functie care returneaza TRUE daca S este 
+o submultime a lui T;
+     Reuniune(S,T) - functie care returneaza multimea rezultata 
+prin reuniunea lui S si T;
+     Intersectie(S,T) - functie care returneaza multimea 
+rezultata prin intersectia lui S si T;
+     Diferenta(S,T) - functie care returneaza multimea rezultata 
+prin diferenta dintre S si T;
+     MultimeVida(S) - procedura care-l face pe S multime vida;
+     CreazaMultime(e) - functie care returneaza multimea formata 
+numai din elementul e.
+     Implementarea structurii si a operatiilor in Pascal:
+     TYPE TipElement=...;
+          TipMultime=SET OF TipElement;
+     VAR S,T,V:TipMultime;
+         e:TipElement;
+         b:Boolean;
+     ApartineMultime(S,e) - b:=(e in S);
+     Submultime(S,T) - b:=(S<=T);
+     Reuniune(S,T) - V:=S+T;
+     Intersectie(S,T) - V:=S*T;
+     Diferenta(S,T) - V:=S-T;
+     MultimeVida(S) - S:=[];
+     CreazaMultime(e) - S:=[e].
+
+     2.d. Tipul de date abstract secventa
+     Secventa este o structura formata din elemente de acelasi 
+tip (tipul de baza). Accesul la elemente este secvential si se 
+efectueaza cu ajutorul unui pointer, la un moment dat fiind 
+accesibil un singur element. Pointerul atasat
+secventei indica intotdeauna urmatorul element la care se 
+poate realiza accesul.
+     Notatii utilizate:
+     TipElement - tipul de baza; nu poate fi un tip secventa;
+     f - secventa;
+     e - obiect de tip TipElement;
+     b - valoare booleana.
+     Operatii elementare:
+     Rescrie(f) - procedura care pozitioneaza pointerul asociat 
+pe inceputul secventei f si pregateste secventa pentru scriere;
+     DepuneSecventa(f,e) - pentru secventa f, deschisa in 
+scriere, procedura copiaza valoarea lui e in elementul urmator 
+al secventei si avanseaza pointerul asociat;
+     ResetSecventa(f) - procedura care muta pointerul asociat pe 
+inceputul secventei f si pregateste secventa pentru consultare;
+     EOF(f) - functie care returneaza valoarea TRUE daca 
+pointerul asociat secventei f indica sfirsitul acesteia 
+(marcherul de sfirsit de fisier);
+     FurnizeazaSecventa(f,e) - pentru secventa f, deschisa in 
+consultare, procedura furnizeaza in e urmatorul element al 
+secventei si avanseaza pointerul asociat, atita vreme cit EOF(f) 
+este FALSE.
+     TYPE TipElement=...;
+     TipSecventa=FILE OF TipElement;
+     VAR f:TipSecventa;
+         e:TipElement;
+     Rescrie(f) - Rewrite(f);
+     DepuneSecventa(f,e) - Write(f,e);
+     ResetSecventa(f) - Reset(f);
+     EOF(f) - Eof(f);
+     FurnizeazaSecventa(f,e) - Read(f,e).
+
+     3. Aplicatii
+     3.1 Se considera o structura de date tablou de dimensiune N. Se 
+cere sa se realizeze un program interactiv care implementeaza 
+urmatoarele operatii:
+  - creaza in mod interactiv tabloul;
+  - afiseaza continutul acestuia;
+  - cauta un element precizat prin urmatoarele tehnici:
+      -cautare liniara
+      -tehnica fanionului
+      -cautare binara
+      -cautare binara performanta
+      -cautare prin interpolare;
+  - evaluare performante ( se masoara timpii de cautare pentru aceeasi secventa
+aleatoare de valori, pentru toate tehnicile ).
+ 
+     3.2. Se considera urmatoarele structuri de date:
+  TYPE Alfa=string[20];
+       Data=RECORD
+         zi:1..31;
+         luna:1..12;
+         an:1900..2000
+       END;
+       Studii=(medii, superioare, doctorat );
+       TipProf=(economic, tehnic);
+       Angajat=RECORD
+         Nume,Prenume:Alfa;
+         DataNastere:Data;
+         Salariu:real;
+         CASE Pregatire:Studii OF
+           medii:(MediaBac:Real);
+           superioare:(NotaStat:Integer);
+           doctorat:(Profil:TipProf)
+      END;
+   VAR Angajati=ARRAY[1..N] OF Angajat;
+     Se cere sa se realizeze un program interactiv care
+implementeaza urmatoarele operatii:
+     -creaza in mod interactiv tabloul Angajati pentru un numar
+precizat de persoane;
+     -cauta in tablou o persoana dupa un nume precizat si ii
+afiseaza caracteristicile;
+     -afiseaza la cerere numarul si salariul mediu al angajatilor cu studiile
+si limita superioara de virsta precizate;
+     -sterge o persoana din tablou dupa urmatoarea tehnica: aduce
+ultima persoana in locul celei sterse si decrementeaza contorul
+de persoane.
+
+     2.3. Se considera TDA multime avind ca
+elemente litere ale alfabetului. Se cere sa se realizeze un
+program interactiv care efectueaza operatii cu multimi.
+Programul va accepta de la terminal elementele
+multimilor implicate si operatorul specific, va efectua
+operatia si va vizualiza rezultatul. Se vor implementa
+urmatoarele operatii:
+     -reuniunea a doua multimi;
+     -diferenta a doua multimi;
+     -intersectia a doua multimi;
+     -testul de egalitate a doua multimi;
+     -comparatie subset (<=);
+     -comparatie superset (>=);
+     -testul de membru al multimii.
+ Exemplu de vizualizare:
+  OPERATIA REUNIUNE
+  ['a','b','c','d','e'] + ['c','e','f'] =
+   ['a','b','c','d','e','f']
+  OPERATIA TEST MEMBRU MULTIME
+  'd' IN ['a','b','c','d','e'] = TRUE
+
+Programul se va scrie in C++, iar TDA multime va fi implementat ca si clasa,
+in doua variante:
+  a) folosind ca structura de date, o variabila long unsigned;
+  b) folosind ca structura de date un tablou boolean.
+Se vor compara timpii de executie ai operatorilor multimii in cele doua imple-
+mentari.
+
+     2.4. Se considera o structura de date de tip secventa ale
+carei componente sint articole cu urmatoarea structura:
+          Nod = RECORD
+                      Grad : Integer;
+                      Sinus : Real
+                END;
+    Structura contine sinusurile unghiurilor cuprinse intre 1
+grad si 90 grade cu pasul 1. Se cere:
+      -sa se creeze in mod dinamic structura de date;
+      -sa se reciteasca componentele secventei si sa se
+calculeze suma cimpurilor "Sinus";
+      -sa se creeze o alta secventa cu aceeasi structura de
+noduri, in care valorile cimpurilor fiecarui element sint mediile
+aritmetice ale cimpurilor apartinind la doua componente
+consecutive ale primei secvente.

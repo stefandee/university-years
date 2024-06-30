@@ -1,0 +1,109 @@
+
+[PRINT 'si READ]
+
+PRINT prime'ste un singur argument pe care ^il evalueaz'a 'si ^il
+tip'are'ste pe o linie nou'a. Urm'atorul exemplu afi'seaz'a p'atratele
+numerelor ^intregi p^an'a c^and ^il oprim:
+
+(defun bore-me ()
+  (do ((n 0 (+ n 1)))
+      (nil)
+      (print (* n n))))
+
+(bore-me)
+  0
+  1
+  4
+  9
+  ...
+
+PRINT returneaz'a valoarea argumentului.
+
+C^and ^int^alne'ste (READ), interpretorul LISP se opre'ste 'si
+a'steapt'a ca utilizatorul s'a scrie o expresie. Aceast'a expresie,
+f'ar'a evaluare, devine valoarea lui (READ).
+
+Din cauz'a c'a READ nu afi'seaz'a nimic pentru a indica faptul c'a
+a'steapt'a o expresie la intrare, este o practic'a bun'a s'a folosim
+^inainte PRINT pentru a semnala c'a se a'steapt'a un r'aspuns.
+
+[Conven'tii pentru simboluri speciale]
+
+C^ateodat'a este util s'a avem simboluri ce con'tin caractere speciale
+(spa'tii, paranteze etc.)
+Acest lucru se realizeaz'a prin plasarea de bare verticale ^in jurul
+simbolului:
+
+(setq simbol1 '|(| )
+  |(|
+
+(setq simbol2 '|un simbol| )
+  |un simbol|
+
+(print simbol1)
+  |(|
+  |(|
+
+(print simbol2)
+  |un simbol|
+  |un simbol|
+
+Dac'a dorim un simbol neutilizat, putem genera simboluri noi cu
+GENSYM.
+
+(GENSYM)
+  G1
+
+(GENSYM)
+  G2
+
+[TERPRI, PRIN1 'si PRINC]
+
+TERPRI ^incepe o linie nou'a.
+
+PRIN1 seam'an'a cu PRINT dar nu afi'seaz'a pe o linie nou'a 'si nu
+scrie un spa'tiu la sf^ar'sit.
+
+PRINC este asem'an'ator cu PRIN1 dar nu v'a afi'sa nici o bar'a
+vertical'a dac'a exist'a.
+
+(print simbol2)
+  |un simbol|
+  |un simbol|
+
+(prin1 simbol2)|un simbol|
+  |un simbol|
+
+(princ simbol2)un simbol
+  |un simbol|
+
+[Probleme]
+
+1. Scrie'ti o procedur'a PRETTY-PRINT care prime'ste un argument
+(list'a generalizat'a), 'si ^il afi'seaz'a dup'a regula:
+
+(<element-1> <element-2>
+             <element-3>
+             ...
+             <element-n>)
+
+Orice element care este la r^andul lui list'a, va fi afi'sat ^in
+acela'si fel recursiv.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

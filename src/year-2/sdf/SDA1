@@ -1,0 +1,426 @@
+
+
+
+				Lucrarea nr. 1 
+
+
+	1.Definitia unui tip de date abstract - TDA
+
+	Un TDA este un model matematic  cu  o  colectie  de operatori definiti 
+pe el.
+	Intr-un TDA, operatorii pot avea ca operanzi nu numai instante ale 
+TDA-ului respectiv, ci si ale altui TDA, dupa cum rezultatul poate fi o instanta 
+a oricarui TDA, dar cel putin un operand sau rezultatul trebuie sa apartina 
+TDA-ului respectiv.
+	Un TDA "incapsuleaza" un tip de date, in sensul ca definitia si toti 
+operatorii tipului pot fi localizati intr-o sectiune a programului, astfel incit 
+metoda de implementare a TDA-ului poate fi modificata usor, aceasta implicind 
+doar rescrierea operatorilor tipului, restul programului raminind nemodificat.
+	In afara sectiunii unde este definit, TDA-ul poate fi privit ca un tip 
+primitiv.
+	O implementare a unui TDA este "traducerea" intr-un limbaj de programare 
+a declaratiei unei variabile a TDA si, prin cite o procedura, a fiecarui 
+operator al TDA; o implementare foloseste o anumita structura de date pentru
+reprezentarea TDA.
+	Notiunile tip de date, structura de date si tip de date abstract, desi 
+asemanatoare, au intelesuri diferite.
+	Intr-un limbaj de programare, tipul de date al unei variabile reprezinta
+setul (multimea) de valori pe care le poate lua variabila respectiva.
+	Daca un algoritm se elaboreaza folosind pseudocodul si tipuri de date 
+abstracte, pentru implementarea algoritmului intr-un limbaj de programare, 
+TDA-urile trebuie reprezentate in termenii tipurilor de date si a operatorilor 
+definiti in limbajul respectiv. Pentru implementarea unui model matematic 
+reprezentind un TDA, se folosesc structuri de date, care sint colectii de 
+variabile, ce pot fi de tipuri diferite.
+
+	2.Timpul de executie al unui program
+
+	De multe ori, pentru rezolvarea unei probleme, trebuie ales un 
+algoritm dintre mai multi posibili, doua criterii principale de alegere fiind 
+contradictorii:
+	(1)algoritmul sa fie simplu de inteles, de codificat si de depanat;
+	(2)algoritmul sa foloseasca eficient resursele calculatorului, sa aiba 
+un timp de executie redus.
+	Daca programul care se scrie trebuie rulat de un numar mic de ori, prima 
+cerinta este mai importanta; in aceasta situatie, timpul de punere la punct a 
+programului e mai important decit timpul lui de rulare, deci trebuie aleasa 
+varianta cea mai simpla a programului.
+	Daca programul urmeaza a fi rulat de un numar mare de ori, avind si un 
+numar mare de date de prelucrat, trebuie ales algoritmul care duce la o executie 
+mai rapida. Chiar in aceasta situatie, ar trebui implementat mai inainte 
+algoritmul mai simplu si calculata reducerea de timp de executie pe care ar 
+aduce-o implementarea algoritmului complex.
+	Timpul de rulare al unui program depinde de urmatorii factori:
+	-datele de intrare
+	-calitatea codului generat de compilator
+	-natura si viteza de executie a instructiunilor programului
+	-complexitatea algoritmului care sta la baza programului.
+	Deci timpul de rulare e o functie de intrarea sa, de cele mai multe ori, 
+nedepinzind de valorile de la intrare, ci de numarul de date. 
+	Se noteaza cu T(n) timpul de rulare al unui program, ale carui date de 
+intrare au dimensiunea n.De exemplu T(n) poate fi cn^2, unde c este o constanta.
+	Daca timpul de rulare depinde de valorile datelor de la intrare, in 
+calculul lui T(n) se va lua in considerarea situatia cea mai defavorabila, cea 
+care duce la timpul cel mai mare.
+	Cum timpul de rulare depinde nu numai de intrare (n) si de algoritm, 
+ci si de performantele calculatorului pe care se executa programul, T(n) se 
+apreciaza ca fiind proportional cu o anumita functie de n si nu se exprima in 
+unitati reale de timp, deci T(n)=cf(n).
+	Timpul T(n) de rulare al unui program, poate fi apreciat printr-o 
+functie O(f(n)), daca exista constantele pozitive c si n0, astfel incit 
+T(n)<=cf(n), oricare ar fi n>=n0. Functia O(f(n)) reprezinta aproximarea limitei 
+superioare a lui T(n) si se spune ca T(n) este O(f(n)), iar f(n) se numeste 
+limita superioara a ratei de crestere a lui T(n).
+
+	Exemplul 1.1
+T(n)=3n^3+2n^2 este O(n^3), pentru ca 3n^3+2n^2<=5n^3, pentru orice n>=0.
+
+	Pentru specificarea limitei inferioare a ratei de crestere a
+lui T(n), se foloseste functia @(g(n)) si se spune T(n) este @(g(n)), 
+insemnind ca exista constanta pozitiva c, astfel incit T(n)>=cg(n), pentru o 
+infinitate de valori ale lui n.
+
+	Exemplul 1.2 
+T(n)=n^3+2n^2 este @(n^3), pentru ca pentru c=1, T(n)=n^3+2n^2>=n^3, pentru o 
+infinitate de valori ale lui n, cele n>=0.
+
+	In comparatia intre timpii de rulare ai diferitelor programe (sau a 
+diferitelor variante ale aceluiasi program), constantele de proportionalitate nu 
+pot fi intotdeauna neglijate. Spre exemplu, s-ar putea spune ca un program avind 
+O(n^2) este mai rapid decit unul cu O(n^3), dar, in cazul cind constantele ar fi 
+100, respectiv 5, al doilea program este mai rapid pentru n<20.
+	Exista urmatoarele cazuri cind rata de crestere a timpului de executie, 
+nu e cel mai bun criteriu de apreciere a performantelor unui algoritm:
+	-daca un program se ruleaza de putine ori, se alege algoritmul cel mai 
+usor de implementat;
+	-daca intretinerea trebuie facuta de o alta persoana decit cea care l-a 
+scris, un algoritm simplu,chiar mai putin eficient, e de preferat unuia 
+performant, dar foarte complex si greu de inteles;
+	-exista algoritmi foarte eficienti, dar care necesita un spatiu de 
+memorie foarte mare, astfel incit folosirea memoriei externe, le diminueaza 
+foarte mult performantele.
+	Inainte de prezentarea citorva reguli pentru determinarea timpului de 
+executie al unui program, se dau cele referitoare la suma si produsul functiei 
+O:
+	(1)Daca T1(n) si T2(n) sint timpii de executie a doua secvente de 
+program P1 si P2, T1(n) fiind O(f(n)), iar T2(n) fiind O(g(n)), atunci timpul 
+de executie T1(n)+T2(n), al secventei P1 urmata de P2, va fi O(max(f(n),g(n))).
+	Demonstratie:
+	Exista c1 si n1 astfel incit T1(n)<=c1f(n), pentru orice n>=n1 si
+	exista c2 si n2 astfel incit T2(n)<=c2g(n), pentru orice n>=n2.
+	Notind n0=max(n1,n2), pentru n>=n0
+	T1(n)+T2(n)<=c1f(n)+c2g(n)<=(c1+c2)max(f(n),g(n)).
+
+	Exemplul 1.3
+Avind trei secvente de program cu timpii O(n^3),O(n^2) si O(n*log n),
+conform regulii anterior prezentate, timpul total de executie a celor trei 
+secvente va fi O(max(max(n^3,n^2),n*log n))= O(max(n^3,n*log n))=O(n^3).
+
+	(2)Daca T1(n) este O(f(n)) si T2(n) este O(g(n)),atunci T1(n)T2(n) este 
+O(f(n)g(n)).
+	Citeva reguli generale pentru evaluarea timpului de executie, functie de 
+marimea n a datelor de intrare, sint:
+	(1)timpul de executie a unei instructiuni de asignare, citire sau 
+scriere, este O(1);
+	(2)timpul de rulare a unei secvente de instructiuni e determinat de 
+regula de insumare, fiind proportional cu cel mai lung timp din cei ai 
+instructiunilor secventei;
+	(3)timpul de executie a unei instructiuni if-then-else este suma dintre 
+timpul de evaluare a conditiei (O(1)) si cel mai mare dintre timpii de executie 
+ai instructiunilor pentru conditie adevarata sau falsa;
+	(4)timpul de executie a unei instructiuni de ciclare este suma, pentru 
+toate iteratiile, dintre timpul de executie a corpului instructiunii si cel de 
+evaluare a conditiei de terminare (O(1));
+	(5)pentru evaluarea timpului de executie a unei proceduri recursive, se 
+asociaza fiecarei proceduri recursive un timp necunoscut T(n), unde n masoara 
+argumentele procedurii; se poate obtine o relatie recurenta pentru T(n), adica 
+o ecuatie pentru T(n), in termeni T(k), pentru diferite valori ale lui k;
+	(6)timpul de executie poate fi analizat chiar pentru programele scrise 
+in pseudocod; pentru secventele care cuprind operatii asupra unor TDA, se pot 
+alege citeva implementari si astfel se poate face comparatie intre performantele 
+implementarilor, in contextul aplicatiei respective.
+
+	Exemplul 1.4
+Mai jos se prezinta modul de evaluare a timpului de executie a procedurii de 
+sortare a elementelor unui tablou de dimensiune n prin metoda "bubble":
+  type int_array=array[1..n] of integer;
+  procedure bubble(var a:int_array); {sortare crescatoare}
+    var i,j,temp:integer;
+    begin
+  (1) for i:=1 to n-1 do
+  (2)   for j:=n downto i+1 do
+  (3)     if a[j-1]>a[j] then begin
+  (4)       temp:=a[j-1];
+  (5)       a[j-1]:=a[j];
+  (6)       a[j]:=temp
+	  end
+    end; {bubble}
+	Timpii de rulare pentru instructiunile de asignare (4),(5) si (6) sint 
+O(1), deci pentru secventa (4)-(6), timpul este O(max(1,1,1))=O(1).
+	Pentru instructiunea if-then (3), timpul este suma dintre cel pentru 
+evaluarea conditiei, O(1) si cel al secventei ce se executa la conditie 
+adevarata, tot O(1), calculat mai sus, deci O(1), acesta fiind deci si timpul 
+pentru o iteratie a instructiunii for (2).
+	Pentru cele n-i iteratii ale lui for (2), timpul de executie este 
+O((n-i)*1)=O(n-i).
+	Pentru instructiunea for (1), avind n-1 iteratii, timpul de executie 
+este:
+	S(i=1,n-1)(n-i)=(n-1)+(n-2)+...+(n-n+1)=n^2/2-n/2,
+deci este O(n^2).
+
+	Exemplul 1.5
+Modalitatea de evaluare a timpului de executie al unei proceduri recursive, 
+este ilustrata prin cea a functiei de calcul al factorialului:
+  function factorial(n:integer):integer;
+    begin
+  (1) if n<=1 then
+  (2)   factorial:=1
+      else
+  (3)   factorial:=n*factorial(n-1)
+    end; {factorial}
+	Dimensiunea intrarii este aici n, valoarea numarului al carui factorial 
+se calculeaza si se noteaza cu T(n), timpul de rulare al functiei factorial(n).
+	Timpul de rulare pentru liniile (1) si (2) este O(1), iar pentru 
+linia (3) este O(1)+T(n-1), deci cu constantele c si d neprecizate:
+     T(n)=c+T(n-1), pentru n>1 sau
+     T(n)=d       , pentru n<=1.
+Pentru n>2, expandind pe T(n-1), se obtine
+	T(n)=2c+T(n-2), pentru n>2.
+Pentru n>3, expandind pe T(n-2), se obtine
+     T(n)=3n+T(n-3), pentru n>3.
+Deci, in general
+	T(n)=ic+T(n-i), pentru n>i.
+In final, cind i=n-1, se obtine
+	T(n)=(n-1)c+T(1)=(n-1)c+d.
+Deci T(n) este O(n).
+
+	3.Citeva recomandari
+
+	Disciplinele SDTPA si PAA prezinta o serie de TDA, cu implementari ale 
+fiecarui tip, precum si algoritmi si aplicatii specifici tipurilor, dar si unor 
+implementari particulare.
+	Pe parcursul lucrarilor de laborator, se vor urmari performantele 
+TDA-urilor si ale implementarilor lor in aplicatii diverse, atit printr-o 
+evaluare a lor in termenii functiei O, cit si prin masurarea efectiva a 
+timpilor de executie.
+	Pentru generalitatea programelor scrise si posibilitatea de comparatie 
+intre implementarile aceluiasi TDA, e indicat ca in elaborarea programelor, 
+ultima detaliere sa se faca asupra TDA, pentru "incapsularea" TDA se propun 
+variantele:
+	(1)specificarea unui TDA ca obiect in Pascal, respectiv clasa in C++, 
+metodele publice fiind identice indiferent de implementare;
+	(2)implementarile unui TDA sa se faca prin unit-uri Pascal cu aceeasi 
+interfata; pentru abordarea limbajului C, se recomanda ca operatorii unui TDA 
+(functiile) sa se defineasca intr-un fisier separat si sa aiba aceleasi 
+prototipuri, grupate intr-un fisier header, indiferent de varianta de 
+implementare a tipului. 
+	Pentru exemplificare se prezinta mai jos implementarea TDA durata cu
+operatorii starton si startoff care ,intercalind o secventa de program, cel
+de-al doilea returneaza durata ( in secunde ) de executie a secventei.
+
+(1)
+unit timer1;   { fisierul timer1.pas }
+  interface
+    procedure starton;
+    function startoff:real;
+
+  implementation
+    uses dos;
+    var aux:real;
+    function secunde:real;
+      var h,m,s,ms:word;
+      begin
+	gettime(h,m,s,ms);
+	secunde:=3600*h+60*m+s+ms/100
+      end;
+    procedure starton;
+      begin
+	aux:=secunde
+      end;
+    function startoff;
+      begin
+	startoff:=secunde-aux
+      end;
+end.
+
+Exemplu de utilizare:
+
+uses timer1;   { fisierul ttimer1.pas}
+  var timp:real;
+      i,j:integer;
+  begin
+    starton;
+    for i:=1 to 2000 do for j:=1 to 2000 do if odd(i) then i:=i;
+    timp:=startoff;
+    writeln(timp:0:4)
+  end.
+
+(2)
+unit timer2;  { fisierul timer2.pas }
+
+  interface
+    type
+    durata=object
+      procedure starton;
+      function startoff:real;
+	   private
+      aux:real;
+      function secunde:real;
+    end;
+
+  implementation
+    uses dos;
+    function durata.secunde;
+      var h,m,s,ms:word;
+      begin
+	gettime(h,m,s,ms);
+	secunde:=3600*h+60*m+s+ms/100
+      end;
+    procedure durata.starton;
+      begin
+	aux:=secunde
+      end;
+    function durata.startoff;
+      begin
+	startoff:=secunde-aux
+      end;
+end.
+
+Exemplu de utilizare:
+
+uses timer2;  { fisierul ttimer2.pas }
+  var timp:real;
+      timpexec:durata;
+      i,j:integer;
+  begin
+    timpexec.starton;
+    for i:=1 to 2000 do for j:=1 to 2000 do if odd(i) then i:=i;
+    timp:=timpexec.startoff;
+    writeln(timp:0:4)
+  end.
+
+(3)
+#include <time.h>  /* fisierul timer1.c */
+
+clock_t aux;
+void starton(void){
+  aux=clock();
+}
+float startoff(void){
+  return (clock()-aux)/CLK_TCK;
+}
+
+void starton(void);  /* fisierul timer1.h */
+float startoff(void);
+
+Exemplu de utilizare:
+
+#include <stdio.h>   /* fisierul ttimer1.c */
+#include <timer1.h>
+
+void main(void){
+  float timp;int i,j;
+  starton();
+  for(i=1;i<=2000;i++)
+    for(j=1;j<=2000;j++)
+      if(i%2)i=i;
+  timp=startoff();
+  printf("%f",timp);
+}
+
+(4)
+#include <time.h>  // fisierul timer2.h
+
+class durata{
+  protected:
+    clock_t aux;
+  public:
+    void starton(void);
+    float startoff(void);
+};
+
+#include <time.h>  // fisierul timer2.cpp
+#include <timer2.h>
+
+void durata::starton(void){
+  aux=clock();
+}
+float durata::startoff(void){
+  return (clock()-aux)/CLK_TCK;
+}
+
+Exemplu de utilizare:
+
+#include <stdio.h>  / fisierul ttimer2.cpp
+#include <timer2.h>
+
+void main(void){
+  durata timpexec;
+  float timp;int i,j;
+  timpexec.starton();
+  for(i=1;i<=2000;i++)
+    for(j=1;j<=2000;j++)
+      if(i%2)i=i;
+  timp=timpexec.startoff();
+  printf("%f",timp);
+}
+
+	4.Aplicatii
+
+	4.1.Evaluati in termenii functiei O, timpii de rulare ai urmatoarelor 
+proceduri si functii:
+
+  procedure inmultire_matrici(n:integer); {inmulteste doua matrici
+					   patratice a si b}
+    var i,j,k:integer;
+    begin
+      for i:=1 to n do
+	for j:=1 to n do begin
+	  c[i,j]:=0;
+	  for k:=1 to n do
+	    c[i,j]:=c[i,j]+a[i,k]*b[k,j]
+	end
+    end;
+
+  procedure numere_impare(n:integer;var x,y:integer);
+    var i,j:integer;
+    begin
+      for i:=1 to n do
+	if odd(i) then begin
+	  for j:=i to n do
+	    x:=x+1;
+	  for j:=1 to i do
+	    y:=y+1
+	end
+    end;
+
+  function recursiva(n:integer):integer;
+    begin
+      if n<=1 then recursiva:=1
+      else recursiva:=recursiva(n-1)+recursiva(n-2)
+    end;
+
+	4.2.Functia max(i,n) returneaza cel mai mare element dintre cele n 
+aflate intre pozitiile i si i+n-1 ale matricii a.
+
+  function max(i,n:integer):integer;
+    var m1,m2:integer;
+    begin 
+      if n=1 then max:=a[i]
+      else begin
+	m1:=max(i,n div 2);
+	m2:=max(i+n div 2,n div 2+ n mod 2);
+	if m1<m2 then max:=m2
+	else max:=m1
+      end
+    end;
+
+	(a)Evaluati timpul T(n) de executie a functiei, in termenii functiei O.
+	(b)Scriind si varianta in C a functiei, masurati timpii de executie 
+pentru diferite valori ale lui n, utilizind toate cele patru variante de 
+masurare si comparati rezultatele cu evaluarea de la punctul (a).
+	Tabloul a se va crea aleatoriu, prin apeluri ale functiei random.
+	Se vor face masurari ale timpului de executie pentru mai multe valori 
+ale lui n, timpii stocindu-se intr-un fisier de rezultate ( se va lansa din
+DOS programul de test si se va redirecta iesirea spre fisierul de rezultate). 
+

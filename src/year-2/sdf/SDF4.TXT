@@ -1,0 +1,218 @@
+Lucrarea 4
+----------
+		Operatii la nivel de bit
+		------------------------
+
+1.Tabela de precedenta a operatorilor
+-------------------------------------
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+  #  Prioritate ³ Operator ³ Actiune
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+  1. Cea mai    ³    ()    ³ Apel de functie
+     ridicata   ³    []    ³ Selector tablou
+		³    ->    ³ Selector indirect de membru
+		³     .    ³ Selector direct de membru
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  2. Unar       ³     !    ³ Negare logica (NOT)
+		³     ~    ³ Complement de (1) pe bit
+		³     +    ³ Plus unar
+		³     -    ³ Minus unar
+		³    ++    ³ Preincrement sau postincrement
+		³    --    ³ Predecrement sau postdecrement
+		³     &    ³ Adresa
+		³     *    ³ Indirectare
+		³  sizeof  ³ (returneaza dimensiunea operandului, in octeti)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  3. Multipli-  ³     *    ³ Inmultire
+     cativ      ³     /    ³ Inpartire
+		³     %    ³ Rest (modulus)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  4. Aditiv     ³     +    ³ Plus binar
+		³     -    ³ Minus binar
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  5. Deplasare  ³    <<    ³ Shift left (deplasare stinga)
+		³    >>    ³ Shift right (deplasare dreapta)
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  6. Relational ³     <    ³ Mai mic
+		³    <=    ³ Mai mic sau egal
+		³     >    ³ Mai mare
+		³    >=    ³ Mai mare sau egal
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  7. Egalitate  ³    ==    ³ Egal cu
+		³    !=    ³ Diferit de
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  8.            ³     &    ³ SI pe bit
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  9.            ³     ^    ³ SAU EXCLUSIV pe bit
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 10.            ³     |    ³ SAU pe bit
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 11.            ³    &&    ³ SI logic
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 12.            ³    ||    ³ SAU logic
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 13. Conditional³    ?:    ³ (a ? x : y  inseamna "if a then x, else y")
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 14. Atribuire  ³     =    ³ Atribuire simpla
+		³    *=    ³ Atribuire produs
+		³    /=    ³ Atribuire cit
+		³    %=    ³ Atribuire rest (modulus)
+		³    +=    ³ Atribuire suma
+		³    -=    ³ Atribuire diferenta
+		³    &=    ³ Atribuire SI pe bit
+		³    ^=    ³ Atribuire SAU-EXCL. pe bit
+		³    |=    ³ Atribuire SAU pe bit
+		³   <<=    ³ Atribuire deplasare stinga
+		³   >>=    ³ Atribuire deplasare dreapta
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 15. Virgula    ³     ,    ³ Evalueaza
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+	Operatorii din cadrul aceleasi categorii au aceeasi prioritate.
+Operatorii unari, cel conditional si cei de atribuire sint asociativi de la
+dreapta la stinga, restul sint asociativi de la stinga la dreapta.
+
+2.Operatorii logici la nivel de bit
+------------------------------------
+	Acesti operatori se aplica unor intregi, adica obiecte de tipul
+char, short, int, long si corespondentilor lor fara semn (precedate de
+modificatorul de tip unsigned), iar rezultatele obtinute sint de asemenea
+intregi.
+	Un mod tipic de utilizare a operatorilor logici la nivel de bit este
+implementarea unei multimi ca vector de biti. In acest caz un bit dintr-un
+intreg fara semn reprezinta un element din multime, iar valoarea 1, rsp. 0 a
+unui bit semnifica prezenta, rsp. absenta elementului din multime. Numarul de
+elemente din multime este limitat de numarul de biti. In acest caz operatorul
+binar & este interpretat ca si intersectie, | ca si reuniune si ^ ca si dife-
+renta.
+Obs: Numarul intreg corespunzator unui element din multime (cind numai acesta
+este prezent) este puterea i a lui 2, unde i este pozitia bitului.
+
+3. Exemple
+----------
+
+1) Se considera urmatoarea secventa din "CTYPE.H":
+
+#define _IS_SP  1           /* is space */
+#define _IS_DIG 2           /* is digit indicator */
+#define _IS_UPP 4           /* is upper case */
+#define _IS_LOW 8           /* is lower case */
+#define _IS_HEX 16          /* [0..9] or [A-F] or [a-f] */
+#define _IS_CTL 32          /* Control */
+#define _IS_PUN 64          /* punctuation */
+
+    Se considera ca exista un tablou de caractere "_ctype[]", in care fiecarui 
+caracter din tabela ASCII ii corespunde un intreg ce ii specifica tipul. 
+
+  de ex. :- caracterul 'A' este un caracter litera mare si un caracter hexazeci-
+	   mal, deci  _ctype['A'+1]=0x14 ( 00010100 in binar, 20 in zecimal )
+	  - caracterul 'm' este un caracter litera mica, deci
+		      _ctype['m'+1]=0x08 ( 00001000 in binar, 8 in zecimal )
+	  - caracterul '1' este cifra si caracter zecimal, deci
+ 		      _ctype['0'+1]=0x12 ( 00010010 in binar, 18 in zecimal )
+	  - caracterul ' ' este caracter spatiu, deci
+    	      	      _ctype[' '+1]=0x01 ( 00000001 in binar, 1 in zecimal )
+          - caracterul ';' este caracter de punctuatie, deci
+		      _ctype[';'+1]=0x40 ( 01000000 in binar, 64 in zecimal )	
+    
+    Functiile isdigit(c), isalpha(c), s.a.m.d. sint implementate astfel:
+
+#define isalnum(c)  (_ctype[(c) + 1] & (_IS_DIG | _IS_UPP | _IS_LOW))
+#define isalpha(c)  (_ctype[(c) + 1] & (_IS_UPP | _IS_LOW))
+#define iscntrl(c)  (_ctype[(c) + 1] & _IS_CTL)
+#define isdigit(c)  (_ctype[(c) + 1] & _IS_DIG)
+#define islower(c)  (_ctype[(c) + 1] & _IS_LOW)
+#define ispunct(c)  (_ctype[(c) + 1] & _IS_PUN)
+#define isspace(c)  (_ctype[(c) + 1] & _IS_SP)
+#define isupper(c)  (_ctype[(c) + 1] & _IS_UPP)
+#define isxdigit(c) (_ctype[(c) + 1] & (_IS_DIG | _IS_HEX)) /* & are priori-
+					tate mai mare decit | */
+
+
+2) Sa se scrie o functie care returneaza un cimp de n biti, incepind cu
+pozitia p, totul aliniat la dreapta.
+ ex:     	n=3 biti
+	     ÚÄÁ¿
+
+    ÀÁÁÁÁÁÁÁÁÁÁÁÁÁÁÁÙ
+	     ³
+	    pozitia p=6
+
+ #  include <stdio.h>
+
+    unsigned getbits( unsigned x, int p, int n){
+       return ( x >> (p+1-n) ) & ~(~0 << n);
+    }
+    void main(){
+      unsigned x;
+      int p=6,n=3;
+      do{
+	printf("numar initial:");
+	scanf("%u",&x);
+	printf("valoarea extrasa: %u\n",getbits(x,p,n));
+      }while(x);
+    }
+
+   - secventa x >> (p+1-n) aliniaza bitii de extras la dreapta
+   - secventa ~(~0 << n) creaza masca de extragere, adica 000...0111
+								 ÀÂÙ
+								  n biti
+4.Probleme propuse
+------------------
+1) Sa se scrie o functie setbits, care returneaza pe x cu n biti incepind
+de la p pozitionati pe ultimii biti ai lui y.
+
+2) Se considera o multime de baza de dimensiunea (cardinalitatea) M. Sa se
+scrie urmatoarele operatii(functii) asupra tipului multime, implementata ca si
+vector de biti (tablou de caractere):
+	- afisarea elementelor unei multimi date, unde pentru fiecare element
+prezent se afiseaza pozitia lui. Se va alege un mod sugestiv de afisare.
+	- reuniunea, intersectia, diferenta a doua multimi
+	- suprimarea, adaugarea unui element dintr-o, rsp. la o multime data
+Se va scrie un program care executa in mod repetat una din aceste operatii.
+
+3) Se considera un intreg pe patru octeti (tipul long), in care avem depusa
+informatia privind timpul sistemului.
+
+    unsigned    sec   : pe 5 biti;   /* Secundele numarate din doua in doua */
+    unsigned    min   : pe 6 biti;   /* Minute */
+    unsigned    hour  : pe 5 biti;   /* Ore */
+    unsigned    day   : pe 5 biti;   /* Zile */
+    unsigned    month : pe 4 biti;   /* Luni */
+    unsigned    year  : pe 7 biti;   /* An */
+
+    Sa se scrie un program care ofera in mod repetat urmatoarele operatii:
+- afisarea datei si a timpului curent, prin interpretarea variabilei DATE_TIME
+de tip long int (initializata la inceputul programului) cu ajutorul functiei
+getbits
+- modificarea unei componente a datei sau al timpului cu ajutorul functiei
+setbits
+
+4) Se considera ca avem la dispozitie o zona rectangulara de memorie video, cu
+ny linii si nx coloane, salvata intr-un tablou bidimensional de caractere (un
+caracter reprezinta opt pixeli). Sa se implementeze urmatoarele functii:
+
+  - pune_pixel(x,y,cul) - pozitioneaza elementul din linia y, coloana x pe
+valoarea cul (1=aprins, 0=stins)
+  - linie_oriz(x1,x2,y,cul) - traseaza o linie orizontala in linia y intre
+coordonatele x1, x2 cu culoarea cul
+  - dreptunghi(x1,y1,x2,y2,cul) - traseaza un dreptunghi avind coltul stinga
+sus dat de x1,y1, rsp. coltul dreapta jos de x2,y2 cu culoarea cul
+  - drept_umpl(x1,y1,x2,y2,cul) - umple o zona dreptunghiulara cu culoarea cul
+
+ La un moment dat dispunem de o zona dreptunghiulara de biti cu Ny linii, Nx
+coloane, memorata intr-un tablou de caractere "imag_mem[Ny,Nx/8]". Sa se implemen-
+teze functiile:
+  - extrage_imagine(xstart,ystart,xend,yend,image), unde xstart, ystart, xend,
+yend sint coordonatele stinga sus, dreapta jos ale zonei din imag_mem pe care
+o copiem in tabloul image
+  - pune_imagine(xstart,ystart,image,mod), unde xstart, ystart preciseaza
+coordonatele coltului stinga sus al destinatiei (tabloul imag_mem), iar mod
+reprezinta modul de copiere:
+mod
+ÄÄÄÄÄÄÂÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+COPY_P³  0  ³ Copiaza sursa peste destinatie
+XOR_P ³  1  ³ SAU_EXCLUSIV al sursei cu destinatia
+OR_P  ³  2  ³ Adauga sursa peste destinatie (SAU)
+AND_P ³  3  ³ SI dintre sursa si destinatie
+NOT_P ³  4  ³ Copiaza inversa sursei

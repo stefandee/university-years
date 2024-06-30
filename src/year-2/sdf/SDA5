@@ -1,0 +1,353 @@
+                    Lucrarea nr. 5
+
+               TIPUL DE DATE ABSTRACT SIR
+
+
+     1.Scopul lucrarii: familarizarea cu TDA sir de caractere, cu
+metodele  de reprezentare ale acestuia si cu cele  mai  utilizate
+tehnici de cautare in siruri.
+     2.Aspecte teoretice
+     2.1.Definirea tipului de date abstract sir
+     Un    sir    este   o   secventa   finita    de    caractere
+(c1,c2,...,cn),unde  ci  este de tip caracter, iar  n  precizeaza
+lungimea   secventei.   Este  permis  si  cazul   n=0,   secventa
+corespunzatoare desemnind sirul vid.
+     TDA sir
+     a.Modelul matematic:secventa finita de caractere.
+     b.Notatii: s,sub,u - siruri
+                c - valoare de tip caracter
+                b - valoare booleana
+                poz,lung - intregi pozitivi
+     c.Operatori:
+CreazaSirVid(s) - procedura ce creaza sirul vid s;
+SirVid(s)-->b - functie ce returneaza true daca sirul e vid;
+Sircomplet(s) - functie booleana ce returneaza valoarea true daca
+sirul este complet;
+LungSir(s)-->lung  - functie ce returneaza numarul  de  caractere
+ale lui s;
+Pozitie(sub,s)-->poz  - functie care returneaza pozitia  la  care
+subsirul sub apare prima data in s; daca sub nu e gasit in s,  se
+returneaza  val 0; pozitiile caracterelor sint numerotate  de  la
+stinga la dreapta incepind cu 1;
+Concat(u,s)  -  procedura care concateneaza la  sfirsitul  lui  u
+atitea caractere din s, pina cind SirComplet(u) devine true;
+CopiazaSubsir(u,s,poz,lung)  - procedura care-l face pe  u  copia
+subsirului  din  s incepind cu pozitia poz, pe lungime  lung  sau
+pina  la  sfirsitul lui s; daca poz < 1 sau poz >  LungSir(s),  u
+devine sirul vid;
+StergeSir(s,poz,lung)  - procedura care sterge din s,incepind  cu
+pozitia  poz, subsirul de lung caractere; pentru  poz invalid,  s
+ramine nemodificat;
+InsereazaSir(sub,s,poz)  - procedura care insereaza in s,  de  la
+pozitia poz, sirul sub;
+FurnizeazaCar(s,poz)-->c - functie care returneaza caracterul  de
+la pozitia poz din s; pentru poz invalid, se returneaza Chr(0);
+AdaugaCaracter(s,c)  -  procedura  ce  adauga  caracterul  c   la
+sfirsitul sirului s;
+StergeSubsir(sub,s,poz)  - procedura ce sterge prima  aparitie  a
+subsirului sub in sirul s si returneaza pozitia poz de  stergere;
+daca sub nu e gasit, poz revine pe 0, iar s nemodificat;
+StergeToateSubsir(s,sub) - sterge toate aparitiile lui sub in s.
+
+     2.2.Implementarea TDA sir
+
+     2.2.1.Implementarea TDA sir cu ajutorul tablourilor.
+           Varianta 1
+
+     Cea  mai  simpla implementare a unui TDA sir se  bazeaza  pe
+doua  elemente : un  tablou  de caractere si  un  intreg  precizind
+lungimea sirului.Un exemplu de astfel de implementare PASCAL este
+urmatorul:
+const LungimeMax=...;
+type TipLungime=0..LungimeMax;
+     TipIndice=1..LungimeMax;
+     TipSir=record lungime:TipLungime;
+                   sir:array[TipIndice] of char
+            end;
+var s:TipSir;
+Spre  exemplu,  in  acest  context,  operatorii  CreazaSirVid  si
+FurnizeazaCar se pot implementadupa cum urmeaza:
+procedure CreazaSirVid(var s:TipSir);
+     begin
+          s.lungime:=0
+     end;
+function FurnizeazaCar(s:TipSir,poz:TipIndice):char;
+     begin
+          if (poz<1) or (poz>s.lungime) then
+               begin
+                    writeln('pozitie incorecta');
+                    FurnizeazaCar:=chr(0)
+               end
+          else
+               FurnizeazaCar:=s.sir[poz]
+     end;
+     Tipul standard String=String[255] ( sau String[lung_sir], 
+unde 1<=lung_sir<=255) din Turbo PASCAL implementeaza fiecare sir printr-un
+tablou de caractere (array [0..lung_sir] of char), elementul 0 al tabloului
+precizind lungimea sirului (deci pentru un sir s:string, functia length 
+returneaza ord(s[0])).
+      In C, implementarea sirurilor se face tot prin tablouri de caractere, 
+marcarea sfirsitului unui sir fiind facuta prin caracterul cu ordinalul 0 ('\0')
+care urmeaza caracterelor sirului.
+
+     2.2.2.Implementarea TDA sir cu ajutorul tablourilor.
+                                              Varianta 2
+     E o modalitate care economiseste spatiul in dauna vitezei de
+lucru,specifica   implementarii  cu  ajutorul   tablourilor.   Se
+utilizeaza un tablou suficient de lung, "heap"(gramada) pentru  a
+memora  toate  sirurile  si o tabela  auxiliara  de  siruri  care
+pastreaza  evidenta sirurilor in heap (e o tehnica  utilizata  de
+unele  interpretere  Basic).In acest mod, un  sir  e  reprezentat
+printr-o intrare  in tabele de siruri care contine  doua  valori:
+lungimea  sirului  si  un  indicator  in  heap  care   precizeaza
+inceputul sirului.
+     Un exemplu de implementare in Pascal este:
+const LungimeHeap={numar foarte mare};
+      LungimeTabela={numar maxim de siruri};
+type ElementTabela=record
+                      lungime,
+                      indicator:1..LungimeHeap
+                   end;
+     TipSir=1..LungimeTabela;
+                    {un sir e un indicator in tabela de siruri}
+var TabelaDeSiruri:array [1..LungimeTabela] of ElementTabela;
+    Heap:array [1..LungimeHeap] of char;
+    Disponibil:0..LungimeHeap;  {primul caracter liber din heap}
+    NumarDeSiruri:0..LungimeTabela;
+     In aceasta implementare, pentru o utilizare rationala, maxima a heap-ului,
+orice stergere a unui sir, ar trebui sa fie urmata de o compactare a sirurilor 
+ramase in heap, sau de o adaugare a spatiului disponibilizat intr-o tabela
+a spatiilor disponibile, asemanatoare cu cea de siruri (in aceasta ultima 
+varianta, la o insertie, trebuie ocupat spatiul disponibil cu lungimea cea mai
+apropiata (mai mare) celei a sirului )
+
+
+2.2.3.Implementarea TDA cu ajutorul pointerilor
+
+     Esenta   acestei   implementari  rezida   in   reprezentarea
+sirurilor   printr-o  colectie  de  celule  inlantuite,   fiecare
+continind   un  caracter  (sau  un  grup  de   caractere   intr-o
+implementare  mai  elaborata) si un pointer la  celula  urmatoare
+(secventa urmatoare).
+type PointerCelula=^Celula;
+     Celula=record
+               ch:char;
+               urm:PointerCelula
+            end;
+     TipSir=record
+               Lungime:integer;
+               Cap,Coada:PointerCelula
+            end;
+     In  acest  context,  unii din operatorii  specifici  pot  fi
+implementati astfel:
+procedure CreazaSirVid(var s:TipSir);
+     begin
+          s.Lungime:=0;
+          s.Cap:=nil;
+          s:coada:=nil
+     end;
+function FurnizeazaCar(s:TipSir;poz:integer):char;
+     var contor:integer;
+         p:PointerCelula;
+     begin
+          if (poz<1) and (poz>s.Lungime) then
+               begin
+                    writeln('index eronat');
+                    FurnizeazaCar:=chr(0)
+               end
+          else
+               begin
+                    p:=s.cap;
+                    for contor:=1 to poz-1 do p:=p^.urm;
+                    FurnizeazaCar:=p.ch
+               end
+     end;
+
+     2.3.Tehnici de cautare in siruri
+
+     2.3.1.Cautarea tabelara de siruri
+
+     Se  considera  un  tablou ordonat ale  carui  elemente  sint siruri de 
+caractere. Fiecare sir e implementat printr-un tablou de caractere de lungime l, 
+sfirsitul sirului marcindu-se prin caracterul cu ordinalul 0 (similar cu 
+implementarea in C a sirurilor).
+
+const n={numarul de siruri din tabela de siruri};
+      l={numarul maxim de caractere dintr-un sir, sfirsitul  unui
+                                   sir se marcheaza cu chr(0)}
+type Sir=array [0..l-1] of char;
+      Tabela=array [0..n-1] of sir;
+var T:tabela;
+    X:Sir;
+     Se  cere sa se verifice apartenenta sirului X la  tabela  T.
+Presupunind  ca  n  este  suficient de mare  si  ca  tabela  este
+ordonata alfabetic, se poate utiliza cautarea binara performanta.
+
+function CautareTabelara(var T:tabela;var X:Sir;var poz:integer):boolean;
+     { primii doi parametrii formali (de lungime mare), se declara cu var,
+       pentru a li se transmite (prin stiva) doar adresa }
+     var i,s,d,m:integer;
+     begin
+          s:=0;d:=n;
+          while s<d do
+               begin
+                    m:=(s+d) div 2;i:=0;
+                    while (T[m,i]=X[i]) and (X[i]<>chr(0)) do
+                                                       i:=i+1;
+                    if T[m,i]<X[i] then s:=m+1
+                    else d:=m
+               end;
+          if d<n then
+               begin
+                    i:=0;
+                    while (T[d,i]=X[i]) and (X[i]<>chr(0)) do
+                                                       i:=i+1
+               end;
+          poz:=d;
+          CautareTabelara:=(d<n) and (T[d,i]=X[i])
+     end;
+
+     Parametrul poz returneaza indicele primului sir mai mare sau egal
+decit cel cautat sau prima intrare de dupa cele ocupate (daca toate sirurile 
+sint mai mici decit cel cautat), deci functia poate fi utilizata si la crearea
+(ordonata) a tabelei de siruri.
+
+     2.3.2.Cautarea de siruri directa
+
+     Se considera urmatoarele declaratii:
+var s:array [0..n-1] of char;
+    p:array [0..m-1] of char; {0<m<=n}
+     Se cere sa se determine pozitia primei aparitii in sirul s a
+sirului ( modelului ) p.
+     In cautarea directa, modelul e "deplasat paralel" cu sirul, cu cite o 
+pozitie, pina la gasirea lui sau pina cind numarul pozitiilor netestate din sir
+e mai mic decit lungimea modelului.
+     O  posibilitate  de  implementare a  cautarii  directe  este
+urmatoarea:
+ 
+function CautareDirecta(var poz:integer):boolean;
+  var i,j:integer;  {i parcurge caracterele din sir, j pe cele din model}
+  begin
+     i:=-1;
+     repeat
+          i:=i+1; j:=0;
+          while (j<m) and (s[i+j]=p[j]) do j:=j+1
+     until (j=m) or (i=n-m);
+     poz:=i;
+     CautareDirecta:=j=m
+  end;
+
+     2.3.3.Cautarea de siruri Knuth-Morris-Pratt
+
+    E   o metoda de cautare mai performanta . Aceasta  metoda  se
+bazeaza   pe  o  serie  de  informatii  apriorice  obtinute   din
+compilarea modelului (sirul cautat), pe baza carora avansarea in
+procesul  de  cautare  se realizeaza mai  rapid.
+    Compilarea construieste un tablou d de deplasari, continind cite o
+intrare pentru fiecare caracter din model; valoarea din intrare e indicele de
+la care continua comparatia intre caracterele din model si cele din sir dupa
+o nepotrivire anterioara, realizindu-se deplasarea modelului pe mai mult de o
+pozitie. Calculul elementului i al tabloului d ia in considerare lungimea maxima
+a subsirului care incepe cu primul caracter al modelului si e egal cu subsirul
+care precede caracterul de pe pozitia i a modelului.
+    O  varianta  de implementare este urmatoarea:
+
+const mmax={lungime maxima model};
+      nmax={lungime maxima sir sursa};
+var m{lungime model},n{lungime sir}:integer;
+    p:array [0..mmax-1] of char;{model}
+    s:array [0..nmax-1] of char;{sir}
+    d:array [0..mmax-1] of integer:{tabela de deplasari}
+function CautareKMP(var poz:integer):boolean;
+  var i,j,k:integer;
+  begin
+     {citire sir}
+     {citire model}
+     j:=0;k:=-1;d[0]:=-1;  {compilare model}
+     while j<m-1 do
+          begin
+               while (k>=0) and (p[j]<>p[k]) do k:=d[k];
+               j:=j+1;k:=k+1;
+               if p[j]=p[k] then d[j]:=d[k]
+               else d[j]:=k
+          end;
+     i:=0;j:=0;  {cautare model}
+     while (j<m) and (i<n) do
+          begin
+               while (j>=0) and (s[i]<>p[j]) do j:=d[j];
+							 j:=j+1;i:=i+1;
+          end;
+     poz:=i-m;
+     CautareKMP:=j=m
+  end;
+
+     2.3.4.Cautarea de siruri Boyer-Moore
+
+     Este  o  metoda de cautare performanta care  se  bazeaza  pe
+informatii  obtinute  din precompilarea modelului  de  cautat.
+     Cautarea se face comparind perechi de caractere din sir si model, pornind
+de la ultimul caracter din model. In cazul aparitiei unei inegalitati, modelul
+va fi "deplasat" astfel incit in dreptul caracterului din sir unde a aparut
+nepotrivirea, sa se afle un caracter identic din model, cel mai apropiat spre
+stinga, daca un astfel de caracter exista; altfel, numarul de pozitii cu care
+se face "deplasarea" modelului, este egal cu lungimea lui. Marimea deplasarii
+pentru fiecare caracter posibil (din sir, unde apare nepotrivirea), se calculeaza
+in tabloul d, la precompilarea modelului.
+     O varianta de implementare este urmatoarea:
+
+const mmax={lungime maxima model};
+      nmax={lungime maxima sir sursa};
+var m{lungime model},n{lungime sir}:integer;
+    p:array [0..mmax-1] of char;{model}
+    s:array [0..nmax-1] of char;{sir}
+    d:array [char] of integer:{tabela de deplasari}
+function CautareBM(var poz:integer):boolean;
+  var i,j,k:integer;
+begin
+     {citire sir}{citire model}
+     for i:=0 to 255 do d[chr(i)]:=m;{compilare model}
+     for j:=0 to m-2 do d[p[j]]:=m-j-1;
+     i:=m;j:=m;{cautare model}
+     while (j>0) and (i<=n) do
+          begin
+               j:=m;k:=i;
+               while (j>0) and (s[k-1]=p[j-1]) do
+                    begin
+                         k:=k-1;j:=j-1
+                    end;
+							 if j>0 then i:=i+d[s[k-1]]
+          end;
+     poz:=i-m;
+     CautareBM:=j=0
+  end;
+
+     3.Aplicatii
+
+     3.1. Se cere sa se implementeze TDA sir cu ajutorul
+tablourilor liniare, varianta 1.
+     3.2. Se cere sa se implementeze TDA sir cu ajutorul
+tablourilor liniare, varianta 2.
+     3.3. Se cere sa se implementeze TDA sir cu ajutorul
+pointerilor.
+     3.4. Se cere sa se redacteze un program interactiv care
+implementeaza urmatoarele comenzi:
+          A-adauga un sir
+          C-cauta un sir
+          E-terminare
+Programul utilizeaza drept structura de date un tabel ordonat  de
+siruri, cautarea fiind prin metoda tabelara.
+     3.5. Se cere sa se redacteze un program interactiv  care
+implementeaza urmatoarele comenzi:
+          I-introdu un sir sursa
+          M-introdu un sir model
+          D-cautare model prin metoda directa
+          K-cautare model prin metoda KMP
+          B-cautare model prin metoda BM
+          E-terminare
+
+     4.Mersul  lucrarii: Se  vor realiza  programele  propuse. In
+fiecare  caz se va preciza performanta implementarii, functie  de
+spatiul  de  memorie  necesar, respectiv  functie  de  timpul  de
+executie,  In cazul aplicatiei 3.5 se vor realiza  masuratori  de
+timp pentru a evidentia in mod comparativ performantele metodelor
+de cautare.

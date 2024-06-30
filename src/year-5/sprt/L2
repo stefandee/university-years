@@ -1,0 +1,195 @@
+
+			       LUCRAREA 2
+
+                       NIVELUL DE GESTIONARE A PROCESELOR
+
+
+    Functiile ce se vor scrie pe baza acestei lucrari, vor crea un mic nucleu
+ce va putea gestiona o aplicatie in multitasking cooperativ.
+
+    1.Gestionarea UC. Planificatorul executiei la UC
+
+    Nivelul executivului de gestionare a UC realizeaza alocarea UC, pe rind,
+proceselor aflate in starea PREGATIT, conform unei discipline prestabilite,
+( Round - Robin ) asigurind executia intretesuta, concurenta a proceselor.
+    La o realocare a UC trebuie realizate urmatoarele operatii:
+    - salvarea contextului procesului activ si trecerea lui in starea
+PREGATIT ( salvarea contextului se face in scopul posibilitatii reluarii
+ulterioare a executiei respectivului proces )
+    - alegerea procesului caruia i se va aloca UC, dintre cele aflate in
+starea PREGATIT, acesta devenind activ
+    - lansarea in executie a noului proces activ, prin refacerea contextului
+sau.
+
+    Asa cum s-a specificat si in lucrarea anterioara, schimbarea procesului
+care ruleaza, deci intreruperea executiei procesului activ si cedarea UC altui
+proces PREGATIT, poate avea loc in urmatoarele situatii:
+    - procesului activ i se epuizeaza cuanta de rulare; dupa fiecare cuanta
+elementara ( 55 ms ) se genereaza o intrerupere de ceas ( intrerupere fizica
+de nivel 0 ), adresa rutinei de tratare fiind la 0x20 ( INT 8 ); executivul
+va trebui sa trateze aceasta intrerupere, una din sarcinile rutinei fiind
+realocarea UC ( tratarea intreruperii de ceas va constitui obiectul lucrarii
+urmatoare )
+    - procesul activ cedeaza UC la cererea sa explicita, printr-o functie
+a executivului
+    - procesul activ solicita un serviciu de autointirziere ( delay ), pentru
+un timp specificat trecind in starea INTIRZIAT, UC trebuind a fi realocata
+    - procesul activ solicita o resursa nedisponibila printr-o operatie P
+asupra unui semafor, trecind in starea BLOCAT, iar UC se va realoca.
+
+    Secventa de realocare este aceeasi, indiferent de cauzele apelarii, de mai
+sus; in literatura de specialitate, acestei secvente de planificare la executia
+in UC i s-a incetatenit numele de "scheduler" - planificator, programator.
+    Scheduler-ul, vazut ca o functie publica a executivului, trebuie sa fie
+neintreruptibila si sa salveze contextul procesului activ ( toti registrii ), in
+stiva proprie acestuia. Deci prototipul scheduler-ului va fi:
+
+    void interrupt cedeaza_UC(...);
+
+    La apelul ei din codul unui proces ce doreste cedarea UC sau dintr-o alta
+functie a executivului, fiind interrupt, se introduc in stiva registrul 
+indicatorilor, CS si IP; dupa salvarea flag-urilor, IF si TF ( Interrupt si 
+Trap Flags ) sunt automat pusi pe 0, deci functia este neintrerupibila (apelul ei
+se face similar cu intrarea hard intr-o rutina de tratare a unei intreruperi ).
+    De asemenea, inainte de a se trece la executia codului popriu-zis al
+functiei, se salveaza automat in stiva restul registrilor procesului, deci
+intregul sau context este salvat pe stiva, posibilitatea refacerii lui
+necesitind retinerea virfului stivei( SS:SP ). Iesirea din functie se face cu
+refacerea automata de pe stiva a registrilor, apoi cu instructiunea IRET,
+revenirea la adresa urmatoare apelului scheduler-ului si refacerea
+indicatorilor.
+
+    Executia functiei scheduler va trebui sa realizeze urmatoarele prelucrari:
+    - salvarea contextului procesului activ ( s-a vazut ca se face automat,
+pe stiva, functia fiind interrupt )
+    - trecerea procesului activ, din starea ACTIV ( daca o are ) in PREGATIT
+( s-ar putea ca starea lui sa fi devenit anterior BLOCAT sau INTIRZIAT,
+cazuri in care nu se modifica )
+    - selectia unui proces PREGATIT caruia urmeaza a i se aloca UC; selectia
+se face conform unei discipline ROUND-ROBIN, care cauta urmatorul proces
+pornind de la cel succesiv procesului ce a fost activ, baleierea tabelei de
+procese facindu-se circular
+    - trecerea procesului selectat in starea ACTIV si completarea 
+informatiilor referitoare la numarul noului proces activ si adresa sa in tabela
+de procese ( variabile private ale executivului )
+    - refacerea contextului noului proces activ si reluarea sa; se face 
+printr-o instructiune de forma:
+    
+    if ( setjmp( cimpul_env_din_blocul_vechiului_proces_activ ) )
+       return;
+    else
+       longjmp( cimpul_env_din_blocul_noului_proces_activ , 1 );
+
+    Prin apelul functiei setjmp se salveaza toti registrii deci si SS si SP,
+dar nu si cei de date, in cimpul env al fostului activ si se returneaza valoarea
+0. Ulterior, la un longjmp pereche cu acelasi env ca parametru, se reia
+executia de la adresa urmatoare lui setjmp, deci return ( ce reface registrii,
+apoi IRET ).
+    La executia scheduler-ului, cum setjmp returneaza 0, se face longjmp, ce
+reia executia noului activ ( reluarea se face fie din punctul de intrerupere
+survenit intr-o rulare anterioara a scheduler-ului, fie de la adresa de
+inceput a procesului, pregatita la initializare in env ).
+    Cind , ulterior, scheduler-ul selecteaza din nou vechiul proces activ, care
+si-a salvat contextul printr-un setjmp, executia lui se reia, prin longjmp-ul
+din scheduler, de la return, conditia devenind adevarata; la revenire,
+valoarea returnata de setjmp va deveni cel de-al doilea parametru din longjmp 
+( a se vedea descrierea functiilor setjmp si longjmp cu prototipurile in 
+setjmp.h ).
+
+    Disciplina ROUND-ROBIN asigura faptul ca intr-un timp finit, oricarui pro-
+ces i se va aloca UC. Cautarea urmatorului proces PREGATIT se face verificind pe
+rind starea proceselor din tabela de procese. In varianta propusa deci, procesele 
+au prioritati egale si nu exista o lista a proceselor PREGATIT, care ar duce la
+o regie de sistem mai mare pentru adaugari si suprimari in ea ( s-a mentionat
+in lucrarea anterioara, faptul ca aceasta lista s-ar putea crea tot pe heap-ul 
+tabelei de procese, prin intermediul cimpului urm ).
+
+    Observatie:
+    Nu exista restrictia de a declara o functie interrupt ca membru al unei
+clase; daca se declara, ea nu va "recunoaste" adresa clasei. Comportarea ei
+va fi corecta daca va fi declarata static, acest lucru implicand ca si restul
+campurilor, membrilor ce-i acceseaza sa fie statici. Solutia e ca toate
+campurile si membriii clasei executiv sa se declare static si acest lucru nu
+va deranja, intrucat va exista o singura instantiere a clasei executiv.
+
+    2.Procesul nul
+
+    E necesar ca la un moment dat, sa existe cel putin un proces PREGATIT,
+intreruptibil, care sa fie selectat de scheduler, astfel incit intreruperile
+care apar sa poata fi tratate, permitind scoaterea restului proceselor
+din starea INTIRZIAT sau BLOCAT. Acest proces este un proces al executivului,
+deci proces sistem; se va crea de la initializarea executivului, pe ultima
+pozitie a tabelei de procese; codul sau va fi un ciclu infinit ( while(1) ) de
+apel a alocatorului UC ( deci va ceda UC imediat dupa primire ), daca nu toate
+procesele aplicatiei sunt in starea INEXISTENT ( numarul de procese in starea
+INEXISTENT e diferit de numarul de procese ale aplicatiei ), in caz contrar
+se apeleaza functia de iesire din executiv.
+    Se va modifica functia de initializare a executivului in sensul alocarii
+pentru tabela_procese a unui tablou cu dimensiunea cu unu mai mare decat nu-
+marul de procese ale aplicatiei, ultiul element corespunzand procesului nul,
+functia de implementare a acestuia fiind membru al clasei executiv.
+    O varianta mai simpla ar fi ca procesul nul sa fie proces al aplicatiei,
+trebuind ca orice aplicatie sa-l includa.
+
+    3.Functia de distrugere a unui proces
+
+    E o functie publica a executivului, fara parametrii, procesul activ
+trecind in starea INEXISTENT , deci nu va mai putea fi reluat; e apelata
+la terminarea codului unui proces. Functia incrementeaza o variabila privata
+a executivului ce numara procesele inexistente, pusa pe 0 la initializarea
+executivului si folosita de procesul nul. Iesirea din functie se face prin
+apelul scheduler-ului. Trecerea din ACTIV in INEXISTENT se poate realiza de o
+functie corespunzatoare a clasei proces.
+
+    4.Functia de pregatire a unui proces
+
+    E o functie publica a executivului , (apelata de procesul activ )
+realizind trecerea din starea SUSPENDAT in starea PREGATIT a unui proces
+specificat prin numarul ( sau numele )lui; iesirea din functie se face prin
+apelul alocatorului UC. Numarul unui proces e acelasi cu cel de ordine in
+tabela cu informatiile initiale ale proceselor, din sursa aplicatiei,
+parametrul numarul ( sau numele ) procesului trebuind sa fie validat.
+    Functia e echivalenta cu cea de creare a unui proces.
+
+    5.Functia de suspendare a unui proces
+
+    E o functie publica a execuivului, poate fi apelata de procesul activ,
+determinind trecerea sa in SUSPENDAT, cu posibilitatea ca ulterior, alt proces,
+sa-l repuna in PREGATIT; functia da comanda alocatorului UC.
+
+    6.Lansarea in executie a aplicatiei TR
+
+    O va face functia de initializare a executivului, dupa initializarea
+proceselor. Se va selecta primul proces PREGATIT, pornind de la intrarea 0 a
+tabelei de procese. Se vor introduce numarul si adresa intrarii corespunzatoare
+din tabela in variabilele executivului referitoare la numarul procesului activ
+si adresa blocului sau, si se pune starea procesului pe ACTIV, iar apoi un
+longjmp avind ca parametru cimpul env al acestuia realizeaza saltul la prima
+instructiune a procesului ( initializarea env s-a facut in acest sens, la
+initializarea procesului, folosind informatiile din info_init_proces).
+
+    7.Functia de iesire din executiv
+
+    Se apeleaza din procesul nul daca toate procesele aplicatiei sunt
+inexistente, putind fi apelata si din procese ( e deci publica ). Realizeaza
+un exit(0), eventual eliberind inainte spatiul ocupat de tabela de procese
+si stivele proceselor. Poate fi conceputa ca functia destructor a executivului.
+
+   8.Mersul lucrarii
+
+   Se vor scrie:
+   - functia ce implementeaza alocatorul UC ( scheduler )
+   - procesul nul, adaugind initializarea lui in cea a executivului
+   - functiile de distrugere, suspendare, pregatire a unui proces
+   - functia de iesire din executiv
+   - secventa de lansare a unei aplicatii.
+
+   Functiile concepute in primele doua lucrari ofera setul minim pentru
+implementarea unui multitasking cooperativ, UC fiind cedata la cererea
+proceselor, nefiind inca implicata intreruperea de timp.
+   Se poate deci concepe o aplicatie concurenta, in care fiecare proces,
+dupa ce executa o actiune, o scriere pe ecran de exemplu, da comanda
+alocatorului UC, pentru reluarea procesului urmator; actiunea se va executa
+intr-un ciclu finit, urmat de apelul functiei de distrugere a procesului.
+
+

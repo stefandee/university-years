@@ -1,0 +1,239 @@
+
+				LUCRAREA 1
+
+    EXECUTIVE DE TIMP REAL. PREZENTAREA UNEI VARIANTE DE IMPLEMENTARE
+
+
+    1.Specificul unui executiv si al unei aplicatii timp real
+
+    In cadrul unor aplicatii specializate cum ar fi conducerea proceselor 
+industriale, robotica, automatizari, telefonie, comunicatii, achizitii de date,
+aeronautica, sistemele de calcul sunt nemijlocit conectate prin intermediul
+terminalelor, traductorilor si a senzorilor la aplicatia condusa. De la aceasta,
+la momente bine precizate de timp sau in mod aleator, sistemul de calcul
+primeste informatii care trebuie prelucrate, iar rezultatele prelucrarii
+furnizate de indata ce sunt produse sau la cerere. Cel mai important parametru 
+al unor astfel de sisteme este timpul de raspuns, definit de regula ca fiind 
+intervalul de timp  scurs intre solicitarea unui serviciu sistemului si
+momentul onorarii acestuia. Timpul de raspuns trebuie corelat cu cerintele 
+externe ale aplicatiei, solicitarile trebuind rezolvate in intervale utile de
+timp, motiv pentru care aceste sisteme se numesc timp real ( TR ).
+    Aceste intervale variaza functie de specificul aplicatiei, de caracteristi-
+cile sistemului de calcul, acoperind intervalul de la citeva fractiuni de 
+secunda la citeva ( zeci de ) minute.
+
+    Un executiv TR ( ETR ) nu difera mult de nucleul unui SO multitasking, 
+oferind in plus functii specifice de TR si trebuind sa asigure timpi de
+raspuns performanti, printr-o regie de sistem cit mai redusa. ETR ofera ser-
+viciile necesare executiei unei aplicatii TR ( ATR ). O ATR se constituie
+intr-un numar de procese concurente, care se sincronizeaza si comunica intre 
+ele si cu exteriorul, putind apela si functii specifice de TR ( citirea 
+ceasului de TR sau intirzieri pentru un timp precizat ).
+
+    Procesul e conceput ca o entitate logica de sine statatoare care implemen-
+teaza una sau mai multe din functiile aplicatiei. O ATR este constituita 
+dintr-un numar fix de procese organizate intr-o structura de graf, ce eviden-
+teaza gradul de paralelism al executiei proceselor si relatiile de precedenta 
+dintre acestea. Pentru a indeplini cerintele aplicatiei, procesele 
+interactioneaza si isi disputa resursele sistemului. Optimizarea acestei 
+activitati revine ETR.
+
+    2. Nivelele unui ETR
+
+    Nivelele unui ETR, traduse prin serviciile pe care acesta le ofera, sunt:
+
+      ( hardware )
+      gestionarea memoriei
+      gestionarea UC
+      sincronizarea proceselor
+      comunicarea proceselor
+      functii de TR
+      drivere de I/E
+      gestionarea memoriei externe
+      ( aplicatia TR )
+
+    In continuare se va face o prezentare succinta a acestor nivele, notiunile
+fiind deja cunoscute, propunindu-se variante de implementare.
+     Alocarea UC se face prin time-sliceing, asigurind executia paralela a
+proceselor; resursa UC revine unui proces, numit activ,  pentru un timp maxim
+specificat ( o cuanta de timp de 55 ms ), fiind cedata altui proces in una din
+situatiile:
+a) la epuizarea timpului ( deci la aparitia unei intreruperi de timp )
+b) la cererea procesului ( printr-o functie cedeaza_UC a executivului )
+c) cind executia procesului necesita o alta resursa, nedisponibila, procesul
+   raminind in asteptarea eliberarii respectivei resurse ( blocat intr-un
+   semafor )
+d) cind procesul solicita executivului serviciul de intirziere pentru un
+   timp specificat
+    Executia concurenta a proceselor implica existenta pentru acestea a cite
+unei stive proprii, pentru variabilele locale, apelurile de functii si salvarea
+contextului ( registrilor ) procesului. Este sarcina nivelului de gestionare a
+memoriei de a aloca fiecarui proces, la initializarea lui, cite o stiva 
+si la executie, spatiu pe heap, pentru variabilele dinamice. Dimensiunea 
+stivei e specificata in informatiile de initializare, proprii fiecarui
+proces. 
+Dupa cum se va vedea, gestionarea memoriei se va realiza apelind alocatorul 
+standard, in regim de excludere mutuala, folosind un semafor propriu 
+executivului.
+    Sincronizarea proceselor sau interactiunea de nivel inferior se
+realizeaza prin intermediul semafoarelor, cu ajutorul acestora putindu-se
+realiza excluziunea mutuala, sincronizarea de conditie ( ambele prin semafoare
+binare ) sau alocarea resurselor multiple ( prin semafoare generalizate ).
+    Comunicarea proceselor prin mesaje se poate realiza in doua variante:
+    - de la proces la proces, varianta implementata in XINU
+    - prin intermediul cutiilor postale , propusa pentru implementare.
+    Functiile de TR permit citirea ceasului de TR, precum si autointirzierea
+proceselor pentru un numar specificat de cuante de timp.
+    Driverele de I/E asigura comunicarea cu perifericele a proceselor; in cadrul
+laboratorului vor fi propuse numai pentru I/E standard.
+    Gestionarea memoriei externe nu e obligatorie intr-un ETR, nu se va trata.
+
+    3. Procese. Implementare
+
+    Structura ( sau clasa ) de baza in ETR o constituie cea proces; ETR
+pastreaza si gestioneaza informatiile referitoare la evolutia proceselor.
+Cum criteriul timp ( dar si memorie ) este important, ca structura de date
+de baza a clasei executiv pentru informatiile referitoare la toate procese
+se alege tabloul alocat dinamic ( alocarea se face la initializarea
+executivului, astfel nu se limiteaza numarul de procese ale aplicatiei ) deci:
+
+    proces * tabela_procese;
+
+    O aplicatie de TR se constituie dintr-un numar cunoscut, finit, de procese
+ce se executa concurent, fiecare avand o anumita sarcina. Fiecare proces va
+fi implementat printr-o functie void, fara parametri.
+
+    Informatia referitoare la un proces ar fi urmatoarea:
+
+    struct /* class */ proces{
+      stari stare;                  // starea procesului
+      char nume[LUNG];              // numele
+      jmp_buf env;                  // structura pentru salvarea contextului
+      int urm;                      // cursor spre urmatorul proces din lista
+      semafor * adr_semafor;        // adresa semaforului de blocare
+      unsigned char cuante_delay;   // numarul de cuante de intirziere
+      window fereastra;             // pozitia ferestrei de I/E si a cursorului
+    };
+
+    Daca procesul si executivul se implementeaza ca si clase ( desi cea
+executiv are o singura instantiere ), ultima trebuie sa fie friend pentru proces,
+pentru a putea opera asupra cimpurilor de date direct ( prin metode , timpul
+ar fi mai mare ). Fiecare lucrare va adauga campuri si metode noi claselor.
+    Pentru initializarea unui proces, sunt necesare urmatoarele informatii :
+
+    struct info_init_proces{
+      adresa adresa_proces;           // adresa initiala a procesului
+                                      // ( a functiei ce-l implementeaza )
+      char * nume;
+      int dim_stiva;                  // necesarul de stiva ( in octeti )
+      stari stare;     		      // starea initiala;
+    };
+
+    La un moment dat, un proces se poate afla in una din urmatoarele stari
+( tipul stari se va defini ca o enumerare a acestora ):
+    ACTIV-o are procesul ce ruleaza la un moment dat; numarul lui si pointerul
+spre intrarea din tabela_procese corespunzatoare, se pastreaza in variabile
+( private ) ale executivului si se modifica in secventa de alocare a UC unui
+nou proces
+    PREGATIT-un proces e in aceasta stare daca dispune de toate resursele cu
+exceptia UC, fiind un candidat la alocarea acesteia; disciplina de alocare
+poate fi functie de prioritatile proceselor sau ROUND-ROBIN ( cea care
+se va implementa );tehnica ROUND-ROBIN parcurge tabloul proceselor circular,
+incepand cu procesul urmator celui care a fost activ, selectand pentru executie
+primul proces gasit PREGATIT
+    INTIRZIAT-o au procesele ce au solicitat executivului serviciul de intir-
+ziere ( delay ) pentru un numar specificat de cuante ( ce se introduce in
+cimpul cuante_delay ), dupa epuizarea acestora, revenind in PREGATIT; procesele
+aflate in intirziere formeaza o lista, pe spatiul tabelei de procese ( imple-
+mentata cu cursori prin campurile urm ), lista fiind ordonata crescator
+dupa timpul de intirziere;
+    BLOCAT-o are un proces ce a facut operatia P asupra unui semafor cu valoarea
+<= 0; listele cu procesele blocate ale semafoarelor, se creaza tot prin inter-
+mediul cimpului urm, pe spatiul tabelei de procese      SUSPENDAT-executivul are toate informatiile despre un proces in aceasta
+stare, procesul are alocata si stiva, dar nu participa la alocarea resurselor;
+un proces poate ajunge in aceasta stare din oricare alta prin operatia de
+suspendare ( spatiul de stiva nu se elibereaza ) sau din aceasta stare in
+PREGATIT  prin operatia de pregatire ( executata de alt proces )
+     INEXISTENT-un proces ajunge in aceasta stare prin functia de distrugere,
+semnalind faptul ca si-a terminat executia ( pe care n-o va mai putea relua ).
+
+    Initial un proces se poate gasi in starea SUSPENDAT sau PREGATIT.
+Rularea aplicatiei incepe cu cea a primului proces gasit PREGATIT. Modul cum
+se face lansarea in executie a aplicatiei se va prezenat in lucrarea 2.
+    Tabela de procese poate fi privita ca un heap al proceselor, la un moment
+dat, in ea coexistind mai multe liste, cite una pentru procesele blocate
+in fiecare semafor si una pentru procesele intirziate; la un moment dat, un
+proces se poate gasi numai in una din aceste liste, listele necontinand deci
+nici un nod comun
+
+    La initializarea executivului se va aloca tabelei de procese spatiu pentru
+toate procesele aplicatiei, atit cele in starea PREGATIT cit si pentru cele in
+SUSPENDAT.
+    Ar putea fi gestionata si o lista a proceselor PREGATIT, pentru o mai
+rapida gasire a urmatorului proces PREGATIT, la alocarea UC, dar s-ar pierde
+timp la gestionarea ei, cind se fac treceri din / spre aceasta stare spre /din
+alte stari; o astfel de lista ar putea fi ordonata descrescator dupa prioritati
+( statice si dinamice ), acesta fiind criteriul de alocare a UC.
+
+    Cimpul env de tip jmp_buf ( predefinit in <setjmp.h> ) contine cimpuri
+( unsigned ) corespunzatoare tuturor registrilor procesorului ( cu exceptia
+celor 4 de date ), deci va contine contextul procesului. La initializarea
+fiecarui proces, aceste campuri se initializeaza cu valorile pe care trebuie
+sa le aiba registrii procesorului la lansarea in executie a procesului
+respectiv; cimpurile j_ip si j_cs vor contine adresa de inceput a procesului
+( ce se furnizeaza in info_init_proces ), j_sp si j_ss, adresa virfului stivei
+alocate de executiv, de dimensiunea precizata in info_init_proces, iar
+valoarea lui j_flag va insemna posibilitatea sau nu de intrerupere a
+procesului ( 0x200, respectiv 0x0 ); restul campurilor se initializeaza cu
+valorile curente ale registrilor corespunzatori , de exemplu j_ds cu _DS;
+modelul de compilare ales va fi small .
+    Se va reveni asupra lui env la descrierea comutarii proceselor; salvarea
+contextului se face apelind setjmp, iar reluarea executiei cu longjmp.
+
+    Cimpul nume se furnizeaza in info_init_proces si se alege sugestiv
+pentru sarcina procesului; se va inscrie in fereastra de I/E a procesului .
+
+    Cimpurile urm, adr_semafor, cuante_delay si fereastra vor fi initializate
+(NIL, NULL, 0, 0 ) fiind folosite la nivele superioare; pot fi initializate in
+constructorul clasei proces.
+
+    La executia proceselor, se va folosi pentru alocari dinamice alocatorul
+standard, pentru a putea utiliza in codul proceselor operatorii new
+si delete, care n-ar putea fi redefiniti ( in totalitate ) prin scrierea
+unui alt alocator ( acesta ar permite numai cereri gen malloc ).
+Dar alocatorul standard, inainte de a verifica existenta de spatiu disponibil,
+verifica conditia SP > inceput_heap, deci ca stiva sa nu fi crescut ocupind
+tot spatiul disponibil.
+    Deci stivelor proceselor , la initializarea executivului, trebuie sa li se
+aloce spatiu la sfirsitul memoriei disponibile ( a segmentului de date ce
+coincide cu cel de stiva in modelul small ), prin algoritmul:
+    * aloca unui pointer p1 spatiul disponibil ce va ramane disponibil dupa
+      alocarea stivelor ( de dimensiune = coreleft() - suma_stivelor )
+    * aloca unui pointer p2 spatiul necesar stivelor ( suma_stivelor )
+    * initializeaza stivele ,deci campurile j_sp, in spatiul alocat lui p2
+    * elibereaza spatiul ramas dupa alocarea stivelor, deci cel alocat lui p1
+      ( pentru alocari dinamice in procese ).
+
+    4. Mersul lucrarii
+
+    Cu sugestiile date mai sus :
+    - se vor defini clasele ( structurile de date ) executiv si proces
+    - se vor scrie functiile lor de initializare - cea a executivului
+      trebuie sa primeasca doi parametri: pointerul spre un tablou
+      de tip info_init_proces si dimensiunea acestui tablou ( numarul de
+      procese ale aplicatiei ); functia de initializare a executivului poate
+      fi constructorul clasei executiv; algoritmul initializarii va fi:
+        * alocarea tabelei de procese ( echivaland cu instantierea clasei
+          proces prin elementele acestui  tablou )
+        * calcule pentru plasarea stivelor la sfarsitul segmentului de date
+        * initializarea fiecarui proces ( a fiecarei intrari din
+          tabela_procese ) - prin apelarea functiei de initializarea a clasei
+          proces ( aceasta va initializa campurile stare, nume, env, restul se
+          initializeaza in constructor ) - functia va primi ca informatii
+          structura info_init_proces corespunzatoare precum si parametrii
+          necesari pozitionarii stivei )
+    - pentru o "aplicatie" continind un numar de procese se va verifica
+      corectitudinea initializarilor facute de executiv cu ajutorul
+      debugger - ului.
+
+

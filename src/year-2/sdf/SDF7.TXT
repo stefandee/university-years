@@ -1,0 +1,296 @@
+Lucrarea 7
+----------
+
+      Compilarea independenta a fisierelor. Tipul abstract. Definirea tipului 
+      -----------------------------------------------------------------------
+          abstract stiva. Evaluarea unei expresii in notatie poloneza.
+          ------------------------------------------------------------
+
+
+1. Consideratii teoretice
+-------------------------
+
+1.1. Structurarea programelor C pe mai multe fisiere
+----------------------------------------------------
+
+   Este avantajos sa repartizam programele C de dimensiuni mari pe mai multe 
+fisiere. Aceste fisiere pot fi compilate independent si linkeditate impreuna,
+eventual lor adaugindu-se functiile biblioteca, in vederea obtinerii programului 
+final. Orice modificare impune recompilarea intregului program. Acest aspect 
+este deosebit de util in faza de detectare a erorilor sintactice, semantice si 
+la executie, reducind timpul si resursele necesare.
+   Structurarea programelor pe mai multe fisiere permite simularea mecanismu-
+lui de ascundere a informatiei (data hiding) si incapsularea datelor (data in-
+capsulation). Obiecte externe unui fisier, declarate cu clasa de memorare "ex-
+tern" sint accesibile si altor fisiere, in timp ce obiectele declarate cu
+"static" pot fi accesate doar in fisierul in care ele au fost declarate. Din
+acest punct de vedere fisierele apar ca un mecanism de control al vizibilita-
+tii obiectelor.
+
+1.2. Modul project
+------------------
+
+   A se vedea lucrarea 1.
+
+1.3. Tipuri de date abstracte
+-----------------------------
+
+   Un tip de date abstract este un obiect ce este manipulat folosind doar ope-
+ratiile ce definesc acel tip. Ca si consecinte avem:
+    1) programele devin independente de modul concret de reprezentare a date-
+    lor. Aceste date pot fi modificate fara a afecta restul programului.
+    (De ex. o multime poate fi implementata ca si tablou, dar si ca lista or-
+    donata)
+    2) se previne violarea intentionata sau accidentala a datelor. Utilizato-
+    rul tipului abstract este fortat sa manipuleze datele doar prin interme-
+    diul operatiilor ce compun acest tip.
+Mecanismul de implementare a tipului abstract folosind fisiere are bineinteles
+propriile sale limitari:
+    1) nu se poate defini un tablou de tipuri abstracte
+    2) nu se poate transmite un tip abstract ca si parametru.
+
+2. Definirea tipului abstract stiva
+-----------------------------------
+
+   O stiva este un tip special de lista in care toate insertiile si suprima-
+rile se executa la un singur capat, care se numeste virful stivei. Modelul
+intuitiv al unei stive este acela al unui vraf de carti, in care cel mai sim-
+plu mod de a adauga sau extrage o carte este de a o pune pe, rsp. lua din
+virful vrafului.
+   Se defineste tipul abstract stiva care contine operatori pentru urmatoare-
+le functii:
+	1) initializare stiva
+	2) verificare stiva plina
+	3) verificare stiva goala
+	4) introducere un element in virful stivei
+	5) extragere un element din virful stivei
+	6) furnizeaza element din virful stivei
+
+  Se considera implementarea stivei printr-un tablou de valori reale (double) si
+un indice in tablou care indica virful stivei:
+   double stiva[MAX];
+   int ind_top;
+Operatorii se implementeaza astfel:
+1) void sterge(void){
+     int i;
+     for (i=0;i<MAX;i++)
+	 stiva[i]=0;
+     ind_top=-1;
+   }
+2) int plin(void){
+      return ind_top==MAX;
+   }
+3) int gol(void){
+      return ind_top==-1;
+   }
+4) void push(double nr){
+      if(plin()){
+	 printf("eroare:stiva plina\n");
+	 exit(1);
+      }
+      else
+	 stiva[++ind_top]=nr;
+   }
+5) void pop(void){
+     if(gol()){
+	printf("eroare: stiva vida\n");
+	exit(1);
+     }
+     else
+	ind_top--;
+   }
+6) double top(void){
+     if(gol()){
+	printf("eroare: stiva vida\n");
+	exit(1);
+     }
+     else
+	return stiva[ind_top];
+   }
+
+3. Evaluarea unei expresii in notatie poloneza
+----------------------------------------------
+
+   Notatia poloneza este un mod de scriere al expresiilor, in care ordinea
+operatorilor si al operanzilor este schimbata fata de cea cunoscuta. In nota-
+tia infix (cea uzuala) o expresie este de forma :
+    operand  operator  operand
+In notatia postfix (poloneza) expresia este scrisa de forma:
+    operand  operand  operator
+De ex:   a+b       devine    ab+
+       (a-b)*c              ab-c*
+       a-b*(c+d)           abcd+*-
+  Avantajul notatiei poloneze este acela ca indica ordinea corecta a executiei
+operatiilor, fara a utiliza paranteze, iar expresia poate fi evaluata printr-o
+singura baleere.
+  Pentru evaluarea unei expresii utilizam o stiva de valori reale. Oridecite
+ori intilnim in expresie un operand se va depune valoarea acestuia in stiva.
+Intilnirea unui operator duce la extragerea a doua valori din stiva (cei doi
+operanzi), aplicarea operatorului asupra valorilor extrase si depunerea rezul-
+tatului in stiva. In momentul cind s-a terminat parcurgerea expresiei, rezul-
+tatul final se gaseste in virful stivei.
+
+Exemplu
+-------
+    Se da o expresie in notatie poloneza, formata din constante reale, scrisa
+pe o linie. Dupa ce s-a citit linia sa se evalueze si sa se tipareasca rezul-
+tatul expresiei.
+  Obs:
+       1) se foloseste tipul abstract stiva cu valori double
+       2) se construieste functia " getop (char *s)", care citeste succesiv
+       din pozitie curenta a liniei de intrare si detecteaza urmatorul operand
+       sau operator. Functia sare peste spatii si caractere tab.
+	- pentru operand: returneaza constanta NUMAR si returneaza in parame-
+	  trul "s" sirul format din cifrele numarului.
+	- pentru operator: returneaza caracterul citit si in parametrul "s"
+	  sirul format din acel caracter.
+
+Prezentarea programului:
+------------------------
+  Programul este impartit pe trei fisiere:
+1ø stiva.h  - contine definitia tipurilor de date folosite in program, precum
+	    si declaratiile functiilor de prelucrare a tipului abstract stiva.
+2ø stiva.c  - contine implementarea tipului abstract stiva.
+3ø main.c   - contine programul principal si functiile necesare acestuia:
+	      getop(char*) - izoleaza din linia de intrare urmatorul operand
+			     sau operator.
+
+1ø fisierul "stiva.h"
+
+  # define  MAX  100
+  typedef double stiva_double[MAX];
+
+  void sterge(void);
+  int plin(void);
+  int gol(void);
+  void push(double);
+  void pop(void);
+  double top(void);
+
+
+2ø fisierul "stiva.c"
+
+# include "stiva.h"
+
+ static stiva_double stiva; /* stiva de valori reale */
+ static int ind_top;	   /* indicatorul virfului de stiva */
+
+ void sterge(void){
+     int i;
+     for (i=0;i<MAX;i++)
+	 stiva[i]=0;
+     ind_top=-1;
+ }
+
+ int plin(void){
+      return ind_top==MAX;
+ }
+
+ int gol(void){
+      return ind_top==-1;
+ }
+
+ void push(double nr){
+      if(plin()){
+	 printf("eroare:stiva plina\n");
+	 exit(1);
+      }
+      else
+	 stiva[++ind_top]=nr;
+ }
+
+ void pop(void){
+     if(gol()){
+	printf("eroare: stiva vida\n");
+	exit(1);
+     }
+     else
+	ind_top--;
+ }
+
+ double top(void){
+     if(gol()){
+	printf("eroare: stiva vida\n");
+	exit(1);
+     }
+     else
+	return stiva[ind_top];
+ }
+
+3ø fisierul "main.c"
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <ctype.h>
+# include "stiva.h"
+# define NUMAR    0
+# define M_SIR   30
+# define EOLN    -1
+
+int getop (char *s){
+  int i,c;
+  while ((c=getchar())==' ' || c=='\t')
+	 ;
+  s[0]=c; s[1]='\0';
+  if(!isdigit(c))
+    if(c!='\n')
+      return c;      /* s-a intilnit un operator */
+    else
+      return EOLN;    /* sfirsit de linie */
+  i=0;
+  while(isdigit(s[++i]=c=getchar()))
+	     ;
+  if(c=='.')  
+   while(isdigit(s[++i]=c=getchar());
+   s[i]='\0';
+  ungetc(c,stdin);
+  return NUMAR;
+}
+
+void main(){
+  int oper;
+  char sir[M_SIR];
+  double operand1,operand2;
+
+  sterge();				    /* elibereaza continutul stivei*/
+  while((oper=getop(sir))!=EOLN)
+    switch(oper){
+      case NUMAR: push(atof(sir));
+		  break;
+      case  '+' : operand1=top();pop();
+		  operand2=top();pop();
+		  push(operand1+operand2);
+		  break;
+      case  '-' : operand1=top();pop();
+		  operand2=top();pop();
+		  push(operand2-operand1);
+		  break;
+      case  '*' : operand1=top();pop();
+		  operand2=top();pop();
+		  push(operand1*operand2);
+		  break;
+      case  '/' : operand1=top();pop();
+		  operand2=top();pop();
+		  if(operand1==0){
+		      printf("eroare:impartire cu 0\n");
+		      exit(1);
+		  }
+		  else
+		    push(operand2/operand1);
+		  break;
+      default   : printf("eroare: operator necunoscut\n");
+		  exit(1);
+    }   				    /* sfirsit citire expresie */
+  printf("valoarea expresiei e %lf\n",top());
+}
+
+4. Probleme propuse
+-------------------
+
+1) Un editor de texte prelucreaza o linie de text utilizind o stiva. Editorul
+citeste un caracter o singura data: daca caracterul citit nu este nici carac-
+terul '<' nici '>' el este introdus in stiva. Daca caracterul este '<', se
+sterge ultimul caracter din stiva, iar pentru '>' se initializeaza stiva (se
+sterge linia editata). La intilnirea caracterului '\n' se afiseaza linia edi-
+tata (stiva in ordine inversa).
+

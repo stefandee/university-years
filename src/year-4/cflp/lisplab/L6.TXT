@@ -1,0 +1,110 @@
+
+[Liste de asocia'tii]
+
+Se nume'ste list'a de asocia'tii o list'a format'a din subliste de
+forma (<cheie> <valoare>).
+
+Urm'atoarea expresie creaz'a o list'a de asocia'tii ce descrie
+propriet'a'tile unui anume obiect:
+
+(setq brick-a '((color red)
+                (supported-by brick-b)
+                (is-a brick)))
+
+  ((color red) (supported-by brick-b) (is-a brick))
+
+[Primitiva ASSOC returneaz'a valoarea unei chei dintr-o list'a de
+asocia'tii]
+
+ASSOC prime'ste dou'a argumente: o cheie 'si o list'a de
+asocia'tii. ASSOC va c'auta asocia'tia cu cheia dat'a 'si va returna
+^intreaga asocia'tie (<cheie> <valoare>). Dac'a nu gase'ste cheia
+atunci va returna NIL.
+
+[Exemple]
+
+(assoc 'color brick-a)
+  (color red)
+
+(assoc 'is-a brick-a)
+  (is-a brick)
+
+(assoc 'size brick-a)
+  nil
+
+O list'a de asocia'tii poate con'tine dou'a elemente cu aceea'si
+cheie, dar ASSOC va returna doar prima asocia'tie valid'a g'asit'a:
+
+(setq brick-a '((supported-by brick-c)
+                (color red)
+                (supported-by brick-b)
+                (is-a brick)))
+  ((supported-by brick-c) (color red) (supported-by brick-b) (is-a brick))
+
+(assoc 'supported-by brick-a)
+  (supported-by brick-c)
+
+[Probleme]
+
+1. Scrie'ti o procedur'a FETCH care prime'ste o cheie 'si o list'a de
+asocia'tii, iar dac'a g'ase'ste cheia va returna doar valoarea
+ei. Dac'a nu o g'ase'ste va returna un semn de ^intrebare.
+
+(fetch 'temperature '((temperature 100)
+                      (pressure (120 60))
+                      (pulse 72)))
+  100
+
+(fetch 'complaints '((temperature 100)
+                     (pressure (120 60))
+                     (pulse 72)))
+  ?
+
+2. Scrie'ti o procedur'a LIST-KEYS care prime'ste o lis'a de
+asocia'tii 'si returneaz'a o list'a cu toate cheile din ea.
+
+[Propriet'a'ti]
+
+Un simbol poate avea propriet'a'ti. Propriet'a'tile au nume 'si valoare.
+
+Obs: ^in LISP cuv^antul "valoare" poate avea trei ^in'telesuri: vorbim
+despre valoarea returnat'a la evaluarea unei forme, vorbim despre
+valoarea unei propriet'a'ti a unui simbol 'si vorbim despre valoarea
+unui simbol.
+
+[Primitiva GET]
+
+Pentru a returna valoarea unei propriet'a'ti folosim GET, care
+prime'ste numele unui simbol 'si numele unei propriet'a'ti. S'a
+presupunem ca symbolul "pyramid-d" are proprietatea cu numele "color"
+ce are valoarea "red".
+
+(get 'pyramid-d 'color)
+  red
+
+Cu ajutorul lui setf putem da valori unei propriet'a'ti.
+
+(setf (get 'pyramid-d 'color) 'red)
+  red
+
+(setf (get 'pyramid-d 'supported-by) 'brick-c)
+  brick-c
+
+Putem 'sterge o proprietate prin combina'tia:
+
+(setf (get <simbol> <proprietate>) nil)
+
+[Probleme]
+
+3. Presupun^and c'a avem simboluri ce au proprietatea
+"parinte". Defini'ti procedura bunic ce prime'ste un simbol s'i
+returneaz'a bunicul din partea tat'alui dac'a este cunoscut, altfel
+nil.
+
+4. Defini'ti procedura adam care prime'ste un simbol 'si returneaz'a
+cel mai ^indep'artat str'amo's pe linie patern'a.
+
+5. Defini'ti procedura stramosi care returneaz'a o list'a format'a din
+persoana ^impreun'a cu to'ti str'amo'sii cunoscu'ti, merg^and pe dou'a
+proprietat'a'ti: tata 'si mama.
+

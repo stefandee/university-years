@@ -1,0 +1,130 @@
+
+
+[Probleme]
+
+1. Implementa'ti urm'atoarele opera'tii cu mul'timi: uniune,
+intersec'tie, diferen't'a, test de egalitate.
+
+2. Implementa'ti un program LISP care prime'ste o expresie logic'a
+pe care o transform'a, folosind legile lui de Morgan, ^intr-o
+expresie logic'a folosind doar operatorul NAND.
+
+[Primitivele MAPCAR 'si APPLY]
+
+Un mod c^ateodet'a mai elegant de a realiza itera'tiile este de a
+folosi primitivele MAPCAR 'si APPLY.
+
+MAPCAR se folose'ste atunci c^and dorim s'a aplic'am o procedura la
+fiecare element al unei liste. MAPCAR va returna lista rezultatelor.
+
+Sintaxa:
+
+(mapcar <nume procedura>
+	<lista de argumente>)
+
+Exemplu:
+
+Evalu^and expresia:
+
+(mapcan '(lambda (x) (list (oddp x))) '(1 2 3))
+
+ob'tinem
+
+(t nil t)
+
+Aici mapcar produce execu'tia iterativa a predicatului oddp pe fiecare
+element al listei. Rezultatele sunt colectate ^intr-o list'a.
+
+APPLY aplic'a o procedur'a unei liste de argumente (nu fiec'aruia ^in
+parte cum face MAPCAR).
+
+Sintaxa:
+
+(apply <nume procedura>
+	<lista argumente>)
+
+Exemplu:
+
+Dac'a avem o list'a de numere
+
+(setq l '(4 7 2))
+
+'si dorim s'a adun'am numerele din list'a, ar fi gre'sit sa evalu'am
+
+(+ l)
+
+pentru ca + a'stept'a argumente care sunt numere dar aici prime'ste o
+list'a de numere. De fapt am ^incercat s'a evalu'am mai sus
+
+(+ '(4 7 2))
+
+ceea ce evidend e gre'sit. Ceea ce am dori ar fi
+
+(+ 4 7 2)
+
+Tocmai acest lucru ^il face APPLY
+
+(apply '+ l)
+
+va returna 13.
+
+Folosind MAPCAR 'si APPLY ^impreun'a putem rezolva mult mai elegant
+probleme complex recursive.
+
+Exemplu:
+
+O implementare mai eficient'a a procedurii COUNT-ATOMS (num'ar'a
+atomii dintr-o list'a generalizat'a):
+
+(defun count-atoms (l)
+  (cond ((null l) 0)
+        ((atom l) 1)
+        (t (apply '+ (mapcar 'count-atoms l))))))
+
+Aici recursivitatea nu se face doar pe dou'a direc'tii odat'a (car 'si
+cdr, adic'a primul fiu 'si frate drept), ci pe to'ti fii simultan. Se
+face astfel o parcugere in l'at'ime a arborelui generalizat.
+
+Urm'atoarea procedur'a returneaz'a ad^incimea unui arbore generalizat.
+
+(defun depth (l)
+  (cond ((null l) 1)
+        ((atom l) 0)
+        (t (+ 1 (apply 'max (mapcar 'depth l))))))
+
+[MAPCAN]
+
+Primitiva MAPCAN se comport'a ca 'si MAPCAR combinat cu APPEND.
+
+(MAPCAN <nume procedura> <lista argumente>)) ==
+
+== (APPLY 'APPEND (MAPCAN <nume procedura> <lista argumente>))
+
+[Itera'tii folosind DO]
+
+DO are sintaxa:
+
+(DO ((<param 1> <valoare initala 1> <actualizare 1>)
+     (<param 2> <valoare initala 2> <actualizare 2>)
+     ...
+     (<param n> <valoare initala n> <actualizare n>))
+  (<test sfarsit> <rezultat>)
+  (<corpul lui do>))
+
+DO face 'si legarea parametrilor.
+
+Exemplu:
+
+Ridicare la putere ^intreag'a.
+
+(defun expt (m n)
+  (do ((result 1)			; legare 'si atribuire result
+       (exponent n))                    ; legare 'si atr. exponent
+     ((zerop exponent) result)          ; test 'si return
+     (setq result (* m result))         ; corp
+     (setq exponent (- exponent 1))))   ; corp
+
+
+
+
+

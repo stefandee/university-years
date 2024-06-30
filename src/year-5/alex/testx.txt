@@ -1,0 +1,8 @@
+{fjhg
+gkfdk
+ghjfd
+ykhjgf
+hdf}
+'c'
+x : array [ 1..10] of integer;
+a..b

@@ -1,0 +1,191 @@
+                            Lucrarea nr. 8
+
+		STRUCTURI DE DATE DERIVATE DIN STRUCTURA DE LISTA
+
+	1.Liste dublu inlantuite
+
+	Apar din necesitatea traversarii unei liste si inainte si inapoi, deci
+a cunoasterii pentru un nod a succesorului si predecesorului sau. Problema se
+rezolva prin pastrarea in cimpurile unui nod a unei referinte spre nodul
+anterior si a uneia spre cel succesor.De aici denumirea de lista dublu
+inlantuita, descrisa astfel:
+
+type pointer=^nod;
+     nod=record info:tip_info;
+                anterior,urmator:pointer
+         end;
+
+	Listele circulare se folosesc si in varianta in care
+se pastreaza o variabila pointer spre primul nod, ultimul avind inlantuirea
+nil, precum si in varianta circulara in care primul nod se inlantuie dublu
+cu ultimul;in varianta circulara, dispare notiunea de prim, ultim nod,
+existind doar un pointer ce indica un nod oarecare din lista, parcurgerea
+celorlalte putind fi facuta in oricare din cele doua sensuri.
+
+	2.Stive
+
+	Stiva e un tip special de lista la care toate insertiile si
+suprimarile se executa la un singur capat, numit virful stivei. Stiva e o
+lista tip LIFO (Last In First Out).
+	Asupra tipului abstract de date stiva sint definiti urmatorii cinci
+operatori:
+	1.INITIALIZARE(S) - face stiva S vida ( initializeaza lista
+corespunzatoare )
+	2.VIRFST(S) - furnizeaza elementul din virful stivei ( deci
+primul nod al listei )
+	3.POP(S) - suprima elementul din virful stivei
+	4.PUSH(x,S) - insereaza elementul x in virful stivei pe care il
+actualizeaza
+	5.STIVID(S) - functie booleana ce e adevarata daca stiva este vida.
+	Cele mai avantajoase implementari ale structurii de date stiva sint
+cele cu ajutorul tipului pointer si al tipului tablou.
+
+	3.Cozi
+
+	Coada e tot un tip special de lista in care elementele sint inserate
+la un capat ( spate ) si sint suprimate la celalalt ( fata ); se mai numesc
+liste FIFO ( First In First Out ), adica de tip primul venit, primul servit.
+	Se definesc urmatorii operatori:
+	1.INITIALIZARE(C) - face coada ( lista ) vida
+	2.FATZA(C) - functie ce returneaza primul element al cozii C
+	3.ADAUGA(x,C) - insereaza elementul x in spatele cozii
+	4.SCOATE(C) - suprima primul element al lui C
+	5.VID(C) - functie ce e adevarata daca coada este vida.
+	Cele mai uzuale implementari ale cozii sint cu ajutorul tipului
+pointer si al tablourilor circulare.
+	Coada bazata pe prioritate e structura de date abstracta care permite
+insertia unui nou element si suprimarea celui mai mare element dintre cele
+existente. Structura difera de coada ( din care se suprima primul venit, deci
+elementul cel mai vechi ) si de stiva ( din care se suprima ultimul venit,
+deci cel mai nou ).
+	Asupra acestei structuri de date, ale carei elemente sint articole cu
+chei ( sau prioritati ), se definesc operatiile :
+	GENEREAZA - o coada bazata pe prioritati, pornind de la N elemente
+( succesiune de insertii )
+	INSEREAZA - un nou element
+	EXTRAGE - cel mai mare element
+	INLOCUIRE - a celui mai mare element cu unul nou, mai putin prioritar
+( insertie + suprimare )
+	SCHIMBA - prioritatea unui element ( suprimare + insertie )
+	SUPRIMA - un element oarecare, precizat
+	REUNESTE - doua cozi in una singura.
+	Ca implementari a acestei structuri de date, sint mai uzuale cele ce
+folosesc liste neordonate, liste ordonate dupa prioritate, ansamble.
+
+	4.Structuri de date multilista
+
+	O multilista e o lista care contine in cadrul unui nod mai multe
+cimpuri de inlantuire ( se mai folosesc termenii : Braid, MultiList, Multiply
+Linked List ).
+	Flexibilitatea acestei structuri de date e mare, se foloseste in baze
+de date, dar manipularea este dificila.
+
+	5.Liste generalizate
+
+	In LISP, singura structura de date este lista.
+	Unitatea fundamentala in LISP este atomul ( sir de caractere si/sau
+cifre ).
+	O lista este o multime de paranteze ce contin un numar oarecare de
+atomi si liste.
+	Atomii si listele sint memorate cu structuri de date speciale numite
+liste generalizate, cu nodurile avind trei cimpuri :
+	-Atom - boolean
+	-Info - daca Atom este true, altfel un -Pointer - spre o lista
+	-Urm - cimp de inlantuire
+	In PASCAL, o astfel de structura este definita :
+	type ListaGeneralizata=^Nod;
+	     Nod=record Urm:ListaGeneralizata;
+				 case Atom:boolean of
+					     true:( Info:char);
+				             false:(Lista:ListaGeneralizata)
+		 end;
+
+	6.Asocierea memoriei
+
+	Mapping-ul sau asocierea memoriei e o functie M(asociere) definita pe
+multimea elementelor unui tip domeniu, cu valori in multimea unui tip valoare
+( cele doua tipuri pot fi identice ), prin relatia:
+	M(D)=V,
+unde D apartine tipului domeniu, iar V apartine tipului valoare.
+	Uneori nu se poate stabili o expresie matematica prin care sa se
+exprime asocierile tuturor valorilor tipului domeniu, astfel incit trebuie
+memorate valorile lui M(D) pentru fiecare D.
+	Operatiile ce se definesc asupra structurii de tip asociere sint:
+	1.INITIALIZARE(M) - il face pe M identic cu asocierea vida
+	2.ATRIBUIE(M,D,V) - defineste pe M(D)=V
+	3.DETERMINA(M,D,V) - functie ce e true daca exista definita valoarea D
+din tipul memoriei si returneaza valoarea de iesire V, valoarea asocierii lui
+D.
+	De obicei tipul domeniu e un tip elementar, deci poate fi folosit ca
+indice intr-o structura tablou care sa implementeze asocierea.
+	De asemenea, asocierea memoriei se mai implementeaza si printr-o lista,
+fiecare nod continind o pereche (D,V).
+
+	7.Aplicatii
+
+1.Se cere sa se implementeze operatorii de prelucrare pentru
+liste dublu inlantuite, utilizind drept suport de implementare structuri de
+date de tip:
+		a) tablou
+		b) pointer
+		c) cursor.
+Fiecare din aceste implementari se vor realiza in doua variante:
+una obisnuita si o a doua , in care lista e circulara, avind un nod fictiv
+care "inchide lista ".
+Se vor masura timpii de executie ai operatorilor, facind aprecieri asupra
+performantelor.
+
+2.O lista dublu inlantuita existenta in memorie contine o expresie aritmetica
+in notatie postfix, in care operanzii sint reprezentati prin litere mici, iar
+operatorii pot fi +, -, * sau / , nodurile avind urmatoarea structura:
+type pointer=^nod;
+     nod=record oper:char; {litera (numele variabilei) sau unul din operatorii
+                           admisi }
+                val:real;  {valoarea operandului sau 0 daca nodul
+                           corespunde unui operator }
+		urm,ant:pointer {inlantuirile inainte si inapoi}
+	    end;
+Sa se scrie cite o procedura de evaluare a expresiei in urmatoarele variante:
+	-reducind pe rind cite trei noduri (continind 2 operanzi si un operator)
+la un nod continind rezultatul partial, pina la reducerea listei la un singur
+nod continind rezultatul final
+	-folosind o stiva in care se depun valorile operanzilor si rezultatele
+partiale (se va implementa stiva printr-o lista sau tablou)
+Pe parcursul evaluarii, se vor face verificarile privind corectitudinea
+expresiei, o eroare find semnalata printr-un mesaj si oprind evaluarea
+expresiei. Sa se compare timpii de executie ai celor doua variante.
+
+3.Este posibil sa fie memorate doua structuri de date de tip stiva intr-un
+acelasi tablou, una crescind de la pozitia 1 spre sfirsit, cealalta in sens
+invers. Se cere sa se redacteze o procedura PUSH(X,S) unde S este una sau alta
+dintre stive. Procedura va include toate testele de eroare necesare, care vor
+fi semnalate prin mesaje corespunzatoare.
+
+4.Se cere sa se elimine recursivitatea din urmatoarele proceduri:
+
+function combinari(n,m:integer):integer; {calculeaza combinari de n luate cite
+                                         m presupunind ca 0<=m<=n si n>=1}
+	begin
+		if (n=1) or (m=0) or (m=n) then
+			combinari:=1
+		else
+			combinari:=combinari(n-1,m)+combinari(n-1,m-1)
+	end;
+
+procedure inversare(var l:lista); {inverseaza lista l}
+	var x:tip_element;
+	begin
+		if not {lista vida} then 
+			begin	
+				x:=furnizeaza(primul(l),l);
+				suprima(primul(l),l);
+				inversare(l);
+				insereaza(l,x,fin(l))
+			end
+	end;
+
+Sa se compare timpii de executie pentru variantele recursiva si nerecursiva.
+
+5.O coada cu doua capete (DEQUEUE) este o lista in care elementele pot fi
+suprimate sau inserate la ambele capete. Se cere sa se dezvolte implementarea
+unor astfel de cozi utilizind structuri de tip tablou, pointer si cursor.

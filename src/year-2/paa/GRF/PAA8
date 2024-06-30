@@ -1,0 +1,544 @@
+        			Lucrarea nr.8
+
+                           TDA GRAF. IMPLEMENTARE
+
+     1.TDA Graf
+
+     1.1.Definitii
+
+     Un graf este o colectie de noduri si arce.
+     Nodurile pot fi identificate prin chei, iar arcele reprezinta conexiuni
+intre noduri.
+     Un graf G poate fi notat G=(N,A), unde N e multimea nodurilor, iar A a
+arcelor.
+     Ordinul |G| unui graf G e dat de numarul nodurilor.
+     Arcul a ce leaga nodurile x si y se spune ca este incident cu x si y si
+se noteaza a ~ (x,y). x si y se spune ca sunt adiacente.
+     Gradul unui nod este egal cu numarul arcelor incidente lui.
+     Un graf regulat are acelasi grad pentru toate nodurile.
+     Grafurile pentru care orice arc (x,y)=(y,x) sunt neorientate.
+     Bucla e un arc de forma a ~ (x,x).
+     Un graf simplu ( toate discutiile urmatoare se vor referi la astfel se
+grafuri ) nu accepta existenta arcelor multiple, deci intre orice doua noduri
+poate exista cel mult un arc.
+     Un graf G'=(N',A') este subgraf al unui graf G=(N,A) daca N' c N si orice
+arc a' ~ (x,y) din A' conecteaza noduri din N' ( x si y sunt din N' ).
+     Drum de la x la y e o succesiune de noduri conectate prin arce :
+     x, n1, n2, n3,..., y, lungimea drumului fiind data de numarul de arce.
+     Un drum este simplu daca nodurile din drum sunt distincte ( cu exceptia
+posibila a primului si ultimului ).
+     Un ciclu e un drum cu acelasi nod initial si final.
+     Doua noduri x si y se numesc conectate daca exista cel putin un drum
+intre ele.
+     Un graf este conex daca toate perechile sale de noduri sunt conectate.
+     Orice graf neconex este format din componenete conexe.
+     Se observa ca arborii sunt cazuri particulare ale grafurilor.
+     Un arbore de acoperire pentru un graf conex, este un subgraf care
+contine toate nodurile grafului, dar numai atatea conexiuni cate sunt necesare
+formarii unui arbore. Pentru orice graf se poate gasi o padure de arbori de
+acoperire, cate unul pentru fiecare componenta conexa.
+     Un graf complet de ordinul n contine arcuri intre toate perechile ce se
+pot forma cu cele n noduri ( deci contine n(n-1)/2 arce ).
+     Un graf e rar daca are relativ putine arce si dens daca e aproape complet.
+     Un graf e orientat daca arcele sale au un sens precizat.
+     Un graf este ponderat daca arcelor sale li se asociaza cate o valoare.
+     Un graf ponderat orientat se numeste retea.
+
+     1.2.Operatorii TDA Graf
+
+     a) Setul extins de operatori
+
+     Se folosesc notatiile:
+
+     Tip_Element - tipul nodurilor, cu campurile de Tip_Cheie si Tip_Info
+     g           - graf
+     indic_Nod   - indicator la nod
+     indic_Arc   - indicator la arc
+     e           - variabila de Tip_Element
+     k,k1,k2     - variabile de Tip_Cheie
+     x           - variabila de Tip_Info
+     b           - variabila booleana.
+
+     Operatorii setului extins sunt:
+
+     1.Init_Graf(g)    - creaza graful vid
+     2.Graf_Vid(g)     - verifica daca g e vid
+     3.Graf_Plin(g)    - verifica daca g e plin, deci nu mai pot fi adaugata
+                         alte noduri ( depinde de varianta de implementare )
+     4.Cheie_Elem_Graf(g,e)
+                       - returneaza cheia nodului e al grafului g
+     5.Cauta_Cheie_Graf(g,k)
+                       - returneaza true daca cheia k e gasita in g
+     6.Indica_Nod(g,k,indic_Nod)
+                       - indic_Nod va lua valoarea indicatorului spre nodul
+                         cu cheia k
+     7.Indica_Arc(g,k1,k2,indic_Arc)
+                       - indic_Arc va indica spre arcul ce conecteaza nodurile
+                         cu cheile k1 si k2
+     8.Arc_Vid(g,indic_Arc)
+                       - verifica daca indic_Arc este vid
+     9.Inser_Nod(g,e)  - se insereaza in g nodul e ca nod izolat ( neconectat )
+    10.Inser_Arc(g,k1,k2)
+                       - se insereaza arcul ce conecteaza nodurile de chei k1
+                         si k2
+    11.Suprim_Nod(g,indic_Nod)
+                       - se suprima nodul indicat, cu toate arcele incidente
+    12.Suprim_Arc(g,indic_Arc)
+                       - suprima arcul precizat
+    13.Actualiz_Nod(g,indic_Nod,x)
+                       - actualizeaza cu x informatia nodului indicat
+    14.Furniz_Nod(g,indic_Nod)
+                       - returneaza valoarea nodului ( de Tip_Element ) indicat
+    15.Travers_Graf(g,Vizita(Lista_de_argumente))
+                       - parcurge toate nodurile grafului g, pentru fiecare nod
+                         executand prelucrarea Vizita
+
+     b) Setul restrans de operatori
+
+     Se folosesc notatiile ( Rick Decker ):
+
+     - graful contine multimile ATOM si POZITIE
+     - g=(P,R,f) - unde
+     - P - subset finit al multimii POZITIE
+     - f - functie P-> ATOM
+     - R - relatie simetrica in P ( si ireflexiva daca nu se admit bucle )
+     - p,q - de tip POZITIE
+     - e - de tip ARC
+     - a - de tip ATOM
+
+     Operatorii setului restrans sunt:
+
+     1.Creaza(g)       - creaza graful vid g
+     2.Adiacent(p,q,g) - verifica daca p si q sunt adiacente
+     3.Modifica(a,p,g) - se modifica la a zona de date a nodului indicat de p
+     4.Furnizeaza(p,g) - returneaza zona de date a nodului indicat de p
+     5.Suprim_Nod(p,g) - se suprima nodul indicat cu toate arcele adiacente
+     6.Suprim_Arc(e,g) - se suprima arcul a
+     7.Inser_Nod(p,g)  - se adauga nodul indicat, ca nod izolat
+     8.Inser_Arc(e,g)  - se adauga arcul e
+
+     2.Tehnici de implementare a TDA Graf
+
+     2.1.Implementarea grafurilor prin matrici de adiacenta
+
+     Cea mai directa implementare este printr-o matrice de adiacente. Daca graful
+are N noduri, matricea A de dimensiune N x N , are elementul A[x,y] true daca
+x si y sunt adiacente. Matricea e simetrica pentru un graf neorientat.
+     Se realizeaza mai intai o corespondenta intre numele nodurilor si multimea
+indicilor, in una din variantele :
+     - numele pot fi - chiar indicii
+                     - literele alfabetului
+     - corespondenta se mai poate face prin :
+                     - tablouri
+                     - liste
+                     - arbore binar
+                     - tabela ( tehnica dispersiei ).
+     Reprezentarea e eficienta pentru grafurile dense. Pentru un graf cu n
+noduri, crearea grafului necesita O(n) pasi pentru noduri si O(n*n) pentru arce.
+
+      a) Mai jos se da varianta de implementare cu matrice de adiacente, pentru
+un graf cu N noduri, la care indicele unui nod e furnizat prin functia
+index. Se citesc numarul N de noduri si A de arce, apoi perechile de noduri
+conectate:
+
+       const maxN = 50;
+       var j,x,y,N,A: integer;
+           graf: array[1..maxN,1..maxN] of boolean;
+
+       function index(n:Tip_Cheie):integer;
+         begin  { daca cheile sunt primele N litere mici }
+           index:=ord(n)-ord('a')
+         end;
+
+       procedure constr_matrice_de_adiacente;
+         begin {N=nr.de noduri,A=nr.de arce}
+           readln(N,A);
+           for x := 1 to N do
+             for y := 1 to N do graf[x,y] := false;
+           for x := 1 to N do graf[x,x] := true;
+           for j := 1 to A do
+             begin
+               readln(n1,n2);
+               x := index(n1); y := index(n2);
+               graf[x,y] := true; graf[y,x] := true
+             end
+         end; {constr_matrice_de_adiacente}
+
+     b)O alta varianta de implementare cu matrice de adiacente este data mai
+jos, graful aparand ca o structura ce contine contorul nodurilor, tabloul
+nodurilor si matricea de adiacente ( arce ). Tabloul nodurilor nu este ordonat
+dupa chei. Un nod nou se adauga in continuarea celor existente.Suprimarea
+unui nod se realizeaza prin copierea ultimei intrari peste cea ce se sterge in
+tabloul Noduri, respectiv a conexiunilor ultimului nod peste cele ale nodului
+sters in Arce:
+
+     const NumarNoduri        = .......;
+
+     type  TipCheie           = .......;
+           TipInfo            = .......;
+           TipElement         = record
+             Cheie            : TipCheie;
+             Info             : TipInfo
+           end;
+
+           TipContor          = 0..NumarNoduri;
+           TipIndex           = 1..NumarNoduri;
+           TipTablouElem      = array[TipIndex] of TipElement;
+           TipMatrAdj         = array[TipIndex,TipIndex] of boolean;
+
+           Graf               = record
+             Contor           : TipContor;
+             Noduri           : TipTablouElem;
+             Arce             : TipMatrAdj
+           end;
+
+           TipArc             = record
+             linie,
+             coloana          : TipIndex
+           end;
+
+     var   g                  : Graf;
+           k,k1,k2            : TipCheie;
+           e                  : TipElement;
+           indicNod           : TipIndex;
+           indicArc           : TipArc;
+
+     procedure InserNod(var g: Graf;e: TipElement);{ insertia unui nod izolat }
+
+       var i,j: TipIndex;
+
+       begin
+         with g do
+           begin
+             contor := contor + 1;                     { se plaseaza e
+             Noduri[contor] := e;                       in nodul nou}
+             for i := 1 to contor do
+               Arce[i,contor] := false;                { se initializeaza
+             for j := 1 to contor do                   matricea de adiacente
+               Arce[contor,j] := false                 pentru nodul nou }
+           end {with}
+       end; {InserNod}
+
+     procedure InserArc(var g: Graf; indicArc: TipArc);
+
+       begin
+         g.Arc[indicArc.linie,indicArc.coloana] := true;
+         g.Arc[indicArc.coloana,indicArc.linie] := true
+       end; { InserArc }
+
+     procedure SuprimNod(var g: Graf; indicNod: TipIndex);
+
+       var i,j: TipIndex;
+
+       begin
+         with g do
+           begin
+             Noduri[indicNod] := Noduri[contor];
+             for j := 1 to contor do
+               Arce[indicNod,j] := Arce[contor,j];
+             for i := 1 to contor do
+               Arce[i,indicNod] := Arce[i,contor];
+             contor := contor - 1
+           end { with }
+       end; { SuprimNod }
+
+     procedure SuprimArc(var g: Graf; indicArc: TipArc);
+
+       begin
+         g.Arc[indicArc.linie,indicArc.coloana] := false;
+         g.Arc[indicArc.coloana,indicArc.linie] := false
+       end; { SuprimArc }
+
+     Construirea unui graf necesita cate un apel la InserNod pentru fiecare
+nod, respectiv cate un apel la InserArc pentru fiecare arc.
+     Daca nodurile s-ar introduce ordonate dupa cheie in Noduri, localizarea
+unei chei poate fi facuta folosind cautarea binara.
+
+     2.2.Implementarea grafurilor prin structuri de adiacenta
+
+     In aceasta implementare fiecarui nod i se asociaza o lista in care
+sunt inlantuite toate nodurile cu care acesta este conectat. Implementarea
+este avantajoasa in cazul grafurilor rare. Se vor prezenta trei subvariante.
+
+     a)Inceputurile listelor de inlantuiri se pastreaza intr-un tablou Stradj.
+Listele partajeaza acelasi nod final fictiv. Orice insertie se face la
+inceputul listei. Trebuie realizata o corespondenta intre numele nodurilor si
+multimea indicilor, prin functia index. Insertia unui arc implica insertia
+unui nod in fiecare din cele doua liste corespunzatoare nodurilor conectate :
+
+     const maxN = 100;
+
+     type legatura = ^Nod;
+          Nod = record
+            nume: integer; { index }
+            urm: legatura
+          end; { nod }
+
+     var j,x,y,N,A: integer;
+         n1,n2:TipCheie;
+         v,z: legatura;
+         Stradj: array[1..maxN] of legatura;
+
+     procedure constr_structuri_de_adiacenta;
+       begin {N=nr.de noduri,A=nr.de arce}
+         readln(N,A);
+         new(z);z^.urm:=z;
+         for j := 1 to N do
+           Stradj[j]:=z;
+         for j := 1 to A do
+           begin
+             readln(n1,n2);
+             x := index(n1); y := index(n2);
+             new(v); v^.nume := x; v^.urm := Stradj[y];
+             Stradj[y] := v;
+             new(v); v^.nume := y; v^.urm := Stradj[x];
+             Stradj[x] := v
+           end
+       end; {constr_structuri_de_adiacente}
+
+     Fiecare element din StrAdj ar putea retine si cheia nodului, astfel
+nemaifiind necesara o alta asociere:
+
+     StrAdj:array[1..maxN] of record cheie:TipCheie;
+                                     adj:legatura
+                              end;
+
+     b)Graful se implementeaza ca multilista:  o lista a nodurilor contine,
+pentru fiecare nod, inceputul listei de adiacente. Nodurile pot fi pastrate
+ordonat sau nu, in lista nodurilor cat si in cele de adiacente.
+
+     type TipCheie            = .....;
+          TipInfo             = .....;
+
+          TipElement          = record
+            cheie             : TipCheie;
+            info              : TipInfo
+          end;
+
+          PtrAdj              = ^Adj;
+
+          Adj                 = record
+            cheieAdj          : TipCheie;
+            urmAdj            : PtrAdj
+          end;
+
+          ptrNod              = ^Nod;
+          graf                = ptrNod;
+
+          Nod                 = record
+            elem              : TipElement;
+            urmNod            : ptrNod;
+            incepAdj          : PtrAdj
+          end;
+
+          TipArc              = record
+            v1,v2             : ptrNod
+          end;
+
+     var  g                   : graf;
+          indicNod            : ptrNod;
+          indicArc            : TipArc;
+          k,k1,k2             : TipCheie;
+          e                   : TipElement;
+
+     procedure InserArc(g: graf; indicArc: TipArc);
+       { se insereaza cate un nod in listele celor doua noduri conectate }
+
+       begin
+         Insert(indicArc.v1^.elem.cheie,indicArc.v2^.incepAdj);
+         Insert(indicArc.v2^.elem.cheie,indicArc.v1^.incepAdj)
+       end; { SuprimArc }
+
+     procedure SuprimArc(g: graf; indicArc: TipArc);
+       { se suprima cate un nod din listele celor doua noduri ale arcului }
+
+       var ik1,ik2: PtrAdj;
+
+       begin
+         ik1 := Cauta(indicArc.v1^.elem.cheie,
+                      indicArc.v2^.incepAdj);
+         ik2 := Cauta(indicArc.v2^.elem.cheie,
+                      indicArc.v1^.elem.cheie);
+         Suprima(ik1,indicArc.v2^.incepAdj);
+         Suprima(ik2,indicArc.v1^.incepAdj)
+       end; { SuprimArc }
+
+     c)Ceea ce este diferit fata de varianta anterioara este faptul ca in
+listele de adiacente nu apar cheile nodurilor, ci pointerii spre nodurile
+adiacente din lista ( principala ) de noduri ale grafului, algoritmii de
+prelucrare devenind mai simpli. Mai jos sunt dati cativa din setul restrans
+de operatori pentru TDA graf:
+
+     type
+       POZITIE = ^CelulaListNod;
+       PointListArc = ^CelulaListArc;
+
+       CelulaListNod = record
+         data    : ATOM; { informatie apartinind nodului }
+         urm     : POZITIE; { urmatoarea celula in lista nodurilor }
+         incep   : PointListArc {pointer la lista de arce(adiacente) }
+       end;
+
+       CelulaListArc = record
+         data   : ...; { informatie atasata arcului }
+         nod    : POZITIE; { destinatia arcului }
+         urm    : PointListArc { inlantuirea in lista de arce }
+         end;
+
+       ARC = record
+         nod1,nod2: POZITIE
+       end;
+
+       GRAF = POZITIE;
+
+       procedure Creaza(var G: GRAF);
+
+         begin
+           G := nil
+         end; { Creaza }
+
+       function Adiacent(p,q: POZITIE): boolean;
+         { primeste pointerii p si q la lista de noduri a lui G }
+         { cauta in lista de arce a lui p, o celula care indica nodul q }
+
+         var gata: boolean; { verifica traversarea listei de adiacente }
+             curent: PointListArc; { pointer la celula curenta a listei
+                              de adiacente }
+
+         begin { Adiacent }
+           Adiacent := false;
+           curent := p^.incep; { inceputul listei de adiacente a lui p }
+           gata := false;
+           while not gata do
+             if curent = nil then
+               gata := true
+             else
+               if curent^.nod = q then
+                 begin
+                   gata := true;
+                   Adiacent := true
+                 end
+               else
+                 curent := curent^.urm
+         end; { Adiacent }
+
+     procedure Modifica(a: ATOM; var p: POZITIE);
+
+       begin
+         p^.data := a
+       end; { Modifica }
+
+     function Furnizeaza(p: POZITIE): ATOM;
+
+       begin
+         Furnizeaza := p^.data
+       end; { Furnizeaza }
+
+     procedure SuprimNod(p: POZITIE; var G: GRAF);
+
+       var NodCurent: POZITIE;
+
+       procedure SuprimaCel(n: POZITIE; var inceput: PointListArc);
+
+         var temp: PointListArc;
+         { procedura recursiva care suprima din lista indicata }
+         { de inceput, celula avind cimpul nod egal cu n }
+
+         begin
+           if inceput <> nil then
+             if inceput^.nod = n then
+               begin
+                 temp := inceput;
+                 inceput := inceput^.urm;
+                 dispose(temp)
+               end
+             else
+               SuprimaCel(n,inceput^.urm)
+         end; { SuprimaCel }
+
+       procedure StergeList(var inceput: PointListArc);
+         { suprima recursiv toate elementele listei }
+         { indicate de inceput }
+
+         begin
+           if inceput <> nil then
+             begin
+               StergeList(inceput^.urm);
+               dispose(inceput)
+             end
+         end; { StergeList }
+
+       begin { SuprimNod }
+         NodCurent := G;
+         while NodCurent <> nil do
+           begin
+             if p <> NodCurent then
+               SuprimaCel(p,NodCurent^.incep);
+               NodCurent := NodCurent^.urm
+           end
+         StergeList(p^.incep)
+       end; { SuprimNod }
+
+     procedure InserNod(var p: POZITIE; var G: GRAF);
+
+       begin
+         New(p);
+         p^.urm := G;
+         p^.incep := nil;
+         G := p
+       end;
+
+     procedure InserArc(e: ARC; var G: GRAF);
+
+       var temp: PointListArc;
+
+       begin
+         if not Adiacent(e.nod1,e.nod2) then
+           begin
+             temp := e.nod1^.incep;
+             New(e.nod1^.incep);
+             e.nod1^.incep^.nod := e.nod2;
+             e.nod1^.incep^.urm := temp;
+             temp := e.nod2^.incep;
+             New(e.nod2^.incep);
+             e.nod2^.incep^.nod := e.nod1;
+             e.nod2^.incep^.urm := temp
+           end
+       end; { InserArc }
+
+     procedure SuprimArc(e: ARC; var G: GRAF)
+
+       procedure SuprimaCel(n: POZITIE; var inceput: PointListArc);
+            .
+            . { ca mai sus }
+            .
+          end; { SuprimaCel }
+
+       begin { SuprimArc }
+         if Adiacent(e.nod1,e.nod2) then
+           begin
+             SuprimaCel(e.nod2,e.nod1^.incep);
+             SuprimaCel(e.nod1,e.nod2^.incep)
+           end
+       end; { SuprimArc }
+
+
+     3.Aplicatii
+
+     3.1.Sa se implementeze TDA graf in toate cele cinci variante de
+implementare si sa se compare performantele operatorilor prin functia O.
+
+     3.2.Sa se scrie un program interactiv, care prelucreaza un graf prin
+urmatoarele comenzi:
+         I - initializeaza graful
+         N - adauga un nod de cheie precizata
+         S - suprima un nod de cheie precizata
+         A - adauga un arc intre doua noduri cu chei date
+         D - sterge un arc
+         V - vizualizeaza graful, tiparind multimile de noduri si arce
+         X - terminare.
+     Toate informatiile tastate vor fi validate.
+     Graful se va implementa folosind structuri de adiacente, in doua variante:
+         - prin prima metoda, tabloul nodurilor fiind ordonat dupa chei
+         - prin ultima metoda, lista nodurilor fiind ordonata dupa chei.
+

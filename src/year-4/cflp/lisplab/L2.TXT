@@ -1,0 +1,423 @@
+
+				Cap. 2
+				------
+
+Scopul acestui capitol is s'a explice crearea de noi proceduri 'si
+realizarea evalu'arilor condi'tionate.
+
+Recapitul^and, termenii de program, procedur'a 'si primitiv'a au
+sensuri pu'tin diferite. Un program este o colec'tie de proceduri, o
+procedur'a specific'a felul ^in care se face un calcul iar o
+primitiv'a este o procedur'a predefinit'a de limbaj.
+
+[DEFUN permite construirea de noi proceduri]
+
+Sintaxa:
+
+(DEFUN <numele procedurii>
+  (<parametru 1> <parametru 2> ... <parametru n>)
+  <corpul procedurii>)
+
+DEFUN nu ^i'si evalueaz'a argumentele, ci doar stabile'ste o
+procedur'a care va putea fi mai t^arziu utilizat'a. Numele procedurii
+trebuie s'a fie un simbol.
+
+Lista ce urmeaz'a dup'a numele procedurii se nume'ste lista de
+parametrii. C^and o procedur'a va fi apelat'a ^impreun'a cu
+argumentele sale ^intr-o expresie simbolic'a, valoarea fiec'arui
+parametru din procedur'a va fi determinat de valoarea agrumentului
+corespunz'ator din expresie.
+
+De exemplu procedura urm'atoare transform'a temperatura dat'a din
+grade Fahrenheit ^in grade Celsius:
+
+(defun f-to-c (temp)
+  (/ (- temp 32) 1.8))
+  f-to-c
+
+DEFUN va returna numele func'tiei ce tocmai a fost definit'a, dar
+partea util'a se realizeaz'a prin efecte laterale.
+
+La apel valoarea argumentului devine valoarea temporar'a a
+parametrului procedurii.
+
+  - Procesul de preg'atire a spa'tiului de memorie pentru valorile
+parametrilor se nume'ste LEGARE. Parametrii sunt lega'ti la apelul
+procedurilor.
+  - Procesul de stabilire a unei valori se nume'ste ATRIBUIRE. LISP
+^intotdeauna atribuie valori parametrilor imediat dup'a legare.
+
+(defun exchange (pair)
+  (list (cadr pair) (car pair)))	; Inverseaz'a elementele
+  exchange
+
+Comentariile ^in LISP se realizeaz'a cu ; De la ; p^an'a la
+sf^ar'situl liniei este comentariu.
+
+[Probleme]
+
+1. Unii sunt deranja'ti de numele primitivelor critice CAR, CDR 'si
+CONS. Defini'ti noi proceduri my-first, my-rest 'si construct care
+realizeaz'a acela'si lucru. Pute'ti defini 'si my-second, my-third,
+etc.
+
+2. Defini'ti rotate-left care prime'ste o list'a ca argument 'si
+returneaz'a o nou'a list'a ^in care primul element al listei de
+intrare este ultimul element al listei returnate.
+
+(rotate-left '(a b c))
+
+  (b c a)
+
+(rotate-left (rotate-left '(a b c))
+  (c a b)
+
+3. Defini'ti rotate-right.
+
+4. Un palindrom este o list'a care con'tine aceea'si secven't'a de
+elemente atunci c^and este citit'a at^at de la st^anga la dreapta c^at
+'si de la dreapta la st^anga. Defini'ti palindrom care prime'ste o
+list'a ca argument 'si returneaz'a un palindrom de lungime dubl'a.
+
+5. Defini'ti ec2 care prime'ste trei parametrii a, b 'si c 'si
+returneaz'a o list'a ce con'tine cele dou'a r'ad'acini ale ecua'tiei
+de gradul doi a*x^2+b*x+c=0, folosind formula:
+
+     -b+-sqrt(b*b-4*a*c)
+  x=---------------------
+            2*a
+
+[PREDICATELE sunt proceduri ce returneaz'a valoare de adev'ar]
+
+Defini'tii mai complicate necesit'a folosirea unor proceduri numite
+predicate. Un predicat este o procedur'a care returneaz'a o valoare ce
+semnaleaz'a adev'arat sau fals.
+
+Fals este ^intotdeauna semnalat de nil. Adev'arat este deseori
+semnalat de un simbol special t, dar practic orice diferit de nil
+semnaleaz'a adev'arat.
+
+Obs: t 'si nil sunt simboluri speciale, valorile lor fiind legate tot
+la t 'si nil. Astfel valoarea lui t este t 'si valoarea lui nil e nil.
+
+ATOM este un predicat care testeaz'a dac'a argumentul este un atom.
+LISTP testeaz'a dac'a argumentul este o list'a.
+
+Dac'a avem:
+
+b(setq digits '(zero unu doi trei patru cinci sase sapte opt noua))
+
+ATOM 'si LISTP lucreaz'a ^in felul urm'ator:
+
+(atom 'digits)
+  t
+
+(atom 'cinci)
+  t
+
+(atom digits)
+  nil
+
+(atom '(zero unu doi trei patru cinci sase sapte opt noua))
+  nil
+
+(listp 'digits)
+  nil
+
+(listp 'cinci)
+  nil
+
+(listp digits)
+  t
+
+(listp '(zero unu doi trei patru cinci sase sapte opt noua))
+  t
+
+EQUAL ia dou'a argumente 'si returneaz'a t dac'a sunt egale, altfel
+returneaz'a nil:
+
+(equal digits digits)
+  t
+
+(equal 'digits 'digits)
+  t
+
+(equal digits '(zero unu doi trei patru cinci sase sapte opt noua))
+  t
+
+(equal digits 'digits)
+  nil
+
+Predicatul = verific'a dac'a dou'a numere sunt egale.
+
+(= 3.14 2.71)
+  nil
+
+(= (* 5 5) (+ (* 3 3) (* 4 4)))
+  t
+
+Trebuie s'a subliniem acum o caracteristic'a foarte important'a:
+  - nil 'si lista vid'a () sunt complet echivalente: nil == (), ele
+satisfac predicatul EQUAL:
+
+(equal nil '())
+  t
+
+Obs:
+  - prin conven'tie lista vid'a este tip'arit'a ca nil.
+  - pot apare erori de programare din cauz'a c'a (atom '()) este
+t. Aceasta deoarece nil este considerat atom.
+
+Lista vid'a este singura expresie care este at^at list'a c^at 'si
+atom. At^at (atom nil) c^at 'si (listp nil) returneaz'a t.
+
+Predicatul NULL verific'a dac'a argumentul este lista vid'a:
+
+(null '())
+  t
+
+(null t)
+  nil
+
+(null digits)
+  nil
+
+(null 'digits)
+  nil
+
+Predicatul MEMBER testeaz'a dac'a un atom este elementul unei liste.
+
+(member <atom> <lista>)
+
+Ar fi natural ca member s'a returneze t dac'a atomul apar'tine
+listei. De fapt member returneaz'a fragmentul din list'a care ^incepe
+cu atomul g'asit. Ideea este de a returne ceva care este diferit de
+nil 'si ar putea fi util mai departe.
+
+(member 'cinci digits)
+  (cinci sase sapte opt noua)
+
+(member 'zece digits)
+  nil
+
+Primul argument trebuie s'a fie un element ^in primul nivel al celui
+de al doilea argument, nu "^ingropat" undeva ^in list'a:
+
+(member 'cinci '((zero doi patru sase opt) (unu trei cinci sapte)))
+  nil
+
+^In exemplul urm'ator se exploateaz'a faptul c'a MEMBER returneaz'a
+ceva util:
+
+(length (cdr (member 'cinci digits)))
+  4
+
+Pentru exemplele urm'atoare vom stabili:
+
+(setq zero 0 unu 1 doi 2 trei 3 patru 4 cinci 5 sase 6 sapte 7 opt 8
+noua 9)
+  9
+
+Predicatul NUMBERP testeaz'a dac'a argumentul este un num'ar:
+
+(numberp 3.14)
+  t
+
+(numberp cinci)
+  t
+
+(numberp 'cinci)
+  nil
+
+(numberp digits)
+  nil
+
+(numberp 'digits)
+  nil
+
+Predicatele < 'si > a'steapt'a ca argumentele s'a fie numere 'si
+testeaz'a dac'a sunt ordonate strict descresc'ator sau cresc'ator:
+
+(> cinci 2)
+  t
+
+(> 2 cinci)
+  nil
+
+(< 2 cinci)
+  t
+
+(< 2 2)
+  nil
+
+(> cinci patru trei doi unu)
+  t
+
+(> trei unu patru)
+  nil
+
+(> 3 1 4)
+  nil
+
+Predicatul ZEROP testeaz'a daca argumentul este num'arul zero.
+
+(zerop zero)
+  t
+
+(zerop 'zero)
+  error
+
+(zerop cinci)
+  nil
+
+Predicatul MINUSP testeaz'a dac'a un num'ar este negativ:
+
+(minusp unu)
+  nil
+
+(minusp (- unu))
+  t
+
+(minusp zero)
+  nil
+
+Predicatul EVENP testeaz'a dac'a un num'ar este par:
+
+(evenp (* 9 7 5 3))
+  nil
+
+Observa'ti c'a majoritatea predicatelor folosesc la sf^asitul numelui
+P ca mnemonic'a pentru predicat. Excep'tie face ATOM.
+
+[Probleme]
+
+6. Defini'ti propria versiune a predicatului EVENP. Pute'ti folosi
+primitiva REM care returneaz'a restul ^imp'ar'tirii ^intregi a dou'a
+numere.
+
+7. Defini'ti predicatul PALINDROMP care testeaz'a dac'a argumentul
+este un palindrom.
+
+8. Defini'ti predicatul NOT-REALP care ia trei parametrii 'si
+returneaz'a t dac'a b*b-4*a*c < 0.
+
+[Predicate logice]
+
+NOT returneaz'a t doar dac'a argumentul este nil.
+
+(not nil)
+  t
+
+(not t)
+  nil
+
+(setq pets '(dog cat))
+
+(not (member 'dog pets))
+  nil
+
+(not (member 'tiger pets))
+  t
+
+AND returneaz'a diferit de nil doar dac'a toate argumentele sunt
+diferite de nil. OR returneaz'a diferit de nil dac'a cel putin unul
+din argumente este diferit de nil. Ambele iar orice num'ar de
+argumente.
+
+(and t t nil)
+  nil
+
+(or t t nil)
+  t
+
+(and (member 'dog pets) (member 'tiger pets))
+  nil
+
+(or (member 'dingo pets) (member 'tiger pets))
+  nil
+
+Argumentele pentru AND 'si OR nu sunt tratate ^in mod standard:
+  - AND ^i'si evalueaz'a argumentele de la st^anga la dreapta. Daca
+^int^alne'ste nil se opre'ste, argumentele r'amase nu mai sunt
+evaluate! Altfel AND returneaz'a valoarea ultimului argument.
+  - OR ^i'si evalueaz'a argumentele de la st^anga la dreapta. Daca
+^int^alne'ste ceva diferit nil se opre'ste, argumentele r'amase nu mai
+sunt evaluate! Altfel OR returneaz'a nil.
+  Ambele predicate returneaz'a ultima valoare calculat'a ^in caz de
+succes.
+
+(and (member 'dog pets) (member 'cat pets))
+  (cat)
+
+(or (member 'dog pets) (member 'tiger pets))
+  (dog cat)
+
+[Selectarea alternativelor. Primitiva COND]
+
+Sintaxa lui COND este:
+
+(COND (<test 1> ... <resultat 1>)
+      (<test 2> ... <resultat 2>)
+      ...
+      (<test n> ... <resultat n>))
+
+Simbolul COND este urmat de un num'ar oarecare de liste fiecare
+con'tin^and un test 'si o expresie de evaluat. Fiecare list'a se
+nume'ste o clauz'a. Ideea este de a parcurge clauze evalu^and testul
+fiec'areia, p^ana c^and valoarea unui test este diferit'a de nil, ^in
+acest caz evalu^anduse 'si restul clauzei.
+
+Exist'a dou'a cazuri speciale:
+  - dac'a testul nici unei clauze nu este diferit de nil, COND
+returneaz'a nil.
+  - dac'a clauza con'tine doar testul se returneaz'a valoarea
+testului.
+
+^In exemplul urm'ator, presupun^and c'a L este o list'a, rezultatul
+este simbolul EMPTY dac'a L este vid'a altfel NOT-EMPTY:
+
+(cond ((null L) 'EMPTY)
+      (t 'NOT-EMPTY))
+
+Deasemenea se poate scrie:
+
+(cond (L 'NOT-EMPTY)
+      (t 'EMPTY))
+
+Observa'ti c'a NULL 'si NOT sunt practic primitive echivalente:
+
+(NOT X) == (NULL X)
+
+[Probleme]
+
+9. Exprima'ti (abs X), (min A B) 'si (max A B) cu ajutorul lui COND.
+
+10. Exprima'ti (not U), (or X Y Z) 'si (and A B C) cu ajutorul lui
+COND.
+
+11. Care este valoarea urm'atoarei forme:
+
+(cons (car nil) (cdr nil))
+
+[COND 'si DEFUN]
+
+Vrem s'a definim o procedur'a care prime'ste dou'a argumente: un atom
+'si o list'a, 'si returneaz'a o list'a av^and atomul pus ^in capul
+listei doar dac'a nu este deja ^in list'a. Altfel returneaz'a lista
+nemodificat'a.
+
+(defun adjoin (item bag)
+  (cond ((member item bag) bag)		; este deja ^in list'a?
+        (t (cons item bag))))		; adaug'a in capul listei.
+  adjoin
+
+t va ap'area de multe ori ca test pentru ultima clauz'a a unui COND
+prentru a defini ce trebuie f'acut dac'a nici o clauz'a nu a fost
+evaluat'a.
+
+[Probleme]
+
+12. Defini'ti MEDIAN-OF-THREE, o procedur'a care prime'ste trei
+argumente numerice 'si returneaz'a pe cel din mijloc ca valoare
+(adic'a pe cel care nu e cel mai mic 'si nu e cel mai mare).
+

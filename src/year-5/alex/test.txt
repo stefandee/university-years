@@ -1,0 +1,21 @@
+program ok;
+var
+  z : integer;
+
+procedure zi(a : integer);
+  procedure noapte(b : integer);
+    begin
+      print(" b = ", b - 3);
+      if b > 1 then zi(b - 3);
+    end;
+begin
+  print(" a = ", a - 3);
+  z := z + 1;
+  if a > 1 then noapte(a + 2);
+end;
+
+begin
+  z := 1;
+  zi(6);
+  print(" z = ", z);
+end.

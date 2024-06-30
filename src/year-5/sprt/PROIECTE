@@ -1,0 +1,100 @@
+   TEME DE PROIECT
+
+   1. Mecanismul de alocare a UC pe baza prioritatii dinamice a proceselor
+
+   2. Nivelul de comunicare intre procese
+
+   3. Nivelul functiilor de timp real
+
+   4. Functii de I/E
+
+
+
+   Fiecare tema adauga cate un nivel executivului conceput la laborator.
+Proiectul va cuprinde:
+   - o descriere ( pe scurt ) a functiilor executivului (de la laborator)
+   - o prezentare pe larg a nivelului adaugat de proiect
+   - cel putin doua aplicatii care sa apeleze toate functiile executivului.
+
+
+
+   TEMA 1
+
+   a) - procesele aflate in starea PREGATIT vor fi inlantuite intr-o lista,
+implementata prin cursori ( campul urm )
+      - se vor face teste de performanta comparative cu varianta de la
+laborator
+
+   b) - se adauga clasei proces un camp de prioritate, maxima fiind 0
+      - acesta se initializeaza cu informatia corespunzatoare din
+info_init_proces ( unde printr-un camp se precizeaza de catre programator )
+      - se va gestiona o lista ordonata descrescator dupa nivelul de priori-
+tate a proceselor aflate in starea PREGATIT, la lansarea aplicatiei si
+in cedeaza_UC, lansandu-se in executie procesul cu prioritate maxima
+      - se va concepe o functie publica a executivului de modificare la valoa-
+rea precizata a prioritatii unui proces cu numarul ( sau numele ) precizat;
+daca procesul precizat e in starea PREGATIT, trebuie reorganizata lista
+proceselor aflate in aceasta stare
+
+
+
+   TEMA 2
+
+   - se va concepe clasa CutiePostala ce va contine un buffer de mesaje
+de capacitatea precizata la instantierea cutiei ( tablou dinamic );
+cutia foloseste trei semafoare proprii - unul de acces exclusiv la tamponul
+de mesaje, doua pentru relatia producator - consumator
+   - se vor implementa functiile publice ale cutiei:
+      - constructorul ce specifica dimensiunea bufferului
+      - int test() - verifica existenta de mesaje
+      - send(mesaj)
+      - receive(&mesaj)
+      - send_cu_raspuns(&mesaj) - mesajul trebuie sa precizeze cutia la care
+				 se asteapta mesajul de raspuns, care se poate
+				 receptiona in spatiul mesajului trimis
+//    - send_cu_raspuns_temporizat(&mesaj, timp_limita) - analog cu functia
+				 de mai sus, dar se asteapta un timp_limita
+
+
+
+   TEMA 3
+
+   - se vor implementa functiile:
+     - delay ( nr_cuante )
+     - delays ( nr_secunde )
+     - delaya ( timp_absolut ) - intarziere pana la ora precizata
+     - ceastr() - returneaza timpul scurs de la lansarea aplicatiei
+     - ceasa() - returneaza ora
+   - se va implementa o lista a proceselor intarziate ( prin campul urm );
+procesele vor fi inlantuite crescator dupa timpul de asteptare, precizandu-
+se in campul cuante_delay din proces, numarul de cuante de asteptare fata de
+procesul aflat anterior in lista; pe timpul introducerii in aceasta lista,
+deci in executia functiilor delayx, tratarea intreruperii trebuie facuta
+de o functie care sa actualizeze ceasul, revenind apoi in procesul activ;
+in functia de tratare ceas ( de la laborator ) se adauga secventa de actualizare
+a listei proceselor intarziate ( decrementarea numarului de cuante pentru
+primul proces, cu scoatrea din lista si trecerea in PREGATIT a
+procesului ( proceselor ) ce si-a epuizat asteptarea )
+
+
+
+   TEMA 4
+
+   - fiecarui proces i se va "aloca" o fereastra de I/E; calculul pentru
+ferestre si trasarea lor ( cu un antet reprezentand numele procesului ) se
+face la initializarea executivului; s-ar putea introduce in info_init_proces
+un camp care sa indice daca procesului sa i se aloce o astfel de fereastra
+sau nu ( deci va realiza operatii de I/E sau nu )
+   - se vor implementa clasele Intrare si Iesire, cu instantieri cin si cout
+( in aplicatii ) care contin redefinirea operatorilor >> si << pentru citirea si
+scrierea tipurilor de baza; functiile se vor executa in regim de excludere
+mutuala ( se va folosi un semafor binar de I/E ) si vor avea algoritmul
+          - P(sem)
+	  - activarea fereastrei procesului activ si aducerea cursorului
+            la ultima pozitie din aceasta fereastra
+          - citirea / scrierea parametrului functiei
+          - salvarea pozitiei curente a cursorului
+          - V(sem)
+			
+    
+

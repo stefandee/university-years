@@ -1,0 +1,769 @@
+
+
+PROGRAM matrice_de_adiacente;
+CONST maxN = 50;
+VAR j,x,y,N,A: INTEGER;
+    GRAF: ARRAY[1..maxN,1..maxN] OF BOOLEAN;
+BEGIN                              {N=nr.de noduri,A=nr.de arce}         
+  READLN(N,A);
+  FOR x := 1 TO N DO                              ( 3.1 )
+    FOR y := 1 TO N DO GRAF[x,y] := FALSE;
+  FOR x := 1 TO N DO GRAF[x,x] := TRUE;
+  FOR j := 1 TO A DO
+    BEGIN
+      READLN(n1,n2);
+      x := index(n1); y := index(n2);
+      GRAF[x,y] := TRUE; GRAF[y,x] := TRUE
+    END
+END. {matrice_de_adiacente}
+
+
+
+
+CONST NumarNoduri        = .......;
+
+TYPE  TipCheie           = .......;
+      TipInfo            = .......;
+      TipElement         = RECORD
+        Cheie            : TipCheie;
+        Info             : TipInfo
+      END;
+
+      TipContor          = 0..NumarNoduri;
+      TipIndex           = 1..NumarNoduri;
+      TipTablouElem      = ARRAY[TipIndex] OF TipElement;
+      TipMatrAdj         = ARRAY[TipIndex,TipIndex] OF BOOLEAN;
+
+      Graf               = RECORD
+        Contor           : TipContor;              ( 3.2 )       
+        Noduri           : TipTablouElem;
+        Arce             : TipMatrAdj
+      END;
+
+      TipArc             = RECORD
+        linie,
+        coloana          : TipIndex
+      END;
+
+VAR   g                  : Graf;
+      k,k1,k2            : TipCheie;
+      e                  : TipElement;
+      indicNod           : TipIndex;
+      indicArc           : TipArc;
+
+
+
+   
+PROCEDURE InserNod(VAR g: Graf;e: TipElement);
+
+  VAR i,j: TipIndex;
+  
+  BEGIN
+    WITH g DO
+      BEGIN
+        contor := contor + 1;                     { se plaseaza e
+        Noduri[contor] := e;                       in nodul nou}
+        FOR i := 1 TO contor DO                   ( 3.3 )
+          Arce[i,contor] := FALSE;                { se initia-
+        FOR j := 1 TO contor DO                   lizeaza matricea
+          Arce[contor,j] := FALSE                 de adiacente pt.
+      END {WITH}                                  nodul nou}
+  END; {InserNod}                                   
+
+
+
+
+PROCEDURE SuprimNod(VAR g: Graf; indicNod: TipIndex);
+
+  VAR i,j: TipIndex;
+
+  BEGIN
+    WITH g DO                                     ( 3.4 )
+      BEGIN
+        Noduri[indicNod] := Noduri[contor];
+        FOR j := 1 TO contor DO
+          Arce[indicNod,j] := Arce[contor,j];
+        FOR i := 1 TO contor DO
+          Arce[i,indicNod] := Arce[i,contor];
+        contor := contor - 1
+      END { WITH }
+  END; { SuprimNod }
+
+
+
+
+PROCEDURE SuprimArc(VAR g: Graf; indicArc: TipArc);
+
+  BEGIN
+    g.Arc[indicArc.linie,indicArc.coloana] := FALSE;
+    g.Arc[indicArc.coloana,indicArc.linie] := FALSE    ( 3.5 ) 
+  END; { SuprimArc }    
+
+
+
+
+
+
+
+
+
+
+
+PROGRAM StructuraDeAdiacente;
+
+CONST maxN = 100;
+
+TYPE legatura = ^Nod;
+     Nod = RECORD
+       nume: INTEGER;
+       urm: legatura
+     END; { nod }
+
+VAR j,x,y,N,A: INTEGER;
+    v,z: legatura;
+    Stradj: ARRAY[1..maxN] OF legatura;
+
+BEGIN
+  READLN(N,A);
+  NEW(z); z^.urm := z;                            ( 3.6 )
+  FOR j := 1 TO N DO Stradj[j] := z;
+  FOR j := 1 TO A DO 
+    BEGIN
+      READLN(n1,n2);
+      x := index(n1); y := index(n2);
+      NEW(v); v^.nume := x; v^.urm := Stradj[y];
+      Stradj[y] := v;
+      NEW(v); v^.nume := y; v^.urm := Stradj[x];
+      Stradj[x] := v
+    END
+END.
+
+
+
+
+PROCEDURE SuprimArc(g: graf; indicArc: TipArc);
+
+  VAR ik1,ik2: PtrAdj;
+
+  BEGIN
+    ik1 := CAUTA(indicArc.v1@.elem.cheie,
+                 indicArc.v2@.incepAdj);
+    ik2 := CAUTA(indicArc.v2@.elem.cheie,
+                 indicArc.v1@.elem.cheie);        ( 3.8 )
+    SUPRIMA(ik1,indicArc.v2@.incepAdj);
+    SUPRIMA(ik2,indicArc.v1@.incepAdj)
+  END; { SuprimArc }
+
+
+
+
+
+
+
+
+
+
+                   
+
+TYPE TipCheie            = .....;
+     TipInfo             = .....;
+   
+     TipElement          = RECORD
+       cheie             : TipCheie;
+       info              : TipInfo
+     END;
+
+     PtrAdj              = @Adj;
+   
+     Adj                 = RECORD
+       cheieAdj          : TipCheie;
+       urmAdj            : PtrAdj
+     END;
+
+     ptrNod              = @Nod;
+     graf                = ptrNod;
+ 
+     Nod                 = RECORD
+       elem              : TipElement;
+       urmNod            : ptrNod;
+       incepAdj          : PtrAdj                 ( 3.7 )
+     END;
+
+     TipArc              = RECORD
+       v1,v2             : ptrNod
+     END;
+   
+VAR  g                   : graf;
+     indicNod            : ptrNod;
+     indicArc            : TipArc;
+     k,k1,k2             : TipCheie;
+     e                   : TipElement;
+
+
+
+        
+PROCEDURE Creaza(VAR G: GRAF);
+
+  BEGIN
+    G := NIL
+  END; { Creaza }
+
+FUNCTION Adiacent(p,q: POZITIE): BOOLEAN;         ( 3.11 )
+  { primeste pointerii p si q la lista de noduri a lui G }
+  { cauta in lista de arce a lui p, o celula care indica nodul q }
+  
+  VAR gata: BOOLEAN; { verifica traversarea listei de adiacente }
+      curent: PointListArc; { pointer la celula curenta a listei
+                              de adiacente }
+
+
+
+
+PROCEDURE SuprimNod(g: graf; indicNod: graf);
+
+  VAR k1,k2     : TipCheie;
+      indicNod2 : graf;
+      ik2,curent: PtrAdj;
+
+  BEGIN
+    k1 := indicNod@.elem.cheie; curent := indicNod@.incepAdj;
+    WHILE NOT FIN(curent) DO
+      BEGIN
+        k2 := (PRIMUL(curent))@.cheieAdj;
+        SUPRIMA(PRIMUL(curent),curent);           ( 3.9 )
+        indicNod2 := CAUTA(k2,g);
+        ik2 := CAUTA(k1,indicNod2@.incepAdj);
+        SUPRIMA(ik2,indicNod2@.incepAdj);
+        { Se presupune ca operatorul SUPRIMA actualizeaza in mod
+          corespunzator valoarea variabilei "curent" nemaifiind
+          necesara trecerea explicita la elementul urmator al 
+          listei indicate de "curent". Se precizeaza faptul ca in
+          aceasta situatie este vorba despre o suprimare a 
+          primului element al listei }
+      END   
+    SUPRIMA(indicNod,g)
+  END; { SuprimNod }    
+
+
+
+
+TYPE 
+  POZITIE = ^CelulaListNod;
+  PointListArc = ^CelulaListArc;
+  
+  CelulaListNod = RECORD
+    data    : ATOM; { informatie apartinind nodului }
+    urm     : POZITIE; { urmatoarea celula in lista nodurilor }
+    incep   : PointListArc {pointer la lista de arce(adiacente) }
+  END;
+
+  CelulaListArc = RECORD
+    data   : ...; { informatie atasata arcului }
+    nod    : POZITIE; { destinatia arcului }       ( 3.10 )
+    urm    : PointListArc { inlantuirea in lista de arce }
+  END;
+
+  ARC = RECORD
+    nod1,nod2: POZITIE
+  END;
+
+  GRAF = POZITIE;
+     
+
+      
+
+    
+
+  BEGIN { Adiacent }
+    Adiacent := FALSE;
+    curent := p^.incep; { inceputul listei de adiacente a lui p }
+    gata := FALSE;
+    WHILE NOT gata DO
+      IF curent = NIL THEN
+        gata := TRUE
+      ELSE
+        IF curent^.nod = q THEN
+          BEGIN
+            gata := TRUE;
+            Adiacent := TRUE
+          END
+        ELSE
+          curent := curent^.urm 
+  END; { Adiacent }
+
+PROCEDURE Modifica(a: ATOM; VAR p: POZITIE);
+
+  BEGIN
+    p^.data := a
+  END; { Modifica }
+
+FUNCTION Furnizeaza(p: POZITIE): ATOM;
+
+  BEGIN                                      ( 3.11 continuare )
+    Furnizeaza := p^.data
+  END; { Furnizeaza }
+
+PROCEDURE SuprimNod(p: POZITIE; VAR G: GRAF);
+  
+  VAR NodCurent: POZITIE;
+
+  PROCEDURE SuprimaCel(n: POZITIE; VAR inceput: PointListArc);
+
+    VAR temp: PointListArc;
+    { procedura recursiva care suprima din lista indicata }
+    { de inceput, celula avind cimpul nod egal cu n }
+
+    BEGIN
+      IF inceput <> NIL THEN
+        IF inceput^.nod = n THEN 
+          BEGIN
+            temp := inceput;
+            inceput := inceput^.urm;
+            DISPOSE(temp)
+          END
+        ELSE
+          SuprimaCel(n,inceput^.urm)
+    END; { SuprimaCel }
+    
+
+
+
+
+  PROCEDURE StergeList(VAR inceput: PointListArc);
+    { suprima recursiv toate elementele listei }
+    { indicate de inceput }
+
+    BEGIN
+      IF inceput <> NIL THEN
+        BEGIN
+          StergeList(inceput^.urm);
+          DISPOSE(inceput)
+        END
+    END; { StergeList }
+
+  BEGIN { SuprimNod }
+    NodCurent := G;
+    WHILE NodCurent <> NIL DO
+      BEGIN
+        IF p <> NodCurent THEN
+          SuprimaCel(p,NodCurent^.incep);
+        NodCurent := NodCurent^.urm          ( 3.11 continuare )
+      END    
+    StergeList(p^.incep)
+  END; { SuprimNod }
+
+PROCEDURE InserNod(VAR p: POZITIE; VAR G: GRAF);
+
+  BEGIN
+    New(p);
+    p^.urm := G;
+    p^.incep := NIL;
+    G := p
+  END; 
+
+PROCEDURE InserArc(e: ARC; VAR G: GRAF);
+
+  VAR temp: PointListArc;
+
+  BEGIN
+    IF NOT Adiacent(e.nod1,e.nod2) THEN
+      BEGIN
+        temp := e.nod1^.incep;
+        New(e.nod1^.incep);
+        e.nod1^.incep^.nod := e.nod2;
+        e.nod1^.incep^.urm := temp;
+        temp := e.nod2^.incep;
+        New(e.nod2^.incep);
+        e.nod2^.incep^.nod := e.nod1;
+        e.nod2^.incep^.urm := temp
+      END
+  END; { InserArc } 
+
+
+
+
+
+
+PROCEDURE SuprimArc(e: ARC; VAR G: GRAF)
+
+  PROCEDURE SuprimaCel(n: POZITIE; VAR inceput: PointListArc);
+            .
+            . { ca mai sus }
+            .
+    END; { SuprimaCel }
+
+  BEGIN { SuprimArc }                        ( 3.11 continuare )
+    IF Adiacent(e.nod1,e.nod2) THEN
+      BEGIN
+        SuprimaCel(e.nod2,e.nod1^.incep);
+        SuprimaCel(e.nod1,e.nod2^.incep)
+      END
+  END; { SuprimArc }
+
+
+
+
+PROCEDURE CautaInAdincime(x: Nod);
+
+  VAR y: Nod;
+
+  BEGIN
+    marc[x] := vizitat;                           ( 3.12 )  
+    FOR fiecare nod y adiacent lui x DO
+      IF marc[y] = nevizitat THEN
+        CautaInAdincime(y)  
+  END; { CautaInAdincime }
+
+
+
+
+PROCEDURE CautaInAdincime1(x: INTEGER);
+
+  VAR t: INTEGER;
+
+  BEGIN
+    id := id + 1; marc[x] := id;                  ( 3.14 )
+    FOR t := 1 TO N DO
+      IF A[x,t] THEN
+        IF marc[t] = 0 THEN CautaInAdincime1(t)
+  END; { CautaInAdincime1 }
+
+
+
+
+
+
+
+
+
+
+
+
+PROCEDURE Traversare1;
+
+  VAR id,x: INTEGER;
+      marc: ARRAY[1..maxN] OF INTEGER;
+
+  PROCEDURE CautaInAdincime(x: INTEGER);
+
+    VAR t: legatura;
+
+    BEGIN
+      id := id + 1; marc[x] := id;
+      t := Stradj[x];
+      WHILE t <> z DO
+        BEGIN
+          IF marc[t^.nume] = 0 THEN
+            CautaInAdincime(t^.nume);             ( 3.13 )
+          t := t^.urm
+        END
+    END; { CautaInAdincime }  
+
+  BEGIN { Traversare1 }
+    id := 0;
+    FOR x := 1 TO N DO marc[x] := 0;
+    FOR x := 1 TO N DO
+      IF marc[x] = 0 THEN CautaInAdincime(x)
+  END; { Travesare1 }  
+
+
+
+PROCEDURE CautaPrinCuprindere(x: Nod);
+  { se parcurg toate nodurile adiacente lui x prin cautare prin
+    cuprindere }
+
+  VAR Q: CoadaDeNoduri;
+      x,y: Nod;
+      marc: ARRAY[1..maxN] OF INTEGER;
+
+  BEGIN
+    marc[x] := vizitat;
+    ADAUGA(x,Q);
+    WHILE NOT VID(Q) DO
+      BEGIN
+        x := FATA(Q);                             ( 3.16 )
+        SCOATE(Q);
+        FOR fiecare nod y adiacent lui x DO
+          IF marc[y] = nevizitat THEN
+            BEGIN
+              marc[y] := vizitat;
+              ADAUGA(y,Q);
+              INSERTIE((x,y),T)
+            END
+      END
+  END; { CautaPrinCuprindere }  
+   
+
+PROCEDURE Traversare2;
+
+  VAR id,x: INTEGER;
+      marc: ARRAY[1..maxN] OF INTEGER;
+
+
+  PROCEDURE CautaInAdincimeNerecursiv(x: INTEGER);
+
+    VAR t: legatura;
+
+    BEGIN
+      push(x);
+      REPEAT
+        x := pop;
+        id := id + 1; marc[x] := id; 
+        t := Stradj[x];
+        WHILE t <> z DO
+          BEGIN
+            IF marc[t^.nume] = 0 THEN
+              BEGIN
+                push(t^.nume);                    ( 3.15 )
+                marc[t^.nume] := -1
+              END;
+            t := t^.urm
+          END       
+      UNTIL stivid
+    END; { CautaInAdincimeNerecursiv }
+
+
+  BEGIN
+    id := 0; initializare; 
+    FOR x := 1 TO N DO marc[x] := 0;
+    FOR x := 1 TO N DO
+      IF marc[x] = 0 THEN CautaInAdincimeNerecrsiv
+  END; { Traversare2 } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PROCEDURE ParcurgerePrinCuprindere;
+
+  VAR id,x: INTEGER;
+      mark: ARRAY[1..maxN] OF INTEGER;
+
+  PROCEDURE CautaPrinCuprindere(x: INTEGER);
+   
+    VAR t: legatura;
+
+    BEGIN
+      ADAUGA(x);
+      REPEAT
+        x := SCOATE;
+        id := id + 1; marc[x] := id;
+        t := Stradj[x]; 
+        WHILE t <> z DO
+          BEGIN
+            IF marc[t^.nume] = o THEN             ( 3.17 )    
+              BEGIN
+                ADAUGA(t^.nume);
+                marc[t^.nume] := -1
+              END
+            t := t^.urm
+          END 
+      UNTIL VID
+    END; { CautaPrinCuprindere }
+
+  BEGIN { ParcurgerePrinCuprindere }
+    id := 0; INITIALIZARE;
+    FOR x := 1 TO N DO marc[x] := 0;
+    FOR x := 1 TO N DO
+      IF marc[x] = 0 THEN CautaPrinCuprindere(x)
+  END; { ParcurgerePrinCuprindere }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PROCEDURE ArboreDeAcoperireCA(G: GRAF);
+
+  VAR p: POZITIE;
+      e: PointListArc;
+
+  PROCEDURE ConstructieCA(p: POZITIE);
+
+    VAR arcCurent: PointListArc;
+        q        : POZITIE;
+
+    BEGIN
+      p^.marc := TRUE;
+      arcCurent := p^.incep;
+      WHILE arcCurent <> NIL DO
+        BEGIN
+          q := arcCurent^.nod;
+          IF NOT q^.marc THEN                     ( 3.18 ) 
+            BEGIN                                  
+              arcCurent^.marcArb := TRUE;
+              { arcul arboreluiCA poate fi tiparit de asemenea }
+              { poate fi marcata si cealalta copie a lui }
+              { arcCurent, deoarece in aceasta implementare }
+              { fiecare arc e reprezentat de doua ori }
+              ConstructieCA(q)
+            END;
+          arcCurent := arcCurent^.urm
+        END
+    END; { ConstructieCA }
+
+
+
+  BEGIN { ArboreDeAcoperireCA }
+    p := G;
+    WHILE p <> NIL DO
+      BEGIN
+        p^.marc := FALSE;
+        e := p^.incep;
+        WHILE e <> NIL DO
+          BEGIN
+            e^.marcArb := FALSE;
+            e := e^.urm
+          END;
+        p := p^.urm    
+      END;
+    p := G;
+    ConstructieCA(p)
+  END; { ArboreDeAcoperireCA }
+
+
+
+
+
+
+
+ 
+PROCEDURE ArboreDeAcoperireCC(G: GRAF);
+
+  VAR C:COADA; { de pozitii }
+      n,m: POZITIE;
+      arcCurent: PointListArc;
+
+  BEGIN
+    n := G;
+    WHILE n <> NIL DO
+      BEGIN
+        n^.marc := FALSE;
+        n := n^.urm
+      END;
+    INITIALIZARE(C);
+    n := G;
+    ADAUGA(n,C);
+    n^.marc := TRUE;
+    WHILE NOT VID(C) DO
+      BEGIN
+        n := FATA(C);
+        SCOATE(C);
+        arcCurent := n^.incep;                    ( 3.19 )   
+        WHILE arcCurent <> NIL DO
+          BEGIN
+            m := arcCurent^.nod;
+            IF NOT m^.marc THEN
+              BEGIN
+                ADAUGA(m,C);
+                arcCurent^.marcArc := TRUE
+                { se poate afisa arcul de arbore }
+                { se poate marca si cealalta copie }
+                { a lui arcCurent }
+              END;
+            arcCurent := arcCurent^.urm
+          END
+      END      
+  END; { ArboreDeAcoperireCC }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FUNCTION Articulatie(x: INTEGER): INTEGER;
+
+  VAR t: legatura;
+      m,min: INTEGER;
+
+  BEGIN
+    id := id + 1; marc[x] := id; min := id;
+    t := Stradj[x];
+    WHILE t <> z DO
+      BEGIN
+        IF marc[t^.nume] = 0 THEN                 ( 3.20 )
+          BEGIN
+            m := Articulatie(t^.nume);
+            IF m < min THEN min := m;
+            IF m  >= marc[x] THEN WRITELN(x)
+          END
+        ELSE
+          IF marc[t^.nume] < min THEN min := marc[t^.nume];
+        t := t^.urm
+      END
+    Articulatie := min
+  END; { Articulatie }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            

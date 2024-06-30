@@ -1,0 +1,405 @@
+                        Lucrarea nr. 4
+
+                 SORTAREA FISIERELOR SECVENTIALE
+
+
+     1.  Scopul  lucrarii: prezentarea unor  metode  de  sortare 
+specifice  structurilor  de tip fisier,  structuri  caracterizate 
+prin faptul ca la un moment dat este accesibila o singura  compo-
+nenta  a lor. In lucrare se vor prezenta patru metode de  sortare 
+bazate pe interclasare.
+
+     2. Aspecte teoretic
+     Interclasarea  presupune  combinarea a doua  sau  mai  multe 
+secvente ordonate intr-o singura secventa, prin selectia repetata 
+a componentelor curent accesibile.
+     Procesul de sortare implica executia repetata a unui grup de 
+operatii, fiecare operatie tratind intregul set de date. O aseme-
+nea  operatie  se numeste faza, iar grupul de  operatii  care  se 
+repeta se numeste trecere.
+     In cele ce urmeaza vor fi utilizate urmatoarele notatii:
+          TYPE TipElement=RECORD
+                    cheie:Integer;
+                    {alte cimpuri}
+               end;
+               Banda=FILE OF TipElement;
+
+     2.a. Interclasarea cu trei benzi
+     Principiu: fie "a" secventa care trebuie sortata.
+          (1) Se imparte a in 2 jumatati: b si c.
+          (2) Se interclaseaza b cu c, combinind cite un  element 
+din  fiecare,  rezultind perechi ordonate care vor forma  o  noua 
+secventa a.
+          (3) Pentru noua secventa a se repeta pasii (1) si  (2), 
+combinind insa perechile ordonate in quadruple ordonate.
+          (4)  Se repeta pasii (1) si (2),  interclasind  quadru-
+plele  in 8-uple s.a.m.d., dublind de fiecare data lungimea  sub-
+secventelor de interclasare, pina la sortarea intregii secvente.
+     Pentru implementarea acestei metode sint necesare trei benzi 
+magnetice  (respectiv trei fisiere pe disc) corespunzatoare  sec-
+ventelor a, b si c. In cadrul acestei metode o trecere se compune 
+din  doua faze: injumatatirea (1) si interclasarea  (2).  Injuma-
+tatirea  se  va  efectua in asa fel incit un  n-uplu  ordonat  al 
+secventei a sa fie distribuit in intregime pe una din  secventele 
+b sau c (sa nu fie divizat intre cele 2 secvente destinatie).  In 
+acest scop este bine ca n-uplele ordonate sa fie depuse  alterna-
+tiv in secventele b si c.
+     Implementarea algoritmului in Pascal:
+          procedure Interclasare_3_benzi;
+            VAR a,b,c:Banda;
+                p,k:Integer;
+            procedure Injumatatire(n:Integer);
+              VAR x:TipElement;
+              procedure ScrieN_uplu(var d:Banda);
+                VAR i:Integer;
+                begin {ScrieN_uplu}
+                  i:=0;
+                  while (i<n) and (not Eof(a)) do begin
+                    Read(a,x);
+                    Write(d,x); i:=i+1
+                  end;
+                end; {ScrieN_uplu}
+              begin {Injumatatire}
+                Reset(a); Rewrite(b); Rewrite(c);
+                while not Eof(a) do begin
+                  ScrieN_uplu(b);
+                  ScrieN_uplu(c);
+                end;
+                Close(a); Close(b); Close(c);
+              end; {Injumatatire}
+            procedure Interclasare(n:Integer; var s:Integer);
+              VAR i,j:Integer;
+                  x,y:TipElement;
+                  termb,termc:Boolean;
+              begin
+                Reset(b); Reset(c); Rewrite(a);
+                termb:=Eof(b);
+                termc:=Eof(c);
+                if not termb then Read(b,x);
+                if not termc then Read(c,y);
+                repeat
+                  i:=0; j:=0;
+                  {interclasarea unui n-uplu}
+                  while (i<n) and (j<n) and not termb and not           
+                         termc do begin
+                    if x.cheie < y.cheie then begin
+                      Write(a,x); i:=i+1;
+                      if Eof(b) then termb:=true else Read(b,x)
+                    end
+                    else begin
+                      Write(a,y); j:=j+1;
+                      if Eof(c) then termc:=true else Read(c,y)
+                    end;
+                  end;
+                  {copierea restului n-uplului de pe "b"}
+                  while (i<n) and not termb do begin
+                    Write(a,x); i:=i+1;
+                    if Eof(b) then termb:=true else Read(b,x)
+                  end;
+                  {copierea restului n-uplului de pe "c"}
+                  while (j<n) and not termc do begin
+                    Write(a,y); j:=j+1;
+                    if Eof(c) then termc:=true else Read(c,y)
+                  end;
+                  if not termb or not termc then s:=s+1;
+                until termb and termc;
+                Close(a); Close(b); Close(c);
+              end; {Interclasare}
+            begin {Interclasare_3_benzi}
+							p:=1;
+              repeat
+                Injumatatire(p);                  {pasul (1)}
+                k:=0;
+                Interclasare(p,k);                {pasul (2)}
+                p:=p*2;
+              until k=0;
+            end; {Interclasare_3_benzi}
+     Observatie:  prin variabila k se returneaza de fapt  numarul 
+n-uplelor complete depuse pe "a" inainte de epuizarea lui "b" sau 
+a lui "c".
+
+     2.b. Interclasarea echilibrata (cu o singura faza)
+     Principiu:  deriva  din  interclasarea cu  trei  benzi  prin 
+combinarea  fazei  de  injumatatire cu cea  de  interclasare,  si 
+anume:  la  interclasarea n-uplelor nu se  constituie  o  singura 
+secventa a (ca la punctul (2) de mai sus) ci, 2n-uplele rezultate 
+sint distribuite imediat pe alte doua benzi.
+     In  felul acesta se economiseste foarte mult timp,  deoarece 
+faza  de injumatatire, care de fapt nu contribuie direct la  sor-
+tare, consuma jumatate din operatiile de copiere.
+     Implementarea metodei in Pascal: pentru implementarea  meto-
+dei se  foloseste o structura de tablou de fisiere B, cu  4  ele-
+mente.  Se  considera ca structura de sortat se afla  initial  pe 
+B[1]. Ea se distribuie in doua jumatati pe B[2] si B[3],  distri-
+buindu-se  pe  B[1] si B[4], inversind apoi  alternativ  rolurile 
+(B[1]  si B[4] - secventele sursa, iar B[2] si B[3] -  secventele 
+destinatie). In acest scop se utilizeaza variabilele s1, s2  care 
+reprezinta  indicii fisierelor sursa, respectiv d1, d2 -  indicii 
+fisierelor destinatie la un moment dat. In final fisierul  sortat 
+va fi B[d1].
+          procedure InterclasareEchilibrata;
+            VAR B:ARRAY[1..4] OF Banda;
+                s1,s2,d1,d2:1..4;
+                i,j,k,p,h:Integer;
+                x,y:TipElement;
+            procedure Interclasare(n:Integer; var s:Integer);
+              VAR d:Integer;
+                  term1,term2:boolean;
+              begin 
+                Reset(B[s1]); Reset(B[s2]);
+                Rewrite(B[d1]); Rewrite(B[d2]);
+                term1:=Eof(B[s1]);
+                term2:=Eof(B[s2]);
+                if not term1 then Read(B[s1],x);
+                if not term2 then Read(B[s2],y); 
+                d:=d1;
+                repeat
+                  i:=0; j:=0;
+                  while (i<n) and (j<n) and not term1
+                         and not term2 do begin
+                    if x.cheie < y.cheie then begin
+                      Write(B[d],x); i:=i+1;
+                      if Eof(B[s1]) then term1:=true else 
+                              Read(B[s1],x)
+                    end
+                    else begin
+                      Write(B[d],y); j:=j+1;
+                      if Eof(B[s2]) then term2:=true else 
+                      Read(B[s2],y)
+                    end;
+                  end;
+                  while (i<n) and not term1 do begin
+                    Write(B[d],x); i:=i+1;
+                    if Eof(B[s1]) then term1:=true else 
+                         Read(B[s1],x)
+                  end;
+                  while (j<n) and not term2 do begin
+                    Write(B[d],y); j:=j+1;
+                    if Eof(B[s2]) then term2:=true else 
+                    Read(B[s2],y)
+                  end;
+                  if not (term1 and term2) then s:=s+1;
+                  if d=d1 then d:=d2 else d:=d1
+                until term1 and term2;
+                for i:=1 to 4 do Close(B[i]);
+              end; {Interclasare}
+            begin {InterclasareEchilibrata}
+              {impartirea secventei de sortat B[1] in 2 jumatati}
+              Reset(B[1]); Rewrite(B[2]); Rewrite(B[3]);
+              i:=2;
+              while not Eof(B[1]) do begin
+                Read(B[1],x);
+                Write(B[i],x);
+                if i=2 then i:=3 else i:=2;
+              end;
+              for i:=1 to 3 do Close(B[i]);
+              h:=1; p:=1;
+              repeat
+                if h=1 then begin
+                  s1:=2; s2:=3; d1:=1; d2:=4 end
+                else begin
+                  s1:=1; s2:=4; d1:=2; d2:=3 end;
+                k:=0;
+                Interclasare(p,k);
+                p:=p*2;
+                h:=-h;
+              until k=0;
+              {fisierul sortat se afla pe B[d1]}
+            end; {InterclasareEchilibrata}
+
+     2.c. Interclasarea naturala
+     Principiu: spre deosebire de metodele prezentate mai sus, in 
+care  subsecventele  care se interclaseaza la un  moment  dat  au 
+lungime  fixata  (2,4,8...),  tehnica  de  interclasare  naturala 
+porneste  de la faptul ca datele initiale pot fi partial  sortate 
+si cauta sa delimiteze subsecventele deja ordonate, pe care  apoi 
+le  interclaseaza. Notiunea de baza folosita aici este  aceea  de 
+monotonie, prin care se intelege o secventa partiala ai,...,aj ce 
+satisface urmatoarele conditii:
+          i) 1 <= i <= j <= n   (n=lungimea totala a fisierului)
+         ii) ak <= ak+1         i <= k <= j-1
+        iii) ai-1 > ai    sau i=1
+         iv) aj > aj+1    sau j=n
+Definitia include si monotoniile cu un singur element, cind i=j.
+     Sortarea   naturala   se   realizeaza   prin   interclasarea 
+monotoniilor, avind la baza proprietatea ca daca se interclaseaza 
+doua secvente a cite m monotonii, se obtine o secventa cu exact m 
+monotonii. Algoritmul utilizeaza trei fisiere: a,b - auxiliare si 
+c - fisierul de sortat.
+     Fiecare trecere este constituita din doua faze alternative:
+          -defalcarea:   delimitarea  monotoniilor   din   cadrul 
+fisierului c si distribuirea acestora pe fisierele a si b;
+          -interclasarea:  monotoniile de pe a si b  se  combina, 
+formind o noua secventa c.
+     In   faza  de  defalcare  monotoniile  gasite  sint   depuse 
+alternativ  in  fisierele  a si b, astfel  incit  fie  cele  doua 
+fisiere vor contine cite un numar egal de monotonii, fie pe a  va 
+fi o monotonie in plus fata de b. Dupa interclasarea monotoniilor 
+perechi, monotonia nepereche va fi recopiata in c.
+     Implementarea algoritmului in Pascal:
+          procedure InterclasareNaturala;
+            VAR l:Integer;
+                a,b,c:Banda;
+                terma,termb,termc,sm:Boolean;
+                arta,artb,artc:TipElement;
+            procedure Copiaza(var x,y:Banda;var artx:TipElement;
+                              var termx:boolean);
+              var aux:TipElement;
+              begin
+                write(y,artx);
+                if Eof(x) then begin sm:=True;termx:=true end
+                          else begin aux:=artx;read(x,artx);
+                              sm:=aux.cheie > artx.cheie
+              end; {Copiaza}
+            procedure CopiazaMonotonia(var x,y:Banda
+                         ;var artx:TipElement;var termx:boolean);
+              {x - fisierul in care se delimiteaza monotonia
+               y - fisierul in care se copiaza monotonia}
+              begin
+                repeat
+                  Copiaza(x,y,artx,termx)
+                until sm
+              end; {CopiazaMonotonia}
+            procedure Defalcare;
+              begin
+                Rewrite(a);Rewrite(b);Reset(c);
+                termc:=Eof(c);
+                Read(c,artc);
+                repeat
+                  CopiazaMonotonia(c,a,artc,termc);
+                  if not termc then                         
+                         CopiazaMonotonia(c,b,artc,termc)
+                until termc;
+                Close(a);Close(b);Close(c)
+              end; {Defalcare}
+            procedure InterclasareMonotonie;
+              begin
+                repeat
+                  if arta.cheie < artb.cheie then begin
+                    Copiaza(a,c,arta,terma);
+                    if sm then CopiazaMonotonia(b,c,artb,termb)
+                  end
+                  else begin
+                    Copiaza(b,c,artb,termb);
+                    if sm then CopiazaMonotonia(a,c,arta,terma)
+                  end
+                until sm
+              end; {InterclasareMonotonie}
+            procedure Interclasare;
+              begin
+                Reset(a); Reset(b); Rewrite(c);
+                terma:=Eof(a);
+                termb:=Eof(b);
+                if not terma then Read(a,arta);
+                if not termb then Read(b,artb);
+                while not termb do begin
+                  InterclasareMonotonie;
+                  l:=l+1
+                end;
+                if not terma then begin
+                  CopiazaMonotonia(a,c,arta,terma);
+                  l:=l+1
+                end;
+                Close(a);Close(b);Close(c)
+              end; {Interclasare}
+            begin {InterclasareNaturala}
+              repeat
+                Defalcare;
+                l:=0;
+                Interclasare;
+              until l=1;
+            end; {InterclasareNaturala}
+
+
+     2.d. Interclasarea multipla echilibrata
+     Principiu:  constituie o imbunatatire a interclasarii  natu-
+rale  in sensul reducerii numarului de treceri prin  distribuirea 
+monotoniilor  pe  mai mult decit doua fisiere.  Astfel,  daca  se 
+interclaseaza r monotonii si se distribuie pe N benzi, pe fiecare 
+banda  se vor obtine r/N monotonii, la  urmatoarea  interclasare-
+distribuire  vor  rezulta r/N**2  monotonii, apoi r/N**3s.a.m.d. 
+Deci numarul de treceri in acest caz va fi log N (n)  (n=lungimea 
+fisierului de sortat).
+     Interclasarea multipla se poate realiza intr-o singura faza, 
+fapt care presupune ca la fiecare trecere se utilizeaza un  numar 
+egal  de  fisiere  de intrare si de  iesire,  monotoniile  de  pe 
+primele fiind interclasate si imediat redistribuite pe celelalte.
+     In continuare presupunem ca in total se folosesc N  fisiere, 
+N  - par, iar interclasarea se va realiza pe N/2 cai. In  program 
+va fi necesara o structura de date de tip tablou de fisiere. Fata 
+de   interclasarea   naturala  (care  poate  fi  privita   ca   o 
+interclasare  multipla  cu  doua cai) aici  apar  citeva  actiuni 
+suplimentare care trebuie executate:
+          -gestionarea unei liste de fisiere active, din care  se 
+elimina pe rind fisierele ce ramin vide;
+          -comutarea  grupelor  de fisiere de intrare  si  iesire 
+dupa fiecare trecere.
+     Structurile de date folosite se definesc astfel:
+          TYPE NrBanda=1..N; {nr. total de fisiere; N-par}
+          VAR f:ARRAY[NrBanda] OF Banda; {cele N fisiere}
+              f0:Banda; {fisierul initial care trebuie sortat}
+              t:ARRAY[NrBanda] OF NrBanda; {tabela cu indicii 
+                                             benzilor}
+     Tabela  t este necesara in vederea comutarii  fisierelor  de 
+intrare   si  iesire;  astfel:  daca  notam  Nh=N/2,   elementele 
+t[1],...,t[Nh]   contin   indicii  benzilor   de   intrare,   iar 
+t[Nh+1],...,t[N]  - indicii benzilor de iesire.  Initial  t[i]=i, 
+i=1,N si dupa fiecare trecere se va realiza interschimbarea 
+                     t[j] - t[Nh+j] , j=1,Nh
+     Se  mentioneaza ca fisierele nu vor fi accesate  direct,  ci 
+prin  intermediul tabelei t, adica in loc de f[i] se  va  utiliza 
+f[t[i]].
+     Pe  masura  ce  avanseaza procesul  de  sortare,  se  reduce 
+numarul monotoniilor si ca atare si numarul fisierelor active. Se 
+considera  ca  sortarea s-a incheiat cind mai  ramine  un  singur 
+fisier  activ.  In program se va folosi o variabila  k1  care  va 
+indica numarul actual de fisiere de intrare active.
+     Descrierea formala a algoritmului:
+          procedure InterclasareMultipla;
+            VAR i,j,tx:NrBanda;
+                l:Integer; {nr. monotonii distribuite}
+            begin
+              {distribuire monotonii initiale pe t[1]...t[Nh]}
+              j:=Nh; l:=0;
+              repeat
+                if j<Nh then j:=j+1
+                        else j:=1;
+                {copiaza monotonie de pe f0 pe f[j]}
+                l:=l+1
+              until Eof(f0);
+              for i:=1 to N do t[i]:=i;
+              {interclasare de pe t[1]...t[Nh] pe t[Nh+1]...t[N]}
+              repeat
+                {initializare benzi intrare}
+                for i:=1 to Nh do Reset(f[t[i]]);
+                l:=0;
+                j:=Nh+1; {indicele benzii de iesire}
+                repeat
+                  l:=l+1;
+                  {interclaseaza monotonie de la intrari pe t[j]}
+                  if j<N then j:=j+1
+                         else j:=Nh+1;
+                until {toate fisierele de intrare s-au epuizat}
+                {comuta benzile}
+                for i:=1 to Nh do begin
+                  tx:=t[i]; t[i]:=t[i+Nh];
+                  t[i+Nh]:=tx
+                end;
+              until l=1;
+              {banda sortata este f[t[1]]}
+            end; {InterclasareMultipla}
+
+     3. Aplicatii
+     Se  cere sa se scrie un program interactiv care permite testarea 
+metodelor  de sortare externa prezentate in lucrare, avind urmatoarele comenzi:
+          C - creare fisier
+          L - listare fisier
+          B - sortare fisier prin metoda interclasarii cu 3 benzi
+          E - sortare fisier prin metoda interclasarii echilibrate
+          N - sortare fisier prin metoda interclasarii naturale
+          X - terminare program.
+     Intr-o prima varianta,in procedurile de sortare vor fi prevazute tipariri
+intermediare, care sa ilustreze desfasurarea fiecarei treceri, apoi, tiparirile
+vor fi eliminate si se va afisa timpul de executie al fiecarei sortari pentru
+acelasi fisier aleatoriu.
+     

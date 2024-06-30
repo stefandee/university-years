@@ -1,0 +1,5 @@
+%option main
+%option noyywrap
+%%
+[1-9][0-9]*|0	printf("Numar");
+[a-z]*		printf("Cuvint");

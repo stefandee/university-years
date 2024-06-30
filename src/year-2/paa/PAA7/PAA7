@@ -1,0 +1,317 @@
+  
+                               Lucrarea nr.7
+
+       IMPLEMENTAREA TDA MULTIME PRIN STRUCTURI DE DATE DE NIVEL SUPERIOR
+
+
+     1.Implementarea multimilor cu ajutorul arborilor de regasire (Trie Trees)
+
+     Arborii de regasire sint structuri de date speciale care pot fi utilizate 
+in reprezentarea multimilor de caractere sau a tipurilor de date care sint 
+siruri de obiecte de orice tip sau siruri de numere.
+     Un arbore de regasire permite implementarea simpla a operatorilor definiti 
+asupra unei structuri de date de tip multime, ale carei elemente sint siruri de 
+caractere (cuvinte) (INSERTIE, SUPRIMARE, INITIALIZARE si TIPARIRE). Utilizarea 
+e eficienta atunci cind numarul de prefixe distincte ale tuturor cuvintelor din 
+multime e mult mai mic decit numarul total de cuvinte.
+     Intr-un arbore de regasire, fiecare drum de la radacina spre un nod 
+terminal, corespunde unui cuvint al multimii. Nodurile arborelui corespund 
+prefixelor cuvintelor.Pentru delimitarea cuvintelor se foloseste caracterul
+'[' ( ord('[') = ord('Z') + 1 ).
+     Se pot face urmatoarele observatii:
+     1.fiecare nod are cel mult 27 de fii ( literele din alfabet + '[');
+     2.cele mai multe din noduri au mai putin de 27 de fii;
+     3.un nod la care se ajunge printr-un ram etichetat cu '[', poate fi omis 
+din structura ( nu are nici un fiu).
+
+
+     1.1.Structura de date "nod al unui arbore de regasire".
+
+
+     a)Implementarea bazata pe tablouri
+
+     Un nod al unui arbore de regasire poate fi privit ca o structura asociere
+cu domeniul multimea {'A'..'Z','['}={'A'..'['} si codomeniul,o multime de valori,
+apartinind tipului PointerNodArboreDeRegasire (deci o asociere definita pe
+multimea caracterelor cu valori in multimea pointerilor la noduri). Un arbore
+poate fi identificat printr-un pointer la radacina sa (sau prin nodul
+respectiv).
+     Daca p e un pointer, Nod o valoare a structurii NodArboreDeRegasire, c o
+valoare a tipului char, asupra structurii NodArboreDeRegasire, se definesc
+urmatorii operatori:
+     a.Atribuie(Nod,c,p) - procedura care asociaza caracterului c din Nod,
+valoarea p;
+     b.Valoare(Nod,c) - functie ce furnizeaza valoarea pointerului asociat
+caracterului c din Nod;
+     c.NodNou(Nod,c) - procedura ce face ca valoarea lui Nod pentru caracte-
+rul c, sa fie un pointer la un Nod nou;
+     d.Initializeaza(Nod) - procedura ce face ca nodul Nod sa indice asocie-
+rea nula.
+     Se pot folosi urmatoarele structuri de date:
+
+     type PointerNodArboreDeRegasire =^NodArboreDeRegasire;
+          caractere='A'..'[';
+          NodArboreDeRegasire=array[caractere] of PointerNodArboreDeRegasire;
+
+     Pentru caracterul '[' se adopta conventia : Nod['['] sa fie nil
+(cind nodul nu are fiu corespunzator lui '[') sau pointerul spre insusi Nod
+(cind nodul are fiu, indicind terminarea unui cuvint).
+     O implementare a operatorilor ar fi:
+
+     procedure Initializare(var Nod:NodArboreDeRegasire);
+       var c:char;
+       begin
+         for c:='A' to '[' do Nod[c]:=nil
+       end;
+
+     procedure Atribuie(var Nod:NodArboreDeRegasire; c:char;
+                        p:PointerArboreDeRegasire);
+       begin
+         Nod[c]:=p
+       end;
+
+     function Valoare(var Nod:NodArboreDeRegasire; c:char)
+                     :PointerArboreDeRegasire;
+       begin
+         Valoare:=Nod[c]
+       end;
+
+     procedure NodNou(var Nod:NodArboreDeRegasire; c:char);
+       begin
+         new(Nod[c]);
+         Initializare(Nod[c])
+       end;
+
+     Definind
+
+     type ArboreDeRegasire=PointerNodArboreDeRegasire;
+
+     se poate scrie procedura de adaugare a unui cuvint x in multimea
+cuvinte implementata printr-un arbore de regasire:
+
+     procedure Adauga(x:TipCuvint;var cuvinte:ArboreDeRegasire);
+       var i:integer; {contorizeaza pozitia in cuvintul x}
+           t:ArboreDeRegasire; {utilizat pentru a indica nodurile arborelui de
+                               regasire corespunzatoare prefixelor lui x}
+       begin
+         i:=1;
+         t:=cuvinte;
+         while x[i]<>'[' do
+           begin
+             if Valoare[t^,x[i])=nil then {nodul curent nu are fiu pentru x[i],
+                                          deci se creaza unul nou}
+             NodNou(t^,x[i]);
+             t:=Valoare(t^,x[i]); {se trece la fiul lui t pentru caracterul
+                                  x[i], chiar daca a fost creat recent}
+             i:=i+1
+           end; {s-a ajuns la caracterul '[' in x, deci la sfirsitul lui}
+         Atribuie(t^,'[',t); {se face o bucla pentru '[', pentru a marca un nod
+                             terminal}
+       end;
+
+
+     b)Implementarea cu ajutorul listelor
+
+     Se pot gasi diferite implementari, observind ca un nod de regasire este de
+fapt o asociere. Deoarece domeniul si codomeniul contin un numar restrins de
+elemente, apare potrivita reprezentarea bazata pe liste inlantuite.
+
+     type NodArboreDeRegasire=^NodLista;
+          NodLista=record
+            domeniu:char;
+            valoare,urmator:NodArboreDeRegasire {indica prima celula a listei
+                            nodului fiu, respectiv urmatoarea celula a listei
+                            nodului curent}
+          end;
+
+
+     2.Implementarea multimilor cu ajutorul arborilor B-binari (arbori 2-3)
+
+     Cum in cazul arborilor, performantele prelucrarii depind de inaltimea lor,
+e avantajos a se lucra cu arbori echilibrati : AVL, binari optimi sau binari B,
+insa din pacate algoritmii de prelucrare sint foarte complecsi. In continuare
+se va prezenta implementarea folosind arborii B-binari, care sint arbori-B de
+ordinul 1. Au toate nodurile terminale pe acelasi nivel, iar nodurile
+interioare au unul sau doua elemente, deci doi sau trei descendenti (se mai
+numesc arbori 2-3).
+     Se va utiliza o implementare a acestor arbori diferita de cea prezentata
+la capitolul referitor la arborii B-binari.
+     Se presupune ca arborele reprezinta o multime de elemente peste care este
+definita o relatie de ordonare notata '<'. Elementele sint plasate in nodurile
+terminale; daca un element x se gaseste la stinga unui element y, e valabila
+relatia x<y.
+     In fiecare nod interior al structurii de arbore 2-3 va fi memorata, pe
+prima pozitie, cheia celui mai mic descendent al celui de-al doilea fiu al
+nodului; daca nodul contine si un al treilea fiu, atunci pe pozitia urmatoare
+in nod se inregistreaza cheia celui mai mic descendent al acestui fiu ( prin
+cel mai mic descendent se intelege elementul terminal cu cheia cea mai mica in
+contextul considerat).
+     Un arbore 2-3 cu h niveluri, contine intre 2**(h-1) si 3**(h-1) noduri
+terminale, deci arborele 2-3 de reprezentare a unei multimi de n elemente, are
+inaltimea intre 1+log3(n) si 1+log2(n).
+     Cautarea unei chei in intr-un arbore 2-3, se realizeaza cu un efort
+O(log n), prin particularizarea cautarii intr-un arbore B. Astfel, cautarea
+unei chei x se realizeaza simplu, parcurgind arborele de la radacina spre
+nodurile terminale. In fiecare nod parcurs, continind cheile (a,-) sau (a,b),
+se compara x cu a, daca x<a, se trece la primul fiu al nodului; daca x>=a si
+nodul are numai doi fii, se trece la fiul al doilea, altfel se compara x cu b
+si daca x<b se trece la fiul al doilea al nodului, altfel la fiul al treilea.
+Elementul x exista in arbore daca si numai daca exista un nod terminal cu cheia
+x. Cautarea se poate opri la depistarea unei egalitati de genul x=a sau x=b in
+cadrul nodurilor interioare, daca se urmareste numai apartenenta, sau trebuie
+sa continuie pina la depistarea nodului terminal, daca se doreste prelucrarea
+acestuia.
+     Implementarea acestei reprezentari se poate realiza in limbajul PASCAL,
+utilizind structura de tip articol cu variante:
+
+     type TipElement=record
+            cheie:real;
+            {alte cimpuri utile}
+          end;
+          TipNod=(terminal, interior);
+          PointerNodArbore2_3=^NodArbore2_3;
+          NodArbore2_3=record
+            case fel:TipNod of
+              terminal:(element:Tiplement);
+              interior:(cheie_sting,cheie_drept:real;
+                        fiu_unu,fiu_doi,fiu_trei:PointerNodArbore2_3)
+          end;
+
+     O multime poate fi definita ca un pointer la radacina arborelui 2-3 care o
+reprezinta.
+
+     type Multime=PointerNodArbore2_3;
+
+
+     2.1.Insertia in arbori 2-3
+
+     Insertia in arbori 2-3 se realizeaza in principiu ca cea in arbori B.
+Astfel, insertia unui nod cu cheia x incepe cu cautarea cheii x in arbore. Daca
+se ajunge la un nod apartinind nivelului situat chiar deasupra nivelului
+terminal si se constata ca fiii acestuia nu contin pe x, se procedeaza la
+insertie. Daca nodul are numai doi fii, se face x cel de-al treilea fiu al
+nodului, plasindu-l la locul potrivit si reajustind structura nodului, astfel
+incit aceasta sa reflecte noua situatie. Daca nodul considerat are trei fii,
+atunci adaugarea celui de-al patrulea fiu fiind imposibila, nodul se scindeaza
+in doua noduri, iar cei patru fii ai sai sint redistribuiti:cei doi cu chei mai
+mici fostului nod, iar ceilalti doi fii cu chei mai mari, nodului nou aparut
+prin scindare. In continuare, nodul nou aparut trebuie inserat in structura de
+arbore. In urma acestui proces, scindarea se poate propaga spre nivelurile
+inferioare ale structurii, in cazul extrem, pina la radacina. Aceasta este de
+fapt singura posibilitate ca un arbore 2-3 sa creasca in inaltime.
+     Se va prezenta procedura Insertie care se apeleaza pentru radacina si
+procedura Insertie1 care parcurge arborele intr-o maniera recursiva pentru
+insertia elementului x. Se presupune ca arborele 2-3 nu este vid, nici cu un
+singur nod, cazuri care se trateaza simplu, separat.
+     Procedura Insertie1 returneaza pointerul la nodul nou creat, daca se
+creaza un astfel de nod, si cheia celui mai mic element al subarborelui
+determinat de acest nod. Acest lucru este realizat cu ajutorul parametrului
+Pnou, respectiv Mic, care se atribuie in situatia in care se returneaza un nod
+nou. Structura de principiu a procedurii Insertie1 este:
+
+     procedure Insertie1(Nod:PointerNodArbore2_3; x:TipElement;
+                         var Pnou:PointerNodArbore2_3; var Mic:real);
+       var Pprim,W:PointerNodArbore2_3; MicPrim:real;
+       begin
+         Pnou:=nil;
+         if *Nod este terminal then
+           if *x nu este elementul lui Nod then
+             begin
+               *creaza un nod nou indicat de Pnou;
+               *atribuie pe x noului nod;
+               Mic:=x.cheie
+             end
+           else
+             begin {Nod este un nod interior}
+               *fie W acel fiu al lui Nod, caruia ii va apartine x;
+               Insertie1(W,x,Prim;MicPrim);
+               if Pprim <> nil then
+                 begin
+                   *insereaza pointerul Pprim printre fiii lui Nod
+                                                 in dreapta lui W;
+                   if *Nod are patru fii then
+                     begin
+                       *creaza un nod nou indicat de Pnou;
+                       *asociaza acestui nod, fiii trei si patru ai lui Nod;
+                       *actualizeaza valorile lui cheie_sting si cheie_drept
+                                                      in Nod si in noul nod;
+                       *pozitioneaza pe Mic cu cea mai mica cheie apartinind
+                                                           fiilor noului nod
+                     end
+                 end
+             end
+       end;
+
+     Procedura Insertie , in cazul in care Insertie1 returneaza un nod nou,
+trebuie sa creeze o noua radacina.
+
+     procedure Insertie(x:TipElement; var M:Multime);
+       var Pprim:PointerNodArbore2_3;{pointer la noul nod returnat de Insertie1}
+           MicPrim:real; {valoarea Mic a subarborelui determinat de Pprim}
+           Temp:Multime; {utilizat pentru memorarea temporara a valorii
+						         pointerului M}
+       begin
+         {se verifica daca M este arbore vid sau cu un singur nod si se
+                                     realizeaza insertia in consecinta}
+         Insertie1(M,x,Pprim,MicPrim);
+         if Pprim<>nil then
+           begin {se creaza o noua radacina, fiii radacinii sint cei indicati
+                 de M, respectiv Pprim}
+             Temp:=M;
+             new(M);
+             with M^ do
+               begin
+                 fel:=interior;
+                 fiu_unu:=Temp; fiu_doi:=Pprim; fiu_trei:=nil;
+                 cheie_sting:=Mic_prim
+               end
+           end
+       end;
+
+
+     2.2.Suprimarea in arbori 2-3
+
+     Suprimarea in arbori 2-3 se realizeaza intr-o maniera similara cu cea
+in arbori B.
+     Astfel, fie n parintele nodului de suprimat si fie p parintele lui n,
+bunicul nodului de suprimat. Daca n are trei fii, suprimarea se face simplu.
+Daca in urma suprimarii, n ramine cu un singur fiu (subdepasire), arborele 2-3
+trebuie reorganizat. Daca n este chiar nodul radacina, dupa suprimare singurul
+fiu al lui, va deveni noua radacina. Daca p mai are un fiu situat la stinga sau
+la dreapta lui n si acest fiu are la rindul sau trei fii, in cadrul unui proces
+numit "echilibrare", se va realiza "imprumutul" unui fiu, astfel incit n sa
+aiba doi fii. Daca insa fiul lui p adiacent lui n are numai doi fii,
+echilibrarea nu se mai poate realiza prin transfer si in consecinta se
+transfera singurul fiu al lui n unui frate adiacent si se suprima n. Daca in
+urma acestui proces, denumit "contopire", p ramine cu un singur fiu, se repeta
+procedura in mod recursiv, substituind pe n cu p, trecind astfel pe nivelul
+urmator al structurii arborelui. In caz extrem, procesul acesta se poate
+propaga pina la radacina, aceasta fiind practic singura cale de reducere a
+inaltimii arborelui.
+
+
+     3.Aplicatii
+
+     3.1.Sa se redacteze un program interactiv care memoreaza si prelucreaza
+un dictionar de cuvinte, implementat ca arbore de regasire folosind tablouri.
+Se vor implementa urmatoarele comenzi:
+     V - face dictionarul vid
+     A - adauga un cuvint
+     S - suprima un cuvint
+     C - verifica apartenenta unui cuvint
+     L - listeaza cuvintele
+     P - afiseaza toate cuvintele ce incep cu o litera data
+     I - afiseaza numarul de cuvinte, primul si ultimul cuvant din dictionar
+         si cuvintele de lungime minima si maxima
+     X - terminare.
+
+     3.2.Analog cu 3.1., dictionarul de cuvinte fiind implementat ca
+arbore de regasire folosind liste.
+
+     3.3.Analog cu 3.1., dictionarul de cuvinte fiind implementat ca
+arbore 2-3.
+
+     Sa se evalueze performantele fiecarei implementari, din punct de vedere al
+     - spatiului de memorie utilizat,
+     - timpului de executie in termenii functiei O.
+

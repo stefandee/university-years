@@ -1,0 +1,199 @@
+
+[LAMBDA define'ste proceduri anonime]
+
+S'a presupunem c'a avem o list'a de numere:
+
+numbers
+  (4 6 3 8 9 7)
+
+'si div3 este o procedur'a care verific'a dac'a un num'ar este
+divizibil cu trei.
+
+(defun div3 (x)
+  (zerop (rem x 3)))
+
+Folosind mapcar cu procedura div3 putem verifica elementele din list'a
+care sunt divizibile cu trei:
+
+(mapcar 'div3 numbers)
+  (nil t t nil t nil)
+
+Dac'a func'tia div3 nu o mai folosim ^in alt'a parte, putem s'a o
+definit chiar ^in locul ^in care apare (mapcar poate primi nu numai
+numele unei func'tii ci chiar defini'tia ei):
+
+(mapcar (defun div3 (x) (zerop (rem x 3)))
+        numbers)
+  (nil t t nil t nil)
+
+De fapt mapcar prime'ste tot numele unei proceduri, pentru c'a defun
+dup'a ce define'ste procedura returneaz'a numele ei (vezi lucrarea 2). 
+Observ'am c'a numele procedurii div3 nu mai este util dac'a procedura
+apare doar ^in acest loc. Ar fi util, pentru a evita proliferarea
+numelor inutile, ca procedura care verific'a dac'a un num'ar este
+divizibil cu trei s'a nu aib'a nume (s'a fie anonim'a). Acest lucru
+^il specific'am primtr-o primitiv'a asem'an'atoare cu defun, numit'a
+din motive istorice lambda. Deci pentru a folosi o defini'tie local'a
+anonim'a scriem:
+
+(mapcar '(lambda (x) (zerop (rem x 3)))
+        numbers)
+  (nil t t nil t nil)
+
+Primitiva lambda seam'an'a foarte mult cu defun, doar c'a nu d'a nume
+procedurii definite, put^and fi folosit'a astfel doar ^in defini'tii
+locale.
+
+Observa'ti c'a primitiva lambda poate s'a apar'a practic oriunde apare
+numele unei func'tii. ^In particular poate s'a apar'a pe prima
+pozi'tie a unei forme care va fi evaluat'a. Urm'atoarele expresii sunt
+echivalente, presupun^and definit div3:
+
+(div3 6)
+
+((lambda (x) (zerop (rem x 3))) 6)
+
+Urm'ari'ti urm'atorul exemplu ^in care definim o procedur'a care
+num'ar'a c^ate elemente dintr-o list'a sunt divizibile cu trei:
+
+(defun count-div3 (l)
+  (apply '+ (mapcar '(lambda (x)
+                             (cond ((zerop (rem x 3)) 1)
+                                   (t 0)))
+                    l)))
+
+(count-div3 numbers)
+  3
+
+[Predicatul REMOVE-IF-NOT]
+
+Predicatul remove-if-not este asem'an'ator cu mapcar dar p'astreaz'a
+^in rezultatul final doar elementele pentru care un anumit predicat
+este adev'arat.
+
+(remove-if-not 'div3 numbers)
+  (6 3 9)
+
+'Si aici putem folosi lambda:
+
+(remove-if-not '(lambda (x) (zerop (rem x 3)))
+               numbers)
+  (6 3 9)
+
+[Lambda interfa'teaz'a proceduri la liste de argumente]
+
+Consider'am o list'a generalizat'a ^in care dorim s'a num'ar'am
+elementele divizibile cu un num'ar dat:
+
+(defun count-deep-div3 (n l)
+  (cond ((atom l) (cond ((zerop (rem l n)) 1)
+                        (t 0)))
+        (t (apply '+ (mapcar '(lambda (e) (count-div3 n e))
+                              l)))))
+
+Nu puteam aplica recursiv direct (mapcar 'count-deep-div3 l) pentru
+c'a procedura count-deep-div3 are nevoie de doi parametrii iar mapcar
+^ii furnizeaz'a doar c^ate unul. Aici lambda reailzeaz'a interfa'tarea
+dorit'a a procedurii.
+
+[Probleme]
+
+1. Realiza'ti, folosind mapcar 'si lambda, o procedur'a presentp care
+determin'a dac'a un atom exist'a ^intr-o list'a generalizat'a.
+
+(defun sort (l)
+(print l)
+  (cond ((null l) nil)
+	((atom l) l)
+	((= (length l) 2) (cond ((< (car l) (cadr l)) l)
+				(t (reverse l))))
+	(t (append (sort (cons (sort (car l)) (sort (cdr l))))))))
+
+
+(trace sort)
+(sort '(4 2 5 999 7 3 -1 -9 7 2 8 6))
+(< '(4 2))
+
+(defun is (x s)
+  (equal x s))
+
+(defun sort (l)
+  (cond ((null l) nil)
+	(t (append (remove-if-not '(lambda (x) (= x (min l))) l) (sort (remove-if '(lambda (x) (= x (min l))) l))))))
+
+
+(defun inter (l)
+  ()
+
+(do
+ ((setq i 1))
+ ((> i 10) 5)
+ (+ i 1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,286 @@
+        			Lucrarea nr.1
+
+  			   TDA ARBORE GENERALIZAT
+
+
+     1.Definitii
+
+     Prin arbore se intelege o multime n>=0 noduri de acelasi tip, care
+poate fi vida (arbore vid) sau formata dintr-un nod numit radacina, iar restul
+nodurilor formeaza un numar finit de arbori (numiti subarbori), doi cite doi
+disjuncti.
+     Din definitie rezulta ca structura de date arbore este recursiva,
+permitind prelucrarea simpla a acestei structuri cu ajutorul unor algoritmi
+recursivi.
+     Orice nod al unui arbore e radacina unui arbore partial.
+     Succesorii directi ai unui nod se numesc fiii sai, el fiind nodul tata,
+iar succesorii sai directi sint frati intre ei.
+     Intr-o structura de arbore, se definesc niveluri astfel: radacina formeaza
+nivelul 1, fiii sai nivelul 2, si asa mai departe, fiii nodurilor de pe nivelul
+n, formeaza nivelul n+1.
+     Nivelul maxim se numeste inaltimea arborelui.
+     Numarul fiilor unui nod se numeste gradul acelui nod, iar gradul maxim al
+nodurilor unui arbore se numeste gradul arborelui.
+     Un nod de grad 0 (fara fii) se numeste terminal (frunza), restul fiind
+noduri interne (avind cel putin un fiu).
+     Daca n1,n2,...,nk este o secventa de noduri apartinind unui arbore, astfel
+incit ni este parintele lui ni+1 (i=1,k-1), ea se numeste drum sau cale de la
+nodul n1 la nodul nk.
+     Daca exista un drum de la nodul a la b, a se numeste stramos al lui b,
+iar b descendent al lui a.
+     Inaltimea unui nod este lungimea celui mai lung drum de la nodul respectiv
+la unul terminal.
+     Adincimea unui nod e lungimea drumului de la radacina la nodul respectiv.
+     Lungimea drumului unui arbore sau lungimea drumului intern (P) este suma
+adincimilor tuturor nodurilor, care este egala cu suma produselor dintre
+numarul de noduri de pe fiecare nivel si numarul nivelului:
+
+     P=S(i=1,n)ai=S(i=1,m)(ni*i) , unde n-numarul de noduri
+                                        ai-adancimea nodului i
+                                        m-adancimea arborelui
+                                        ni-numarul de noduri de pe nivelul i.
+     Lungimea medie a drumului, Pm, este raportul dintre lungimea drumului
+intern si numarul de noduri :
+
+     Pm=P/n.
+
+
+     2.Traversarea arborilor
+
+     Prin traversarea unui arbore se intelege efectuarea unei anumite operatii
+asupra tuturor nodurilor arborelui.
+     In timpul traversarii, nodurile vor fi vizitate intr-o anumita ordine,
+deci pot fi considerate ca si cum ar fi integrate intr-o lista liniara.
+     Exista trei moduri de traversare (liniarizare) a unui arbore numite
+preordine, inordine si postordine, definite recursiv astfel:
+     -daca arborele A este vid, ordonarea lui A in pre-,in- sau postordine se
+reduce la lista vida;
+     -daca A este format dintr-un singur nod, nodul insusi este traversarea
+lui A in oricare din cele trei variante;
+     -pentru restul cazurilor,fie A arborele cu radacina R, avind subarborii
+A1,A2,...,Ak ; traversarea lui A in :
+         -preordine- inseamna traversarea lui R urmata de traversarea in
+          preordine a lui A1, apoi A2, si asa mai departe pina la Ak;
+	 -inordine- inseamna traversarea in inordine a lui A1, apoi a lui R,
+          si apoi a lui A2, pina la Ak;
+	 -postordine- inseamna traversarea in postordine a lui A1 pina la Ak
+          si apoi traversarea radacinii R.
+     Traversarile pot fi realizate in maniera recursiva sau nerecursiva
+( folosind o stiva ).
+     O metoda practica de traversare : se imagineaza parcurgerea arborelui in
+sens trigonometric:
+         -pentru preordine- nodurile se prelucreaza prima data cind sint
+          intilnite;
+	 -pentru postordine- ultima data;
+	 -pentru inordine- se prelucreaza un nod terminal la prima intilnire,
+          unul interior la a doua.
+
+
+     3.Operatii fundamentale asupra structurii de date de tip arbore
+
+     TATA(N,A)- returneaza tatal nodului N in arborele A; daca N e chiar
+radacina, se returneaza nodul vid;
+     PRIMUL_FIU(N,A)- returneaza cel mai din stinga fiu al nodului N; daca N
+e terminal, returneaza nodul vid;
+     FRATE_DREPT(N,A)- returneaza nodul care are aceeasi parinte ca N si apare
+imediat in dreapta lui N;
+     CHEIE(N,A)- returneaza cheia nodului N;
+     CREAZAi(v,A1,A2,...,Ai)- e una din functiile unei familii ,i=0,1,2,...;
+genereaza un nod nou R cu cheia v, asociindu-i i fii ,radacinile arborilor A1,
+A2,...;in final se genereaza arborele cu radacina R;
+     RADACINA(A)- returneza nodul ce e radacina arborelui A sau nodul vid daca
+arborele e vid;
+     INITIALIZEAZA(A)- face vid arborele A.
+
+
+     4.Tehnici de implementare a structurii de date de tip arbore
+
+
+     4.1.Implementarea arborilor cu ajutorul tipului tablou
+
+     Fie A un arbore cu n noduri numerotate 1,2,...,n.Cea mai simpla maniera
+de implementare e printr-un tablou in care fiecare element are doua cimpuri:
+unul reprezentind valoarea cheii nodului respectiv, celalalt un cursor la
+parinte (numarul nodului parinte- cimpul parinte pentru nodul radacina va fi 0).
+
+     type nod=record cheie:tip_cheie;
+                     parinte:integer
+              end;
+	  arbore=array [1..n] of nod;
+
+     Pentru a da acuratete reprezentarii, se impune o ordine artificiala a
+nodurilor in tablou, respectind conventiile:
+     -numerotarea fiilor se faca numai dupa cea a parintelui
+     -numerele fiilor cresc de la stinga la dreapta.
+     Implementarea este avantajoasa pentru operatorul TATA, dar foarte
+laborioasa pentru operatorul CREAZA.
+
+
+     4.2.Implementarea arborilor cu ajutorul listelor
+
+     Se creaza pentru fiecare nod o lista a fiilor sai. Pentru ca gradele
+nodurilor unui arbore sint diferite ( numarul fiilor este diferit ), se impune
+ca fiind mai potrivita utilizarea listelor inlantuite.
+     Se va implementa deci arborele printr-un tablou de inceputuri ale listelor
+fiilor, cu cite o intrare in tablou pentru fiecare nod al arborelui.
+     Exista doua modalitati de implementare:
+a) in lista fiecarui nod se pastreaza cheile nodurilor fii :
+  type tip_cheie={integer};
+       lista=^nodlista;
+       nodlista=record
+                  cheie:tip_cheie;
+                  urm:lista
+                end;
+       arbore=record
+                tablou_inceputuri:array [1..maxnod] of record
+	                                                 cheie:tip_cheie;
+                                                         inceput:lista
+                                                       end;
+        	radacina:tip_cheie
+	      end;
+
+b) in lista fiecarui nod se pastreaza cursorii spre nodurile fii ( in
+declaratiile de mai se modifica tipul nodlista ) :
+  type nodlista=record
+                  pozitie:1..maxnod;
+                  urm:lista
+                end;
+
+
+     4.3.Implementarea arborelui bazata pe relatiile "primul-fiu" si
+           "frate-drept"
+
+     E o implementare avantajoasa in care intr-o tabela Zona se pastreaza in
+intrarea rezervata fiecarui nod i, valoarea cheii, numarul nodului ce
+reprezinta primul fiu (valoarea 0 in intrarea unui nod terminal) si numarul
+nodului ce reprezinta fratele drept al nodului din intrare (0 daca nodul din
+intrare este ultimul fiu). Deci ultimele doua cimpuri sint cursori in aceeasi
+tabela Zona.
+     Arborele se va reprezenta printr-un cursor la Zona, indicind nodul
+radacina al arborelui.
+
+     type arbore=0..maxnod; {0 daca arborele este vid}
+          cursor=0..maxnod;
+     var  Zona:array [1..maxnod] of record
+					cheie:tip_cheie;
+                                        primul_fiu,frate_drept:cursor
+				   end;
+          radacina:arbore;
+
+     Varianta este improprie implementarii operatorului TATA, necesitind
+baleierea intregii tabele Zona. Pentru o implementare eficienta, se poate
+adauga un al patrulea cimp - tata, reprezentand cursorul spre nodul parinte.
+
+
+     4.4.Implementarea arborelui ca multilista
+
+     Se va prezenta o varianta de implementare a arborilor generalizati, in
+C++ folosind structuri dinamice. Fiecare nod din arbore va contine, pe langa
+cheie, pointeri spre nodurile tata, primul fiu si frate drept.
+
+struct  Nod  
+     {  char *Nume;
+	Nod *Prim_fiu;
+	Nod *Frate_drept;
+	Nod *Tata;
+
+	Nod(const char * nume){  // pentru nod radacina
+	      Nume=new char[strlen(nume)+1];
+	      strcpy(Nume,nume);
+	      Prim_fiu=Frate_drept=Tata=NULL;}
+
+	Nod(const char * nume,Nod * tata){  // nod fiu
+	      Nume=new char[strlen(nume)+1];
+	      strcpy(Nume,nume);
+	      Prim_fiu=Frate_drept=NULL;
+	      Tata=tata;}
+
+	 ~Nod(void){  // in destructor, eliberarea spatiului ocupat de nod
+	      delete Nume;
+	 }
+
+     };
+
+typedef Nod *PNod;
+
+class Arbore_generalizat
+ { 
+    private:
+
+    // date
+    PNod Root;  // radacina arborelui
+
+   // operatori
+
+   PNod PTata(PNod p) 
+     { return p->Tata;};
+   PNod PPrim_fiu(PNod p) 
+     { return p->Prim_fiu;};
+   PNod PFrate_drept(PNod p)
+     { return p->Frate_drept;};
+   PNod Adauga_fiu(PNod p,const char *nume);  // adauga un fiu
+   PNod Pointer(const char * cheie_nod,PNod p);  // returneaza pointerul spre 
+						 // nodul cu cheia data
+   PNod Pointer(const char * cheie_nod);  // returneaza pointerul spre
+					  // nodul cu cheia data
+   void Print(PNod p);  // tipareste un subarbore cu radacina data
+   void Initializare_arbore(PNod p);
+   char *Cheie(PNod p)
+     {return p->Nume;};
+
+
+   public:
+
+   // constructor
+   Arbore_generalizat()
+     { Root=NULL; }
+
+   // operatori
+
+   char * Tata(const char *nume);
+   char * Prim_fiu(const char *nume);
+   char * Frate_drept(const char *nume);
+   void Creaza_radacina(const char *nume);  // creaza nodul radacina
+   void Adauga_fiu(const char *nume_tata,const char *nume);
+   void Print(void);  // tipareste arborele
+   void Print(const char * cheie_nod);  // tipareste subarborele cu rad data
+   void Initializare_arbore(void);
+
+   // destructor
+   ~Arbore_generalizat();
+ };
+
+
+
+     5.Aplicatii
+
+     5.1.Sa se implementeze TDA arbore generalizat in toate variantele
+de implementare si sa se compare performantele operatorilor, inclusiv
+traversarile, evaluate prin functia O.
+
+     5.2.Sa se scrie si sa se compare performantele pentru operatorul
+grad_arbore care returneaza gradul arborelui generalizat pentru toate
+implementarile.
+
+     5.3.Fiind dat un arbore generalizat sa se scrie operatorul numit simetric
+care construieste simetricul (in oglinda) celui dat.
+
+     5.4.Sa se scrie operatorul SUPRIMA(N,A), care suprima nodul N din arborele
+A, pentru toate variantele de implementare. Discutie asupra performantelor.
+
+     5.5.Sa se scrie un program interactiv care permite realizarea urmatoarelor
+operatii intr-un arbore generalizat, in care fiecare nod este identificat
+printr-o cheie alfanumerica:
+     V-face arborele vid
+     C-creaza arborele prin citirea cheilor si fiilor nodurilor
+     N-vizualizeaza, pe nivele, arborele
+     T-afiseaza cheile nodurilor la parcurgerea in preordine
+     P-afiseaza lungimea drumului intern
+     R-verifica daca doua chei date sunt in relatia stramos-descendent
+     I-cauta o cheie data, afisand urmatoarele informatii:
+          -cheia tatalui
+          -cheile fiilor
+          -cheile fratilor
+          -adancimea nodului
+          -gradul nodului.
+

@@ -1,0 +1,247 @@
+                               Lucrarea nr.5
+
+			      ARBORI MULTICAI
+
+
+     1.Definitie
+
+     Arborii multicai sunt cei in care numarul descendentilor unui nod este
+mai mare decat 2.
+     Pentru ca in urma accesului la un element, sunt mai usor accesibile un
+intreg grup de elemente ( in cazul memorarii structurii de arbore pe disc,
+cele de pe acelasi cilindru ), un arbore se divide in subarbori, numiti pagini
+( nodurile dintr-o pagina se pot accesa deodata ).
+     Daca numarul de noduri dintr-un arbore este 10^6, prin organizarea lui in
+pagini de cate 10^3 noduri, numarul de parcurgeri de pagini pentru cazul cel
+mai favorabil este log100 (10^6)=3, dar ajunge la 10^6/100=10^4 cand arborele
+e degenerat intr-o lista, de unde necesitatea unui mecanism de control a
+cresterii arborilor multicai.
+
+
+     2.Arbori B
+
+     Criteriul postulat de R.Bayer in 1970 sta la baza mecanismului de control
+a cresterii arborilor multicai : fiecare pagina, cu exceptia uneia, contine
+intre n si 2*n noduri,unde n este o constanta data. Structura de date se
+numeste arbore B, iar n ordinul arborelui B.
+     Pentru un arbore cu N noduri si 2*n dimensiunea maxina a unei pagini,
+in cel mai dezavantajos caz se fac log n (N) accese la pagina.
+     Caracteristicile arborilor B sunt:
+     1. Fiecare pagina contine cel mult 2*N noduri (chei)
+     2. Fiecare pagina, cu exceptia paginii radacina, contine cel putin n chei
+     3. Fiecare pagina e ori o pagina terminala, ori are m+1 descendenti, m
+fiind numarul de chei din pagina.
+     4. Toate cheile terminale se gasesc pe acelasi nivel
+
+
+     2.1.Inserarea intr-un arbore B
+
+     Constructia unui arbore B se bazeaza pe modul cum se poate realiza
+liniarizarea lui : prin inserarea cheilor descendentilor printre cheile
+stramosilor lor. Intr-o pagina terminala, cheile se parcurg de la stanga
+la dreapta.
+     Pentru o pagina p cu chei notate k1,k2,...,km, notand cele m+1 pagini
+descendente cu p0,p1,...,pm, secventa ordonata a cheilor este cea data de
+parcurgerea:
+     p0 k1 p1 k2 p2 ... pm-1 km pm
+
+     La cautarea unei chei x, daca ea nu se afla intre cheile paginii curente
+p, pot apare urmatoarele situatii:
+     1. ki < x < ki+1, 1 <= i < m - cautarea se continua in pagina pi
+     2. km < x - cautare in pagina pm
+     3. x < k1 - cautare in pagina p0.
+
+     Deci cautarea unei chei x incepe de la pagina radacina, prin parcurgerea
+paginilor in modul descris mai sus, pana in momentul in care x se gaseste
+intre cheile paginii curente sau pana cand pointerul spre pagina unde ar
+trebui sa se gaseasca x este nil.
+
+     Algoritmul de inserare localizeaza pagina ( intotdeauna terminala ) unde
+trebuie sa se insereze noua cheie x, folosind algoritmul de cautare prezentat
+anterior.
+     Daca pagina unde trebuie sa se insereze noua cheie nu este plina ( are
+mai putin de 2*n chei ), cheia se insereaza simplu.
+     Daca pagina este plina ( are 2*n chei ) se scindeaza cele 2*n+1 chei
+in doua, primele n ramanand in pagina curenta, cea mediana transferandu-se
+spre pagina parinte, iar pentru ultimele n se aloca o noua pagina terminala,
+frate drept cu cea curenta.
+     E posibil ca scindarea sa se propage pana la radacina, determinand
+cresterea in adancime a arborelui; maniera de crestere este inedita, de la
+paginile terminale spre radacina.
+
+     O structura de arbore B se poate defini astfel:
+
+     const n=...;
+	   nn=2*n;
+     type  ref=^pagina;
+	   indice=0..nn;
+	   nod_B=record
+		 cheie:Tip_cheie;
+		 p:ref;  { pointer spre pagina cu chei mai mari decat cheie }
+		 contor:integer
+	       end;
+	   pagina=record
+		    m:indice;  { numarul de noduri din pagina, cuprins intre
+				 [n,nn], cu exceptia paginii radacina  }
+		    p0:ref;  { pointer spre pagina cu chei mai mici decat
+			       cele din pagina curenta }
+		    e:array [1..nn] of nod_B;  { tablou ce contine cheile
+					       paginii curente si pointerii
+					       spre cele descendente }
+
+     Trebuie observat ca pointerii paginii ( p0 si campurile p din e )
+sunt toti nil pentru o pagina terminala, iar pentru una interioara, primii m+1
+(p0, e[1].p,...e[m].p) sunt diferiti de nil.
+
+     Procedure de cautare ( care realizeaza insertia daca nu se gaseste cheia
+x ), foloseste cautarea binara intre cheile unei pagini :
+
+     Procedure cauta ( x:Tip_cheie; a:ref; var h:boolean; var n:nod_B );
+			    { indica pagina radacina initial }
+       var k:integer; gasit:boolean;
+       begin
+	 if a=nil then
+	   begin  { x nu e in arbore }
+	     * atribuie cheia x noului nod n
+	     h:=true { indica pasarea nodului spre nivelul de apel }
+	   end
+	 else
+	   with a^ do
+	     begin  { cauta x in pagina a^ }
+	       * cautare binara in tabloul e cu determinarea indicelui k
+	       * si a valorii booleene gasit
+	       if gasit then  { e[k].cheie=x }
+		 inc(e[k].contor)
+	       else
+		 begin
+		   cauta(x,e[k].p { sau p0 daca k=0 },h,n);
+		   if h then
+		     if m < nn then  { pagina nu e completa }
+		       begin
+			 * inserarea nodului n in tabloul e
+			 h:=false
+		       end
+		     else
+		       * scindare pagina si pasarea mijlocului
+		 end
+	     end  { with ]
+       end;  { cauta }
+
+
+     2.2.Suprimarea dintr-un arbore B
+
+     La suprimarea unui nod pot apare doua cazuri:
+     1. Nodul se gaseste intr-o pagina terminala: suprimarea e simpla,
+facandu-se prin mutarea in tabloul e, cu o pozitie spre indici mai mici,
+a tuturor nodurilor cu cheia mai mare decat cea ce se suprima si decrementarea
+numarului de noduri ( m ) ale paginii
+     2. Nodul se gaseste intr-o pagina interna: nodul trebuie inlocuit cu unul
+sau doua noduri adiacente, care sunt in pagini terminale si pot fi usor
+suprimate.
+     Cautarea cheii adiacente ( similara celei de la arbori binari ) se face
+inaintand de-a lungul celor mai din dreapta pointeri, pana la determinarea
+unei pagini terminale p; se inlocuieste nodul de suprimat cu cel mai din
+dreapta a lui p si se reduce dimensiunea paginii terminale p cu 1.
+     Daca noul m este mai mic decat n, apare subdepasire, trebuind echilibrata
+pagina p cu cea vecina q; daca q are chiar n noduri, p si q se pot contopi,
+prin aducerea in aceeasi pagina a nodului median din pagina parinte; extractia
+nodului dinn pagina parinte, poate duce tot la o subdepasire, proces ce se
+rezolva deci recursiv.
+     Daca propagarea subdepasirii se face pana la radacina, aceasta ramane cu
+zero noduri, dispare, ducand la reducerea inaltimii arborelui B cu o unitate.
+
+
+     2.3.Tiparirea unui arbore B
+
+     Procedura de tiparire a unui arbore B, rotit in sens orar cu 90 grade
+( se tiparesc cheile paginilor, prin parcurgera paginilor in preordine ):
+
+     procedure tiparb_B( p:ref; l:integer );
+       var i:integer;
+       begin
+	 if p <> nil then
+	   with p^ do
+	     begin
+	       for i:=1 to l do write(' ');
+	       for i:=1 to m do write(e[i].cheie,' ');
+	       writeln;
+	       tiparb(p0,l+1);
+	       for i:=1 to m do tiparb(e[i].p,l+1)
+	     end  { with }
+	 end;  { tiparb }
+
+
+     3. Arbori B-binari
+
+     Arborii B de ordin 1 se mai numesc arbori B-binari sau arbori BB; paginile
+lor continand una sau doua chei, nu sunt recomandati pentru reprezentarea in
+memoria externa.
+     Cum toate paginile terminale apar pe acelasi nivel, iar cele interioare
+( cu una sau doua chei ) au doi sau trei descendenti, arborii BB se mai numesc
+2-3.
+     Pentru reprezentare se prefera utilizarea pointerilor, fiecare pagina
+fiind o lista cu unul sau doua noduri.
+     Pentru ca orice pagina are cel mult trei descendenti, exista posibilitatea
+combinarii pointerilor ce indica descendentii cu cei ce realizeaza inlantuirea
+in cadrul listei, disparand astfel notiunea de pagina, nodurile aparand intr-o
+structura asemanatoare unui arbore binar obisnuit:
+
+     type nod_BB=record
+		cheie:Tip_cheie;
+		stang,drept:ref;
+		o:boolean  { specifica daca pointerul drept e de inlantuire }
+	      end;	   { orizontala sau verticala }
+
+     Intrucat insertia si suprimarea intr-un astfel de arbore e laborioasa si
+prezinta asimetrie la tratarea cazurilor de crestere a subarborelui stang si
+drept, s-a introdus notiunea de arbore B binar simetric ( arbore BBS ), in care
+si pointerul stang si cel drept pot fi orizontali sau verticali.
+
+     Arborii BBS mai pot fi precizati prin urmatoarele proprietati:
+     1. Fiecare nod contine o cheie si cel mult doi pointeri de subarbori
+     2. Fiecare pointer e fie orizontal, fie vertical; nu exista doi pointeri
+succesivi orizontali pe nici un drum de cautare
+     3. Toate nodurile terminale apar pe acelasi nivel.
+
+     Structura unui nod al unui arbore BBS este:
+
+     type Nod_BBS=record
+		    cheie:Tip_cheie;
+		    stang,drept:ref:
+		    os,od:boolean  { specifica daca pointerii sunt oriziontali }
+		   end;            { sau nu }
+
+     Se poate demonstra ca arborii AVL sunt un subset al celor BBS, adancimea
+celor BBS fiind mai mare, dar operatiile de reechilibrare la insertie si
+suprimare mai rare.
+     Deci arborii AVL vor fi preferati cand cautarile vor fi mai frecvente
+decat insertiile si suprimarile.
+
+    Aplicatii
+
+    1.Sa se scrie un program care citeste o secventa de cuvinte terminata cu
+sirul vid si construieste un arbore B, continand ca si chei cuvintele citite,
+fiecare fiind insotita de contorul aparitiilor.
+    Se va tipari configuratia arborelui dupa fiecare insertie, semnalandu-se 
+momentele cresterii inaltimii.
+    Se vor suprima apoi cheile din secventa initiala, tiparind arborele dupa 
+fiecare suprimare si semnaland momentele descresterii inaltimii.
+
+    2.Pornind de la o secventa aleatoare de chei, se construiesc in paralel un
+arbore BBS si unul AVL. Se vor compara timpii medii de cautare in cei doi
+arbori, pentru mai multe secvente aleatoare de chei.
+
+    3.Sa se scrie un program interactiv care prelucreaza un arbore B, continand
+chei alfanumerice si contoarele lor de acces, prin urmatoarele comenzi:
+û   V - face vid arborele ( cu eliberarea spatiului anterior ocupat )
+û   C - cauta o cheie, afisand contorul ( incrementat ), numarul de comparatii
+necesare localizarii, adancimea si cheile ultimei pagini accesate
+û   A - adauga o cheie ( sau actualizeaza contorul daca ea exista ); se va
+semnala cresterea in inaltime
+    S - suprima o cheie, semnaland descresterea inaltimii
+û   L - afiseaza cheile arborelui in ordine crescatoare
+û   P - afiseaza arborele pe pagini
+û   D - afiseaza adancimea arborelui, cheia cea mai mica si cea mai mare
+û   X - terminare.
+
+

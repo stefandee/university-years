@@ -1,0 +1,9 @@
+kimba 3 dreapta
+timba 3 jos
+mamba 1 stanga
+kimba 2 sus
+kimba 4 stanga
+timba 4 jos
+kimba 2 dreapta
+kimba 4 sus
+kimba 4 sus

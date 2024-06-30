@@ -1,0 +1,277 @@
+                              Lucrarea nr.2
+
+                             TDA ARBORE BINAR
+
+
+     1.Definitie
+
+     Un arbore binar e o multime de n >= 0 noduri, care daca nu este vida,
+contine un nod numit radacina, iar restul nodurilor formeaza doi arbori
+disjuncti numiti subarborele sting si subarborele drept.
+     Aceasta structura de date e importanta pentru ca e usor de reprezentat
+si prelucrat, orice arbore putind fi transformat in arbore binar .
+
+
+     2.Tehnica transformarii unui arbore generalizat in arbore binar
+
+     Un arbore generalizat A cu radacina A1 si subarborii A11, A12, ...,A1k se
+transforma in arbore binar avind radacina A1, A11 fiul sau sting, iar A1i
+devin fii drepti ai lui A1,i-1 pentru 2<=i<=k.
+     Secventele de noduri in parcurgerea in preordine a arborelui generalizat
+si a celui binar obtinut prin transformare, sunt identice.
+
+     3.Implementarea arborilor binari cu ajutorul tablourilor
+
+     a)O prima implementare se poate realiza printr-un tablou de dimensiune
+egala cu numarul nodurilor, fiecare intrare avind trei cimpuri: cheia nodurilor
+si cite un cursor la fiul sting si drept.
+
+     var t:array [1..maxnod] of record cheie:tip_cheie;
+                                       sting,drept:0..maxnod
+                                end;
+
+     b)O alta implementare se bazeaza pe doua leme ce se vor preciza mai jos.
+     Lema1: Numarul maxim de noduri al nivelului i al unui arbore binar este
+2**(i-1). Astfel numarul maxim de noduri al unui arbore binar de inaltime h
+este 2**h -1.
+     Arborele binar de inaltime h cu exact 2**h-1 noduri se numeste arbore
+binar plin de inaltime h.
+     Numerotind secvential nodurile unui arbore binar plin de inaltime h,
+incepind cu nodul radacina (de pe nivelul 1) si continuind nivel cu nivel, de
+la stinga la dreapta, se poate realiza o implementare eleganta a structurii de
+arbore, asociind fiecarui nod locatia corespunzatoare numarului sau intr-un
+tablou liniar:
+
+     const nr_noduri={2**h-1};
+     var t:array [1..nr_noduri] of tip_cheie;
+
+     Un arbore binar oarecare va pastra numerotarea nodurilor existente, ca
+intr-un arbore complet.
+     Lema urmatoare precizeaza maniera simpla in care se poate determina tatal,
+fiul sting si fiul drept al unui nod precizat.
+     Lema 2: Pentru un nod oarecare cu indicele i, 1<=i<=n, sint valabile
+relatiile:
+     TATA(i) - e nodul cu indicele [i/2], daca i <> 1;
+     FIUL_STING(i) - e nodul cu indicele 2*i daca 2*i <= n;
+     FIUL_DREPT(i) - e nodul cu indicele 2*i+1 daca 2*i+1 <= n.
+     Aceasta implementare e avantajoasa doar pentru arbori binari completi,
+este dezavantajoasa la insertia sau suprimarea unui nod.
+
+
+     4.Implementarea arborilor binari cu ajutorul pointerilor
+
+     Un arbore binar poate fi descris cu ajutorul urmatoarei structuri de date dinamice:
+
+     type ref=^nod;
+          nod=record cheie:tip_cheie;
+		     sting,drept:ref
+	      end;
+     var radacina:ref;
+
+     Aceasta implementare e cea mai avantajoasa, inlaturind limitarile
+reprezentarii secventiale si utilizind proprietatile recursive ale tipului
+arbore.
+
+
+     5.Operatii fundamentale referitoare la arborii binari
+
+
+     5.1.Traversarea arborilor binari
+
+     Pentru un arbore binar, notind cu R radacina si cu A si cu B subarborele
+sau sting, respectiv drept, ordonarea arborelui in
+     - preordine - lista R, A, B
+     - inordine  - lista A, R, B
+     - postordine- lista A, B, R.
+     Cele trei metode de traversare se concretizeaza in trei proceduri
+recursive in care prel e operatia ce trebuie facuta asupra fiecarui nod
+(tipul nod e cel definit mai sus). Se va prezenta procedura preordine,
+celelalte doua fiind analoage:
+
+     procedure preordine(r:ref);
+       begin
+	 if r <> nil then
+	   begin
+	     prel(r^);
+	     preordine(r^.sting);
+	     preordine(r^.drept)
+           end
+       end;
+
+
+     5.2.Arbori binari ordonati. Arbori binari de inaltime minima
+
+     Un arbore binar ordonat e arborele binar cu proprietatea ca parcurgind
+nodurile in inordine, secventa cheilor este monoton crescatoare.
+     Are proprietatea ca daca un nod oarecare al arborelui are cheia c, toate
+nodurile din subarborele sting al nodului au cheile mai mici decit valoarea c,
+respectiv toate cheile din subarborele drept au cheile mai mari sau egale cu
+c. De aici rezulta procedeul de cautare foarte simplu, prin trecerea la fiul
+sting sau drept al unui nod curent, functie de relatia dintre cheia cautata
+si cea a nodului curent.
+     Cum inaltimea minima a unui arbore binar ordonat cu n noduri este
+       hmin=[log 2 (n+1)],
+rezulta ca o cautare intr-un arbore binar ordonat necesita aproximativ
+log 2 n comparatii de chei, fata de n/2 comparatii intr-o lista liniara.
+	
+
+     5.3.Tehnici de cautare intr-un arbore binar ordonat
+
+     Pentru urmatoarea structura a nodurilor unui arbore binar ordonat,
+functia loc(x,t), ce primeste ca parametri de intrare valoarea cheii ce se
+cauta si referinta spre nodul radacina, va returna pointerul spre nodul cu
+cheia cautata sau nil daca nu s-a gasit o astfel de cheie.
+
+     type ref=^nod;
+	     nod=record cheie:integer;
+			stinga,dreapta:ref
+		 end;
+     function loc(x:integer;t:ref):ref;
+       var gasit:boolean;
+       begin
+	 gasit:=false;
+	 while (t <> nil) and not gasit do
+	   begin
+	     if t^.cheie = x then gasit:=true
+                             else
+	                       if t^.cheie < x then t:=t^.sting
+                                               else
+					         t:=t^.drept
+           end;
+           loc:=t
+       end;
+
+     Cautarea se poate simplifica aplicind metoda fanionului, modificind
+structurile arborelui astfel incit orice referinta nil se inlocuieste cu cea
+spre nodul fanion. Inainte de inceperea cautarii, cheia nodului fanion se
+asigneaza cu valoarea cautata x, astfel incit va exista in arbore cel putin
+un nod cu acea cheie:
+
+     var fanion:ref;
+     function loc1(x:integer;t:ref):ref;
+       begin
+         fanion^.cheie:=x;
+         while t^.cheie <> x do
+           if x < t^.cheie then t:=t^.sting
+                           else t:=t^.drept;
+         loc1:=t
+       end;
+
+     Faptul ca valoarea cautata x exista in arbore e indicat de o valoare
+returnata de functia loc1 diferita de fanion.
+
+
+     5.4.Tehnici de creare a arborilor binari ordonati
+
+     Procesul de creare consta in insertia cite unui nod intr-un arbore binar
+ordonat, care initial este vid, astfel incit dupa insertie el sa ramina ordonat.
+     Pentru aceasta se traverseaza arborele incepind cu radacina si se
+selecteaza fiul sting sau drept, dupa cum cheia de inserat e mai mica sau mai
+mare decit a nodului parcurs. Se repeta pina cind se ajunge la un pointer nil
+care se inlocuieste cu pointerul spre noul nod creat. Pentru ca sortarea sa
+fie stabila, se trece la fiul drept chiar daca valoarea cheii e egala.
+
+     procedure inarbior(x:integer; var t:ref);
+       begin
+         if t <> nil then
+           if x < t^.cheie then inarbior(x,t^.sting)
+                           else inarbior(x,t^.drept)
+         else { t = nil }
+           begin
+             new(t);
+             with t^ do
+               begin
+                 cheie:=x;
+                 sting:=nil;
+                 drept:=nil
+               end
+           end
+       end;
+
+
+     5.5.Tehnica suprimarii unui nod dintr-un arbore binar ordonat
+
+     In urma suprimarii unui nod avind cheia x dintr-un arbore binar ordonat,
+acesta trebuie sa ramina ordonat.
+     Cazurile ce se disting sint functie de numarul de fii ai nodului ce se
+suprima. Daca numarul fiilor este:
+     -cel mult unu - referinta spre nodul de suprimat se inlocuieste cu
+referinta spre unicul sau fiu ( sau nil daca nodul e terminal );
+     -doi - se cauta predecesorul nodului in ordonarea arborelui in inordine -
+se demonstreaza ca acesta exista si nu are fiu drept; se gaseste construind
+secventa formata din fiul sting al nodului de suprimat si apoi fiii drepti
+pina la cel ce nu are descendent drept;
+          - se asigneaza toate cimpurile de informatie ( nu de inlantuire ) ale
+nodului de suprimat cu cele ale predecesorului sau;
+          - se suprima predecesorul ( nu are fiu drept ).
+
+
+     5.6.Construirea unui arbore binar total echilibrat
+
+     Un ABO total echilibrat are toate nodurile terminale pe ultimele doua
+nivele, astfel incat pentru orice nod, numarul nodurilor din subarborele
+stang sa difere cel mult cu unu de cel al nodurilor subarborelui drept.
+     Avand secventa ordonata crescator a celor n noduri ale arborelui ( cea
+care se va obtine la parcurgerea in inordine ), construirea ABO total
+echilibrat se realizeaza prin urmatorul algoritm recursiv:
+     a) nodul median este radacina
+     b) ns (= n div 2 ) noduri va contine subarborele stang ce se construieste
+incepand cu pasul a)
+     c) nd (= n - ns - 1 ) noduri va contine subarborele drept ce se
+construieste incepand cu pasul a).
+
+
+     6.Aplicatii
+
+     6.1.Sa se construiasca o lista simplu inlantuita, nodurile sale avind
+urmatoarea structura:
+     type pointer=^nod; alfa=string[20];
+          nod=record cheie:alfa;
+	             urm:pointer
+	      end;
+cheile fiind prezente in lista intr-o ordine aleatoare, putind exista chei
+multiple.
+     Sa se construiasca un arbore binar ordonat, cuprinzind toate cheile
+din lista, fiecareia asociindu-i-se si contorul aparitilor sale in lista
+initiala.
+     Se cere sa se efectueze interactiv operatiile:
+	a) sa se vizualizeze informatiile din arborele construit, pe nivele;
+	b) pentru doua chei date sa se determine
+		-daca sint in relatia stramos-descendent sau
+		-daca sint situate pe acelasi nivel si sa se tipareasca
+                 valoarea acestuia;
+	c) sa se determine adincimea arborelui;
+	d) sa se tipareasca toate nodurile terminale;
+	e) pentru o cheie data sa se tipareasca toti descendentii nodului
+        ce o contine;
+        f) pentru o cheie data sa se tipareasca cheile nodurilor parinte,
+           frate drept, frate sting, fiu drept, fiu sting;
+        g) sa se suprime
+                -nodul cu cheia minima û
+                -toate nodurile cu contorul mai mic decit o valoare data
+                -nodul cu o cheie data û
+                -tatal nodului cu cheia data
+                -fiul drept al nodului cu cheia data.
+
+     6.2. Se considera existent in memorie un arbore binar ordonat, avind chei
+siruri de caractere, caruia i se cunoaste radacina. Sa se construiasca arborele
+binar ordonat total echilibrat, avind aceleasi chei ca cel initial, sa se
+vizualizeze arborii si sa li se compare inaltimile.
+
+     6.3. Sa se construiasca un arbore generalizat ( in implementarea cu
+multilista ), avind chei siruri de caractere.
+          Se cere:
+a) sa se transforme intr-un arbore binar ,sa li se compare inaltimile si sa se 
+afiseze cheile ambilor arbori prin parcurgerea in inordine si preordine;
+b) sa se construiasca arborele simetric celui initial;
+c) sa se calculeze gradul arborelui initial.
+
+     6.4. Sa se scrie operatorii care creaza copia si simetricul in oglinda
+ai unui arbore binar dat. Sa se vizualizeze cei trei arbori.
+
+     6.5. Sa se realizeze un program care pornind de la o expresie aritmetica
+ce contine operanzi ( identificatori de o singura litera ), operatorii +, -,
+*, / si paranteze, construieste arborele binar corespunzator.
+     Se vor cere valorile tuturor identificatorilor ( o singura data pentru
+fiecare identificator ), apoi se va evalua expresia prin parcurgerea in
+postordine a arborelui.

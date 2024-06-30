@@ -1,0 +1,502 @@
+
+		MOSTENIREA SI POLIMORFISMUL IN C++
+
+	5.1.Mostenirea
+	--------------
+	Este un mecanism prin care se permite ca, pornind de la o anumita clasa
+-CLASA DE BAZA-, prin adaugarea de atribute noi, sa se obtina o alta clasa -CLA-
+SA DERIVATA-. Prin derivare se obtine o clasa cu un grad de abstractizare mai 
+mic decat cel al clasei de baza.
+	Sintaxa utilizata pentru a defini o clasa derivata D dintr-o clasa de 
+baza B este:
+	class B;
+	class D : tip_acces B
+	{
+	    //membrii clasei D
+	 };
+unde: 'tip_acces' este optional, iar daca este prezent poate fi unul dintre cu-
+vintele cheie 'public', 'private' sau 'protected'. Valoarea implicita pentru 
+'tip_acces' este 'private'. 'tip_acces` va fi numit in continuare MODIFICATOR DE
+ACCES.
+	Relatia intre obiectele clasei B si cele ale clasei D este ilustrata cu
+ajutorul urmatoarei secvente:
+	B obB, *pB;
+	D obD, *pD;
+	obB = obD; //corect
+	obD = obB; //ilegal
+	pB = new B; //corect
+	pb = new D; //corect
+	pD = new B; //ilegal
+	pD = new D; //corect
+	Membrii clasei D se compun din membrii clasei B, la care se adauga 
+membrii specificati in definitia lui D.
+	Clasa B, la randul ei, poate fi derivata dintr-o alta clasa. Un ansamblu
+format din clase intre care exista relatii de mostenire formeaza o IERARHIE DE 
+CLASE. O ierarhie de clase poate fi reprezentata sub forma unui graf orientat, 
+in care nodurile sunt clasele, iar arcele indica relatiile de mostenire. Un arc
+va fi orientat intotdeauna dinspre clasa derivata spre clasa de baza. Un drum 
+dintr-un asemenea graf il vom numi LANT DE DERIVARE.
+	
+	5.2.Mostenirea si drepturile de acces
+	-------------------------------------
+	In cazul unei clase derivate vom discuta problema drepturilor de acces 
+din 2 perspective:
+	-accesul functiilor membru ale clasei derivate la membrii mosteniti din
+clasa de baza;
+	-accesul unui utilizator extern la membrii mosteniti.
+	In ceea ce priveste dreptul de acces la membrii specificati in definitia
+clasei derivate, regulile raman cele prezentate in lucrarea L2.
+	Pastrand notatiile pentru clase adoptate in paragraful anterior, putem 
+enunta urmatoarele reguli privind drepturile de acces la membrii mosteniti:
+	-din interiorul clasei D este permisa referirea acelor membri mosteniti
+care in clasa B sunt situati in sectiunile 'public' si 'protected', indiferent 
+de valoarea modificatorului de acces. Se observa ca membrii mosteniti care in 
+clasa B au fost plasati in sectiunea 'private' nu sunt accesibili, desi ei fac 
+parte din clasa D;
+	-pentru un utilizator extern drepturile de acces la membrii mosteniti 
+depind de modificatorul de acces, in sensul ca vor fi accesibili doar acei mem-
+bri mosteniti care in clasa D sunt considerati ca apartinand categoriei 
+'public'. 
+Mai jos este dat un tabel in care se prezinta modul cum sunt priviti in clasa 
+derivata membrii mosteniti, in functie de modificatorul de acces:
+Categoria in care		Modificatorul	 Categoria in care apar
+apar membrii in B		  de acces	 membrii din B in D
+-----------------------------------------------------------------------
+   public			public			public
+   private						private
+   protected						protected
+-----------------------------------------------------------------------
+   public			private			private
+   private						private
+   protected						private
+-----------------------------------------------------------------------
+   public			protected		protected
+   private						private
+   protected						protected
+-----------------------------------------------------------------------
+Se constata ca un utilizator extern al unui obiect al clasei D are acces la 
+membrii mosteniti care in clasa B au fost declarati in sectiunea 'public', cu 
+conditia ca modificatorul de acces sa fie 'public'.
+	Obs: compilatorul Borland C++ 2.0 nu recunoaste ca modificatori de acces
+decat 'public' si 'private'. Copilatorul de sub Unix recunoaste si modificatorul
+'protected'.
+	Pentru a ilustra drepturile de acces in cazul claselor derivate vom pre-
+zenta urmatorul exemplu:
+	Exemplul 5.1
+	class A
+	{
+	   private:
+	   	int v1A;
+	   protected:
+	   	int v2A;
+	   	void f2A(){v1A = 1;}
+	   public:
+	   	int v3a;
+	   	void f3A(){v1A = 2; v2A = 3;}
+	 };//end A
+	 class B : public A
+	 {
+	   private:
+	   	int v1B;
+	   public:
+	   	A obA;
+	   	void f1B()
+	   	{
+	   	   f2A(); //corect
+	   	   v1A=100; //ilegal
+	   	   v2A=200; //corect
+	   	   v3A=300; //corect
+	   	   f3A(); //corect
+	   	 }//end f1B
+	   	 void f2B()
+	   	 {
+	   	    obA.v1A = 1000; //ilegal	Aceste observatii
+	   	    obA.v2A = 2000; //ilegal	sunt valabile si daca
+	   	    obA.v3A = 3000; //corect	obA era parametru sau
+	   	    obA.f3A(); //corect		variabila locala pt. f2B
+	   	 }//end f2B
+	  };//end B
+	  void main()
+	  {
+	     B obB;
+	     
+	     obB.v1B=1; //ilegal
+	     obB.f1B(); //corect
+	     obB.f2B(); //corect
+	     obB.obA.v1A=2; //ilegal
+	     obB.obA.v2A=3; //ilegal
+	     obB.obA.v3A=4; //corect
+	     obB.v1A=5; //ilegal
+	     obB.f2A(); //ilegal
+	     obB.v3A=6; //corect
+	     obB.f3A(); //corect
+	   }//end main
+	Obs: 
+	-daca modificatorul de acces din definitia clasei B ar fi fost 'private'
+atunci in 'main' ultimele 4 instructiuni ar fi fost toate incorecte, in timp ce
+restul referirilor ar fi fost considerate la fel ca mai sus.
+	-daca in 'main' am fi declarat si un obiect obA al clasei A, drepturile
+de acces la membrii sai ar fi respectat regulile enuntate in lucrarea L2.
+	
+	5.3.Mostenirea multipla
+	-----------------------
+	Daca o clasa derivata trebuie sa mosteneasca atributele mai multor clase
+de baza, acest lucru se specifica astfel:
+	class D: tip_acces1 B1, tip_acces2 B2, . . .
+	{
+	   //definitie clasa D
+	};
+	In acest caz clasa D va fi formata din membrii claselor B1, B2,..., la 
+care se adauga membrii specificati in definitia lui D. Regulile privind dreptu-
+rile de acces sunt cele enuntate in paragraful 5.2., aplicate pentru fiecare 
+clasa de baza in parte.
+	In legatura cu mostenirea multipla, o situatie aparte este aceea in care
+cel putin 2 dintre clasele de baza sunt la randul lor derivate dintr-o clasa co-
+muna. De ex:
+	class X : public B
+	{ . . . };
+	class Y : public B
+	{ . . . };
+	class Z : public X, public Y
+	{ . . . };
+	In acest caz clasa Z contine, prin intermediul claselor X si Y cate 2 
+exemplare ale membrilor lui B. Pentru a evita acest lucru, limbajul C++ propune
+urmatoarea solutie:
+	class X : virtual public B
+	{ . . . };
+	class Y : virtual public B
+	{ . . . };
+	class Z : public X, public Y
+	{ . . . };
+	Declarand astfel clasele X si Y, clasa Z va contine o singura copie a 
+membrilor lui B.
+	
+	5.4.Constructorii si distructorii in contextul derivarii claselor
+	-----------------------------------------------------------------
+	
+	5.4.1.Constructorii
+	-------------------
+	Fie urmatorul exemplu:
+	class B1;
+	class B2 : tip_acces2 B1 {...};
+		. . .
+	class Bn : tip_acces_n B(n-1) {...};
+	class D : tip_acces Bn {...};
+	La crearea unui obiect al clasei D, in mod automat se incearca sa se 
+execute urmatoarea secventa de constructori: constructorii impliciti (sau cei 
+care au toti parametrii initializati cu valori implicite) din clasele B1, B2,...
+si Bn, apoi constructorul clasei D adecvat situatiei in care are loc crearea 
+obiectului.
+	Consecinte:
+	-daca in cel putin o clasa Bi lipseste atat constructorul implicit, cat
+si cel cu toti parametrii initializati cu valori implicite, va fi emis un mesaj
+de eroare de compilare la tentativa de instantiere a unei clase situate dupa Bi
+in lantul de derivare (B(i+1),...,Bn,D);
+	-chiar daca situatia in care crearea unui obiect al clasei D reclama 
+executia constructorului de copiere din D, pentru clasele situate deasupra lui D
+in lantul de derivare, in mod automat se vor apela constructorii impliciti (sau
+cei cu toti parametrii avand valori initiale implicite).
+	Exemplul 5.2.
+	class A
+	{
+		...
+	  public:
+	    A() {...}
+	    A(A &x) {...}
+	    	...
+	};//end A
+	class B
+	{
+		...
+	  public:
+	    B(int a) {...}
+	    B(B &y) {...}
+	    	...
+	};//end B
+	class D : public A
+	{
+		...
+	  public:
+	    D(float a=0.0) {...}
+	    D(D &z) {...}
+	   	...
+	};//end D
+	class E : public B
+	{
+		...
+	  public:
+	    E(char c) {...}
+	    E(E &w) {...}
+	    	...
+	};//end E
+	D func()
+	{
+	  D v; //se va executa in ordine A(), D(float)
+	  . . .
+	  return v; //se va executa in ordine: A(), D(D&)
+	}//end func
+	void main()
+	{
+	  D obD0(13.1); //se va executa in ordine: A(), D(float)
+	  D obD1; //se va executa in ordine: A(), D(float)
+	  E obE1('7'); //eroare la compilare: nu exista B()
+	  . . .
+	}//end main
+	Pentru a rezolva situatiile in care clasele dintr-un lant de derivare 
+fie nu au constructori impliciti, fie sunt mai complexe si necesita ca in di-
+verse situatii sa fie apelati constructori diferiti, utilizatorul trebuie sa 
+indice in mod explicit apelul constructorilor din clasele de baza.
+	Pentru exemplul de mai sus, cazul claselor B si E se poate rezolva ast-
+fel:
+	class E : public B
+	{
+		...
+	  public:
+	    E(char c) : B(c-'0') //aici se poate vedea sintaxa utilizata pt.
+	    {...}		 //apelul constr. clasei de baza la instan-
+	    			 //tierea clasei derivate
+	    	...
+	};//end E
+de unde rezulta ca la instantierea 
+	E obE1('7');
+se va executa secventa B(int), E(char).
+	In mod asemanator se rezolva si cazul in care se dorescte ca, la instan-
+tierea unei clase derivate care implica executia copy-constructorului, sa se im-
+puna ca si pentru clasele de baza sa se execute copy-constructorul. Astfel, pen-
+tru exemplul anterior, in cazul claselor A si D putem scrie:
+	class D : public A
+	{
+		...
+	  public:
+	    D(D &z) : A(z) //putem apela A(z), deoarece este permisa atribuirea
+ 	    {...}	   //unui ob.de tip D la un ob.de tip A (v.5.1)
+	    	...
+	};//end D
+	Daca avem mostenire multipla, specificarea executiei constructorilor 
+claselor de baza se face conform sintaxei:
+	class D: tip_acces1 B1, tip_acces2 B2, . . .
+	{
+		...
+	  public:
+	    D(parametri_D) : B1(...), B2(...), . . .
+	    {...}
+	    	...
+	};//end D
+	
+	5.4.2.Distructorii
+	------------------
+	La eliminarea unui obiect din memorie (fie prin parasirea domeniului sau
+de existenta, fie prin comanda 'delete'), daca obiectul apartine unei clase de-
+rivate, lansarea in executie a distructorilor se face in ordine inversa celei in
+care s-au executat constructorii: adica se incepe cu distructorul clasei deriva-
+te si se termina cu cel al clasei de baza aflate la inceputul lantului de deri-
+vare.
+
+	5.5.Exemple 
+	-----------
+	In fisierele E-5-3.CPP si E-5-4.CPP sunt date 2 exemple de utilizare a 
+mecanismului de mostenire. Asa cum se poate vedea din aceste exemple, intr-o 
+clasa derivata se pot redefini functii ale clasei de baza. Pentru a realiza 
+distinctia intre o functie mostenita si o functie cu acelasi prototip definita 
+in clasa derivata, se utilizeaza operatorul '::'  de apartenenta la clasa.  	 
+	 Analizand exemplul E-5-3.CPP se constata ca functiile 'Deseneaza' (fara
+parametri), `Ascunde' si 'Muta' au fost definite in toate clasele derivate din
+'FiguraGeometrica`, desi codul lor este respectiv identic pentru toate figurile.
+Acest lucru este impus de faptul ca apelurile la functiile membru ale unei clase
+sunt generate static (sunt fixate la compilare). De exemplu, daca se doreste
+executia functiei 'Muta' pentru un obiect de tip 'Cerc', aceasta implica in 
+final apeluri la functia 'Deseneaza(int)'. Daca functiile 'Muta' si 'Ascunde' ar 
+fi definite doar in clasa de baza, la compilare s-ar genera apel la functia
+'Deseneaza(int)' din clasa `FiguraGeometrica', indiferent de obiectul care 
+executa functia 'Muta'. Dupa cum se va vedea in paragrafele urmatoare aceasta 
+problema se rezolva cu ajutorul functiilor virtuale.
+
+	5.6.Polimorfismul
+	-----------------
+	O functie se numeste POLIMORFA daca codul ei poate fi executat cu 
+operanzi de diferite tipuri. Capacitatea unui limbaj de a putea opera cu functii 
+polimorfe se numeste POLIMORFISM. In C++ polimorfismul se realizeaza cu ajutorul 
+functiilor VIRTUALE.
+	Modul de utilizare a functiilor virtuale este ilustrat in exemplele 
+E-5-5.CPP (care cuprinde varianta modificata a exemplului E-5-3.CPP) si 
+E-5-6.CPP. 
+	In exemplul E-5-5.CPP, declarand functia 'Deseneaza(int)' ca virtuala, 
+apelul acestei functii nu se rezolva la compilare, ci in faza de executie. 
+Atunci se cunoaste tipul exact al obiectului pentru care se executa functia 
+respectiva si se va alege acea definitie (cod) care corespunde clasei 
+obiectului. Mecanismul prin care, la un apel de functie legatura spre codul 
+functiei se realizeaza in faza de executie se numeste REFERINTA DINAMICA. 
+Prezenta cuvantului 'virtual' in fata prototipului unei functii membru 
+informeaza compilatorul ca apelurile acelei functii se rezolva prin referinta 
+dinamica, spre deosebire de functiile obisnuite, la care legatura spre cod se 
+face prin REFERINTA STATICA.
+	In exemplul E-5-6.CPP, intrucat p[0] si p[1] au fost definiti ca 
+pointeri spre tipul SIGMA, daca nu am fi declarat functiile 'aduna' si 'afis' ca 
+virtuale, s-ar fi apelat de fiecare data functiile definite in SIGMA, desi 
+pointerul p[1] indica spre un obiect de tip MEDIA. Declarand functiile 
+respective ca virtuale, apelul spre ele se rezolva la executie, cand se stie ce 
+tip au obiectele indicate de pointerii p.
+	
+	5.7.Tema
+	--------
+	Se cere sa se scrie un program care implementeaza urmatoarea ierarhie de 
+clase:
+		      ----------
+		      | Object |
+		      ----------
+			^ ^ ^
+			| | |
+	      ----------- | ------------
+	      |           |            |
+	 -----------  ----------  --------------
+	 | Integer |  | String |  | Collection |
+	 -----------  ----------  --------------
+	                             ^  ^  ^
+	                             |  |  |
+	                     ---------  |  --------
+	                     |          |         |
+                         ---------  ---------  -------
+	                 | Queue |  | Stack |  | Set |
+	                 ---------  ---------  -------
+	Clasa Object
+	------------
+	Reprezinta un obiect abstract. Nu are date membru. Are urmatoarele 
+functii membru:
+	-virtual char *nameOf(); returneaza numele clasei sub forma de sir de 
+caractere;
+	-virtual int isEqual(Object&); returneaza 1 la egalitatea cu argumentul 
+si 0 in caz contrar; 
+	-virtual void printOn(); afiseaza valoarea obiectului;
+	-friend int operator==(Object&, Object&); operatorul de comparare la 
+egalitate;
+	-friend int operator!=(Object&, Object&); operatorul de comparare la 
+diferit.
+	Obs: 
+	-functia isEqual se va include in sectiunea 'private' si, pentru clasa 
+Object, poate returna totdeauna 1 (oricum clasa nu are date membru); 
+	-celelalte functii se vor declara in 'public';
+	-operatorii de comparatie vor testa daca cei 2 operanzi au acelasi nume 
+(functia nameOf) si daca da, vor apela functia isEqual, iar daca nu - vor 
+returna 0; 
+	-pentru clasa Object functia printOn va afisa chiar numele clasei.
+	
+	Clasa Integer
+	-------------
+	Implementeaza tipul de date abstract intreg. Va avea o data membru de 
+tip 'int'. Va redefini functiile virtuale 'nameOf', 'isEqual' si 'printOn'. Pe 
+langa acestea, se vor implementa operatorii de adunare, scadere, inmultire si 
+impartire.
+	
+	Clasa String
+	------------
+	Implementeaza tipul de date abstract sir de caractere. Va avea o data 
+membru de tip 'char*'. Va redefini functiile virtuale 'nameOf', 'isEqual' si 
+'printOn'. Pe langa acestea, se vor implementa operatiile de concatenare 
+(operator+) si cautare subsir (operator<=); aceasta din urma va returna pozitia
+la care incepe subsirul, daca el exista, respectiv valoarea -1, daca subsirul nu
+exista. Operatia de concatenare nu trebuie sa afecteze operanzii.
+	
+	Clasa Collection
+	----------------
+	Se va implementa ca o lista simplu inlantuita, cu noduri apartinand unei 
+clase Node ai carei membri sunt:
+	-un pointer la clasa Object (campul de informatie);
+	-un pointer de legatura spre nodul urmator.
+	Clasa Collection va avea ca data membru un pointer spre radacina listei. 
+Se vor redefini functiile virtuale 'nameOf', 'printOn' si 'isEqual'. 
+	Functia 'printOn' trebuie sa realizeze afisarea listei sub forma:
+	 ( element_1 ; element_2 ; . . . ; element_n )
+unde 'element_i' reprezinta continutul campului de informatie al nodului de pe 
+pozitia i.
+	In cazul functiei isEqual, se considera ca 2 obiecte de tip Collection 
+sunt egale daca au acelasi numar de noduri, iar continutul campurilor de 
+informatie din nodurile corespondente sunt respectiv egale.
+	Pe langa acestea, clasa va contine si urmatoarele functii:
+	-void forEach(iterFuncType iterf, void *args); apeleaza functia 'iterf' 
+pentru fiecare element al colectiei; eventualii parametri ai functiei 'iterf' 
+vor fi transmisi prin intermediul lui 'args'; tipul 'iterFuncType' se poate 
+defini astfel: 
+		typedef tip_ret (*iterFuncType) (void*);
+unde 'tip_ret' este tipul returnat de functia 'iterf' si in particular poate fi 
+'void'; 
+	-virtual void add(Object&); adauga un element in lista;
+	-virtual void detach(Object&); elimina un element din lista;
+	-int isEmpty(); returneaza 1 daca lista este vida si 0 in caz contrar;
+	-void Insert(int Pos,Object &ob); adauga un element in lista la o 
+pozitie precizata;
+	-void Remove(int Pos); elimina un element aflat pe o pozitie precizata;
+	-Object& firstThat(condFuncType condf, void *args); returneaza referinta 
+la primul element din colectie care satisface conditia impusa de functia 
+'condf'; eventualele argumente ale functiei 'condf' se vor transmite prin 
+intermediul lui 'args'; tipul condFuncType se va defini astfel:
+		typedef int (*condFuncType)(void *);
+	Obs:
+	-functiile 'Insert' si 'Remove' vor fi plasate in 'protected', urmand a 
+fi utilizate in clasele derivate din Collection;
+	-celelalte functii se vor pune in 'public';
+	-adaugarea unui element in lista se poate opera la orice pozitie;
+	-functia 'forEach' poate fi utilizata la operatia de afisare a listei;
+	-in cazul functiei 'firstThat', daca in lista nu exista nici un element
+care satisface conditia ceruta, se va returna referinta la un obiect special de-
+clarat care sa joace rol de fanion de eroare. Ca urmare, apelantul functiei
+'firstThat' trebuie sa verifice rezultatul intors, inainte de a-l utiliza.
+	
+	Clasa Queue
+	-----------
+	Implementeaza tipul de date coada cu gestionare FIFO. Ofera spre exteri-
+or urmatoarele functii:
+	-void Put(Object&); adauga un element la sfarsitul cozii;
+	-void Get(); extrage un element din capul cozii;
+	-Object& Head(); returneaza referinta spre elementul din capul cozii 
+(fara a-l scoate din coada).
+	Obs:functiile enumerate vor utiliza operatiile puse la dispozitie de 
+clasa Collection; astfel, functia 'Head' se poate baza pe 'firstThat', conditia
+fiind ca numarul de ordine al nodului cautat sa fie 1.
+	Se vor redefini functiile virtuale 'nameOf' si 'printOn'. Un obiect de
+tip Queue se va afisa sub forma:
+		/Q element_n -> . . . -> element_2 -> element_1 Q/
+
+	Clasa Stack
+	-----------
+	Implementeaza tipul de date stiva. Ofera spre exterior urmatoarele
+functii:
+	-void Push(Object&); introduce un element in stiva;
+	-void Pop(); extrage un element din stiva;
+	-Object& Top(); returneaza elementul din varful stivei.
+	In principiu sunt valabile observatiile de la clasa Queue.
+	Se va redefini functia virtuale 'nameOf' si 'printOn'. Un obiect de tip
+Stack se va afisa sub aceeasi forma ca si Queue, doar ca delimitatorii vor fi
+'/S', respectiv 'S/'
+
+	Clasa Set
+	---------
+	Implementeaza tipul de date multime. Pune la dispozitie urmatoarele ope-
+ratii:
+	-operator+ pt. reuniunea a 2 multimi;
+	-operator* pt. intersectia a 2 multimi;
+	-operator- pt. diferenta dintre 2 multimi;
+	-int isin(Object&); test de apartenenta a unui element la o multime;
+	-int Cardinal(); returneaza numarul de elemente al multimii;
+	-operator<= pt. test de incluziune a unei multimi in alta multime.
+	Initial instantele clasei Set vor fi multimi vide sau multimi cu cate un
+singur element (dat ca parametru constructorului). Completarea unei multimi cu 
+elemente se poate face in 2 variante:
+	-adaugand elementele pe rand, cu ajutorul functiei 'add'; aceasta func-
+tie va fi redefinita pentru clasa Set pe baza functiei 'add' de la clasa 
+Collection (pentru Set trebuie sa se prevada un test care sa evite inserarea a
+2 elemente identice);
+	-utilizand operatia de reuniune in care unul din operanzi este multimea
+initiala, iar celalalt operand - multimea formata din elementul de adaugat.
+	Se vor redefini functiile virtuale 'nameOf', 'printOn' si 'isEqual'. Un
+obiect de tip Set se va afisa sub forma:
+		{ element_1 , element_2 , . . . , element_n }
+
+	Obs:
+	Clasele care au si pointeri ca date membru vor fi prevazute cu construc-
+tori de copiere si cu operatori de atribuire.
+	Programul va fi prevazut cu o interfata utilizator bazata pe meniuri 
+simple, care sa permita verificarea executiei operatiilor fiecarei clase.
+
+	--------------------------------------
+	!!! Termen de predare: 3 saptamani !!!
+	---------------------------------------

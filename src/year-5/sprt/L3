@@ -1,0 +1,115 @@
+				LUCRAREA 3
+
+			NIVELUL DE SINCRONIZARE A PROCESELOR
+
+
+     1.Notiunea de semafor
+     
+     Nivelul de sincronizare este implementat prin intermediul semafoarelor,
+binare si generalizate, care ofera mecanismul de excludere mutuala (acces 
+exclusiv la sectiunile critice ), de sincronizare pe conditii precum si de 
+gestionare a resurselor multiple.
+
+     Notiunea de semafor binar sau boolean a fost introdusa de Dijkstra, ca
+fiind o variabila intreaga ce poate lua doar doua valori: 0 sau 1. Se permit
+doar doua operatii asupra unui semafor, cu exceptia initializarii, si anume:
+     (i) o operatie P de decrementare a valorii semaforului
+     (ii)o operatie V de incrementare a valorii semaforului.
+
+     Fiecarei regiuni critice i se asociaza un semafor binar avind initial
+valoarea 1, iar procesul care doreste sa execute  sectiunea critica, va
+efectua o operatie P, avind acces la sectiune doar daca gaseste semaforul pe
+1, altfel, trece in starea blocat pina la iesirea din sectiune a unui alt
+proces ce va executa la iesire un V:
+
+       P(semafor_asociat_sectiunii);
+       *sectiune_critica
+       V(semafor_asociat_sectiunii);
+
+     Operatiile P si V sunt indivizibile si un singur proces poate executa la
+un moment dat una din aceste operatii asupra unui semafor. Pentru a
+evita asteptarea prin ciclare, se foloseste un sir de asteptare la semafor.
+
+     Semafoarele ofera o metoda relativ completa de sincronizare, dar conduc
+uneori la constructii complexe de programe ce sunt dificil de urmarit. Deza-
+vantajul lor major este legat de necesitatea unei programari foarte atente;
+daca, de exemplu, din eroare, se scrie o operatie P in loc de V, procesele se
+vor bloca reciproc .
+
+     2.Implementarea semafoarelor
+     
+     Dupa cum s-a aratat anterior, un semafor e vazut ca avind o valoare si
+o coada de asteptare,operatiile ce se pot executa fiind initializarea, P si V.
+     Coada de asteptare  se implementeaza prin intermediul cursorilor, folo-
+sind cimpul urm din datele fiecarui proces: deci la un moment dat, pe
+"heapul" tabelei de procese pot exista mai multe liste- cozi de asteptare la
+diferite semafoare.
+
+     Deci semafoarele se pot defini ca o clasa:
+
+     class semafor{
+
+       int valoare;     // numarul de resurse disponibile
+       int prim_proces_blocat,ultim_proces_blocat;
+
+       public:
+   
+       semafor(int val);// valoarea initiala
+       void P(void);    // neintreruptibile, echivaleaza cu instructiuni
+       void V(void);
+     };
+
+     Constructorul va initializa valoarea semaforului si va face coada de 
+asteptare vida.
+
+     Operatia P va avea urmatorul algoritm: 
+
+     *dezactivare_intreruperi
+     daca (--valoare<0) *se pune procesul activ in BLOCAT si la sfirsitul 
+			 cozii de asteptare la semafor
+			*activare_intreruperi
+			*apel_alocator_UC // se lanseaza alt proces
+     altfel *activare_intreruperi // se revine in proces 
+
+     Operatia V va avea urmatorul algoritm: 
+
+     *dezactivare_intreruperi
+     ++valoare;
+     daca (*exista procese blocate) // deblocheaza primul
+			*se pune primul proces blocat in starea PREGATIT
+			 si se extrage din coada de asteptare
+			*activare_intreruperi
+			*apel_alocator_UC // se lanseaza alt proces
+     altfel *activare_intreruperi // se revine in proces 
+
+     Observatie:
+     Cum P si V trebuie sa fie neintreruptibile, o varianta ar fi fost a le
+declara interrupt. Dar, dupa cum s-a explicat in lucrarea anterioara, ar fi
+trebuit declarate statice, la fel ca restul campurilor clasei semafor, lucru
+imposibil intrucat vor exista mai multe instantieri ale clasei semafor.
+     Ramane deci solutia de a face P si V neintreruptibile prin dezactivarea
+intreruperilor; pentru ca la revenirea din P si V, IF sa fie nemodificat,
+acest lucru se va realiza prin
+     asm pushf
+     asm cli
+iar la iesirea din P si V
+     asm popf.
+
+     3.Alocarea dinamica memoriei
+
+     Dupa cum s-a specificat in paragraful 3 al primei lucrari, pentru alocarea
+dinamica a memoriei, procesele vor apela alocatorul standard, prin operatorii
+new si delete. Memoria disponibila este deci o resursa la care accesul trebuie
+realizat in regim de excludere mutuala. Interfata cu nucleul a aplicatiei
+trebuie sa defineasca un semafor asociat memoriei, cu valoarea initiala 1;
+inaintea oricarui apel al alocatorului ( unei operatii new sau delete ), orice
+proces va trebui sa execute un P asupra semaforului memoriei, iar dupa apel, 
+un V.
+
+     4.Mersul lucrarii
+     
+     -se va implementa clasa semafor si se va scrie o aplicatie ( in 
+      multitasking cooperativ ) avind doua procese: producator si consumator
+     -se va defini semaforul asociat memoriei si se va scrie o aplicatie
+      in care procesele sa apeleze alocatorul de memorie.
+      

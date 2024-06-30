@@ -1,0 +1,23 @@
+Bugurile cunoscute la versiunea 0.85 N2
+
+Pentru N2Server :
+  - nu se poate stopa procesul de antrenare; intr'o versiune viitoare, comunicatia
+    server-client se va face pe doua porturi, unul de comanda si altul de date; in
+    plus e foarte possibil sa interceptez mesajjele transmise de Windows pentru a 
+    obtine un control mai strict asupra erorilor de comunicatie;
+  - evident, nici reluarea procesului de antrenare nu functioneaza;
+  - nu se poate antrena cu un lista de paternuri date (sau generate), pentru ca
+    nu am stabilit inca cum anume arata o astfel de lista; adica daca e binara sau
+    text si daca e text, cum e organizata informatia in fisier. Acum paternul de intrare
+    si cel target sint generate aleator;
+  - ar trebui facute mai multe tipuri de matchuri pentru report; deocamdata e numai un
+    match liniar (100% - eroarea liniara mai precis);
+
+Pentru N2Client :
+   - din cauza faptului ca nu am reusit sa fac sa functioneze 'select' ul, nu se 
+     poate face disconnect; in momentul in care voi implementa kestia aia cu portul
+     de date si cel de comanda, va fi mai simplu;
+
+  In plus, daca nu pot fi deschise fisierele si create file mappingurile, clientul si 
+serverul se desincronizeaza; se va rezolva, probabil, cind voi face jmekeria cu porturile.
+ 

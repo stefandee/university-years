@@ -1,0 +1,345 @@
+Lucrarea 5
+----------
+
+		Functii de biblioteca. Lucrul cu fisiere
+		----------------------------------------
+
+1. Functii de biblioteca
+------------------------
+
+  O parte a puterii limbajului C consta in biblioteca de functii puse la
+dispozitia programatorului. Declaratiile diferitelor functii sint grupate in
+fisiere antet (header).
+  Citeva din functiile si constantele cele mai des intilnite au fost deja uti-
+lizate in exemplele anterioare.
+
+1) STDIO.H - contine functii ce trateaza modul de introducere- extragere a da-
+telor.
+  Functiile utilizate pina in acest moment (de ex: getchar, printf, gets,
+etc.) opereaza cu fisierele standard de introducere si extragere: stdin (im-
+plicit tastatura) si stdout (implicit monitorul). Prin redirectare aceste fi-
+siere se pot asocia cu alte fisiere.
+de ex:   fisier_exe  < fisier_1  > fisier_2
+In acest caz preluarea informatiilor se face din fisier_1, iar afisarea infor-
+matiilor de iesire se face in fisier_2.
+  Urmatoarele functii opereaza cu fisiere specificate de utilizator.
+
+- pentru un caracter:
+  int getc(FILE *fis);         - returneaza un caracter din fisierul precizat
+			       convertit la un intreg fara semn, iar la eroare
+			       returneaza EOF
+  int ungetc(int c, FILE *fis);- inapoiaza caracterul c in fisierul deschis
+			       pentru citire
+  int putc(int c, FILE * fis); - trimite caracterul in fisierul deschis pentru
+			       scriere, la eroare returneaza EOF
+
+- pentru un sir de caractere:
+  char *fgets(char *s, int n, FILE *fis); - citeste maxim n-1 caractere sau
+	pina la '\n' inclusiv, si le depune in s, adauga la sfirsit '\0' si
+	returneaza adresa sirului. La eroare intoarce valoarea NULL.
+  int fputs(const char *s, FILE *fis);    - scrie sirul in fisier, fara carac-
+	terul '\0'. La eroare intoarece EOF.
+
+- pentru scriere si citire cu format:
+  int fscanf (FILE *fis, const char *format [, adresa, ...]); - numarul de
+	adrese trebuie sa corespunda cu numarul de specificatori de format.
+	Formatul contine  - caractere spatii - se sare peste spatii pina la
+			    primul caracter nespatiu
+			  - caractere obisnuite - caractere ASCII, mai putin
+			    '%', se trece peste un caracter corespunzator in
+			    intrare
+			  - specificatorul de format: % [*] [width] type
+			     *     - se sare peste urmatoarea data
+			     width - nr. de maxim de caractere ce se citesc
+			     type  - tipul informatiei citite:
+				o - octal , u - fara semn, x,X - hexa
+				d - zecimal, l - long, f - float, lf - double,
+				e,E-  format stiintific, c - char, s - sir
+  int fprintf (FILE *fis, const char *format [, argum...]); - preia un sir de
+	argumente si le aplica formatul corespunzator, dupa care le scrie in
+	fisierul dat.
+	Formatul contine - caractere obisnuite, care apar la fel la iesire
+			 - specificatori de format (egal sau mai mic decit
+	numarul de argumente): % [fanion] [width][.prec] type
+	     fanion - alinierea la dreapta sau stinga, prezenta semnului, etc.
+	     width  - numarul minim de caractere ce se afiseaza
+	     prec   - precizia
+
+2) CONIO.H - functii de intrare, iesire pentru consola
+
+   void window(int left, int top, int right, int bottom); - defineste o fe-
+	 reastra text precizata prin colturile stinga sus, dreapta jos
+   void clreol( void ); - sterge intr-o fereastra text de la cursor pina la
+	 sfirsirul liniei
+   void clrscr( void ); - sterge fereastra text activa si muta cursorul in
+	 pozitia 1,1
+   void gotoxy( int x, int y ); - muta cursorul la coordonatele date
+   int  wherex( void ); - returneaza coordonata curenta x
+   int  wherey( void ); - returneaza coordonata curenta y
+   int  getch( void );  - citeste un caracter fara a-l afisa la consola
+   int  getche( void ); - citeste si afiseaza caracterul
+   int  kbhit( void );  - verifica daca a fost apasata o tasta
+   int  putch( int c ); - pune un caracter in fereastra text curenta
+
+3) STDLIB.H - contine tipuri, variabile si functii uzuale
+
+   #define max(a,b)    (((a) > (b)) ? (a) : (b))
+   #define min(a,b)    (((a) < (b)) ? (a) : (b))
+
+- pentru conversia unui sir:
+   double atof(const char *s); - returneaza valoarea reala obtinuta prin con-
+      versia  sirului, iar la eroare valoarea 0
+   int    atoi(const char *s); - converteste sirul la un intreg
+   long   atol(const char *s); - converteste sirul la un long
+
+- pentru terminarea programului:
+   void   exit(int status);  - termina programul si inchide toate fisierele.
+      Parametrul status indica terminare normala (valoarea 0) sau anormala.
+   void   abort(void);       - termina anormal programul
+
+- pentru alocare dinamica:
+   void  free(void *bloc);   - elibereaza memorie alocata dinamic anterior
+   void *malloc(dim_t nr); - aloca nr locatii de memorie de cite sizeof(dim_t)
+      octeti. La succes returneaza adresa de inceput a zonei alocate, la
+      eroare returneaza NULL
+
+- cautare binara:
+   void * bsearch(const void *key, const void *base, size_t nelem,
+		  size_t width, int (*fcmp)(const void *, const void *));
+      - returneaza adresa primei intrari din tablou care coincide cu parame-
+      trul cautat si zero daca acesta nu exista in tablou.
+      ( key- adresa cheii cautate, base- inceputul tabloului, nelem- nr.elem.
+      din tablou, width- dim. unui elem. de tablou, fcmp- functia de compara-
+      re definita de utilizator si care primeste doi parametrii )
+
+- sortare dupa algorimul Quicksort:
+   void  qsort(void *base, size_t nelem, size_t width,
+		int (*fcmp)(const void *, const void *)); - sorteaza tabloul
+       dat. Nu returneaza nimic.
+
+2. Lucrul cu fisiere
+--------------------
+
+  Un fisier este o grupare de informatii de acelasi tip. Limbajul C permite
+fisiere de tip text si fisiere de tip binar. Pentru a accesa un fisier, aso-
+ciem o variabila de tip (FILE *) cu fisierul dorit, deschidem fisierul pentru
+un anumit mod de acces, iar la sfirsit inchidem fisierul.
+
+  FILE *fopen(const char *nume_fis, const char *mod); - deschide fisierul cu
+    numele dat pentru acces de tip "mod" la fisier . Returneaza pointer la fi-
+    sier sau NULL daca nu l-a putut deschide.
+    mod: "r" - readonly , este permisa doar citirea dintr-un fisier existent
+	 "w" - write, creaza un nou fisier, sau daca exista deja, distruge ve-
+	       chiul continut
+	 "a" - append, deschide pentru scriere un fisier existent. Pointerul
+	       de acces se plaseaza la sfirsitul fisierului.
+	 "+" - permite scrierea si citirea (ex: "r+", "w+", "a+"). O citire nu
+	       poate fi direct urmata de o scriere si reciproc. Intii trebuie
+	       repozitionat cursorul de acces printr-un apel la fseek.
+	 "b" - specifica fisier de tip binar
+	 "t" - specifica fisier de tip text (implicit), la care se face auto-
+	       mat conversia CR-LF("\n\f") in sau din CR ('\n').
+
+  int fclose(FILE *fp) - inchide fisierul. Returneaza 0 la succes.
+
+  int fseek(FILE *fp, long offset, int whence); - repozitioneaza pointerul
+     asociat unui fisier . Offset - numarul de octeti intre pozitia data de
+     whence si noua pozitie. Whence - are una din cele trei valori posibile:
+     SEEK_SET =  0 -  Cautarea se face de la inceputul fisierului
+     SEEK_CUR =  1 -  Cautare din pozitia curenta
+     SEEK_END =  2 -  Cautare de la sfirsitul fisierului
+
+  int feof(FILE *fis); - returneaza 0 daca nu s-a detectat sfirsit de fisier,
+	respectiv o valoare nenula pentru sfirsit de fisier.
+
+3. Exemple
+----------
+
+1øSa se scrie un program care executa in mod repetat urmatoarele operatii:
+1) Preia informatiile (nume si nota) pentru o grupa de studenti. Citirea
+se face dintr-un fisier al carui nume se specifica de utilizator.
+2) Verifica prezenta unui student in grupa
+3) Listeaza grupa in ordine alfabetica si afiseaza media grupei.
+4) Termina program.
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <ctype.h>
+# include <string.h>
+# define MAX_S  30
+# define MAX_L  20
+
+char stud[MAX_S][MAX_L];
+FILE *fp=NULL;
+int nrstud;
+float medie;
+
+void citire(FILE *fp, char tab[][MAX_L]){
+  float nota;
+  int i;
+  medie=0;
+  i=0;
+  while(!feof(fp)){
+    fscanf(fp,"%s%f",tab[i++],&nota);
+    medie+=nota;
+  }
+  nrstud=i-1;
+  medie/=nrstud;
+  qsort(tab,nrstud,MAX_L,strcmp);
+}
+
+int cauta(char *s, char tab[][MAX_L]){
+  char *t;
+  t=bsearch(s,tab,nrstud,MAX_L,strcmp);
+  return (t-tab)/MAX_L;
+}
+
+void main(){
+  char c,s[12];
+  int i;
+  while(1){
+    printf("\nOptiunea:\nCitire, Prezenta_student, Listare, Iesire\n >");
+    c=getchar();getchar();
+    switch(toupper(c)){
+      case 'C': printf("nume fisier:");gets(s);
+		if(fp!=NULL) fclose(fp);
+		if((fp=fopen(s,"r"))==NULL){
+		   printf("fisierul %s nu exista\n",s);
+		   break;
+		}
+		citire(fp,stud);
+		break;
+      case 'P': printf("nume student:");gets(s);
+		if((i=cauta(s,stud))<0)
+		  printf("nu exista studentul %s in grupa",s);
+		else
+		  printf("studentul %s este al %d-lea din grupa",s,i+1);
+		break;
+      case 'L': printf("Lista studenti:\n");
+		for(i=0;i<nrstud;i++)
+		  printf("%d %s\n",i+1,stud[i]);
+		printf("\n\n media grupei = %4.2f\n\n",medie);
+		break;
+      case 'I': printf("terminare program\n");
+		fclose(fp);exit(0);
+    } /*switch*/
+  } /*while*/
+}
+
+2øIntr-un fisier de tip text sint pastrate valorile reale ale unei masuratori
+sub forma:
+nr_masuratori '\n' val1 '\n' val2 '\n' val3 ...
+Sa se scrie programul care afiseaza numarul de masuratori si valorile respec-
+tive, dupa care adauga la fisier noi masuratori pina la introducerea valorii
+0. Valorile citite se afiseaza in format stiintific.
+
+# include <math.h>
+# include <stdio.h>
+# include <stdlib.h>
+# define MAX  100
+
+FILE *fp;
+double masur[MAX],mas_noua;
+char nume_fis[12],s[20];
+int nr_mas;
+
+double convf(char *s){
+  double val=0.0,putere;
+  int i=0,semn;
+  while(isspace(s[i]))
+       i++;
+  semn=(s[i]=='-')?-1:1;
+  if(s[i]=='+'||s[i]=='-')
+       i++;
+  for(val=0.0;isdigit(s[i]);i++)
+      val=10*val+s[i]-'0';
+  if(s[i]=='.'){
+       i++;
+       for(putere=1.0;isdigit(s[i]);i++){
+	  val=10*val+s[i]-'0';
+	  putere*=10;
+       }
+       val/=putere;
+  } /*sfirsit parte zecimala*/
+  val*=semn;
+  if(s[i]=='e' || s[i]=='E'){
+     i++;
+     semn=(s[i]=='-')?-1:1;
+     if(s[i]=='+'||s[i]=='-')
+	  i++;
+     for(putere=0.0;isdigit(s[i]);i++)
+	 putere=10*putere+s[i]-'0';
+     val*=pow10(semn*putere);
+  } /*sfirsit parte exponentiala*/
+  return val;
+}
+
+void loadmat(FILE *fp,int *nrm,double *mas){
+  int i=0;
+  fscanf(fp,"%d",nrm);
+  if (*nrm>MAX) *nrm=MAX;
+  for(;i<*nrm;i++)
+    fscanf(fp,"%lf",&mas[i]);
+}
+
+void afiseaza(double *mas,int nrm){
+  int i;
+  for(i=0;i<nrm;i++)
+    printf("masuratoarea %d = %6.2e\n",i+1,mas[i]);
+}
+
+void main(){
+  printf("nume fisier:");
+  gets(nume_fis);
+  if((fp=fopen(nume_fis,"r+"))==0){
+     printf("nu exista fisierul\n");
+     exit(1);
+  }
+  loadmat(fp,&nr_mas,masur);
+  afiseaza(masur,nr_mas);
+  fseek(fp,0L,SEEK_END);
+  printf("\nmasuratoarea %d =",++nr_mas);
+  while((mas_noua=convf(gets(s))) && nr_mas<MAX-1){
+    printf("\nmasuratoarea %d =",++nr_mas);
+    fprintf(fp,"%lf\n",mas_noua);
+  }
+  fseek(fp,0L,SEEK_SET);
+  fprintf(fp,"%3d",--nr_mas);
+  fclose(fp);
+}
+
+4. Probleme propuse
+-------------------
+
+1) Intr-un fisier "cod.dat" este memorata o tabela de codificare, sub forma:
+car_de_codif ' ' car_codif '\n'
+  Sa se preia un text din fisierul "dat1.dat", sa se codifice conform codului,
+iar textul obtinut sa se scrie in fisierul "dat2.txt".
+
+2) Sa se interclaseze continutul a doua fisiere intr-un al treilea fisier. In-
+formatiile dintr-un fisier sint:
+numarul_de_valori '\n' val1 '\n' val2 '\n'...
+Valorile intregi val1, val2, etc. sint strict crescatoare. Valorile comune se
+trec o singura data in fisierul rezultant.
+
+3) Dintr-un fisier se citesc 15 caractere distincte, care codifica cifrele ze-
+cimale 0,1,2...9 si operatorii +,-,*,/ si =. Tot din fisier se citeste un sir
+de maxim 80 de caractere, terminat prin caracterul '='si care reprezinta o ex-
+presie aritmetica cu operanzi intregi fara semn.
+  Se considera expresie corecta cea care satisface urmatoarele conditii:
+  - contine numai caractere ale carei coduri au fost citite initial
+  - nu contine doi operatori succesivi
+  - nu contine impartiri la zero.
+  Daca expresia este incorecta se afiseaza un mesaj de eroare corespunzator
+primei erori intilnite. Daca expresia este corecta se va evalua, efectuind
+operatiile de la stinga la dreapta in ordinea in care apar si se va afisa va-
+loarea calculata codificata conform listei de coduri date.
+
+4) Dintr-un fisier de intrare se citeste o propozitie terminata printr-un
+punct. Propozitia este formata din cuvinte ce contin doar litere mari. Cuvin-
+tele sint separate prin unul sau mai multi separatori din multimea blanc,'\t',
+'\n'. Stiind ca propozitia are cel mult 30 de cuvinte, sa se afiseze grupurile
+de cuvinte in care fiecare membru reprezinta anagrama altui membru din grup.
+Un grup va contine numarul maxim de membrii, iar membrii sint distincti.
+
+

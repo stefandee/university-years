@@ -1,0 +1,381 @@
+                   
+
+                        PROIECT SDAA
+   
+
+         Autor : Dicu Stefan, an III, grupa 2, semigrupa 1
+
+
+
+
+
+
+1. Specificatii de definitie
+
+	1.1. Enunt tema
+
+             STUDIU : Coduri Huffmann. Algoritmi de comprimare.
+             DEMO   : Exemple de utilizare. Profil performanta.
+
+	1.2. Descriere cerinte
+	
+                Se va scrie un program de arhivare(comprimare) de genul
+		binecunoscutelor ARJ sau ZIP , fara a avea pretentii de
+		viteza sau de calitate.Programul va implementa algoritmul
+		de comprimare Huffmann si va fi scris in Pascal + assembler
+		(pentru viteza in locurile des accesate).Evident,intrucit
+		algoritmul Huffmann este un algoritm TERMINAL(care nu poate
+		fi imbunatatit,el creeind un arbore optim,vezi demonstratia)
+		rata de compresie nu va fi spectaculoasa.       
+
+ 	1.3. Intrari, iesiri
+		Metoda de interfata cu utilizatorul este linia de comanda,
+		acesta trebuind sa scrie unul din parametrii :
+		a - arhivare.Intrarea o reprezinta fisierele ce vor fi
+		    arhivate,iesirea este un fisier arhivat
+		e - dezarhivare.Intrarea este o arhiva,iesirea este,eventual
+		    calea unde se va dezarhiva(altfel,directorul curent).
+	        l - listare arhiva.Intrarea este o arhiva,rezulatul-continutul
+		    arhivei- se va face la iesirea standard(ecranul) 		 
+
+	1.4. Interfata utilizator
+
+	      	Asa cum s-a spus la punctul anterior,interfata cu utiliza-
+		torul este la nivelul liniei de comanda,cu avantaje( viteza
+		de lucru) si dezavantaje( mai putin intuitiva).Oricum,se va
+		folosi o metoda pentru a atrage atentia utilizatorului asupra
+		eventualelor erori sau mesaje importante prin colorarea(high	
+		lighting) acestora.
+	
+	1.5. Cerinte de performanta
+	
+		Din cauza limitarilor impuse de insusi algoritmul Huffmann,
+		programul nu va avea viteza sau rata de compresie deosebite.
+		Este mai mult o aplicatie didactica decit una comerciala.
+
+
+ 	
+2. Specificatii de realizare
+
+        Trebuie prezentat mai intai algoritmul Huffmann,pentru o mai buna
+        intelegere a structurilor de date si program.
+        Se parcurge un fisier,aflindu-se frecventele fiecarui caracter ASCII
+        din respectivul fisier.Aceste frecvente se pot normaliza(raporta la
+        lungimea fisierului) sau nu.Cu aceste frecv se poate construi arborele
+        Huffmann astfel(alg.Huffmann va construi un arbore optim , adica nodurile
+        cu frecvente mici se afla mai departe de radacina) : se cauta 2 noduri cu
+        frecventa minima,se suprima din lista de noduri (vezi variabila Use din
+        tipul Node),si se creaza un alt nod,care are frecv suma celor 2 noduri.
+        Pentru nodul nou creat,se stabilesc legaturile stinga si dreapta spre
+        cele 2 noduri.Dupa ce arborele Huffmann a fost creat,se parcurge de la
+        radacina spre frunze,memorind un cod Huffmann(vezi variabila CA) astfel :
+        daca se alege ramura stinga se adauga 0 la cod,pentru ramura drepta se
+        adauga 1 la cod.Cind s-a ajuns la un nod terminal,se memoreaza codul
+        nodului intr-o tabela de coduri(vezi Code_Table).Apoi se parcurge
+        fisierul din nou,se citesc din nou caracterele si se scriu in arhiva.
+        Daca algoritmul nu a reusit sa comprime suficient(adica arhiva e mai
+        mare ca sursa),fisierul va fi stocat in loc de arhivat.(se mai adauga,
+        evident,un header care contine informatii utile despre fisierul din ar
+        hiva).
+
+	2.1. Structuri de date. Descriere.
+
+                In UNIT-ul F_Table :
+
+                Tipul Node
+                ----------
+                Definitie : Node = record
+                                    c : char;
+                                    l,r : integer;
+                                    freq: longint;
+                                    use : boolean;
+                                   end;
+                Este o intrare pentru un nod din arborele Huffmann(acesta
+                e reprezentat cu matrici).Ca urmare contine caracterul(cele
+                256 coduri ASCII+noduri care se obtin ca suma a frecv minime),
+                nodul sting si drept(l,r) si frecv.Use se foloseste atunci cind
+                se afla minimul si e TRUE daca caracterul nu a fost inca folosit.
+
+                Tipul Frequency_Table
+                ---------------------
+                Definitie : array[0..512] of Node;
+                Contine arborele Huffmann si poate retine maxim 512 noduri(pentru
+                256 de noduri de baza rezulta 510 noduri ale arborelui).
+
+		in UNIT-ul Utils :
+
+                Tipul Buffer
+                ------------
+                Definitie : array[1..65004] of byte;
+                Variabile : InBuf,OutBuf : ^Buffer;
+                Pentru a atinge viteza,se adopta o strategie Greedy pentru
+                a citi din fisier.(1)Se incearca citirea a 65004 octeti.Daca
+                nu se poate(fisierul e mai mic de 65004),se citeste tot
+                fisierul in buffer(InBuf).Altfel se citesc 65004 octeti,se
+                prelucreaza in OutBuf si se incearca din nou cu pasul(1).
+                Octetii prelucrati(codul comprimat la comprimare,codul decom-
+                primat la decomprimare) se depun in OutBuf si in caz ca se
+                atinge limita superioara , se scriu in fisier.
+
+		in UNIT-ul Compress :
+
+                Tipul TSign
+                -----------
+                Definitie : array[1..8] of char;
+                Variabile : (CONST) Sign : TSign = 'KAPA!;-)'
+                Contine semnatura fisierului arhivat,pentru a identifica
+                daca fisierul e o arhiva .K .
+
+                Tipul Header
+                ------------
+                Definitie : Header = record
+                                   sign    : TSign;
+                                   unpak   : longint;
+                                   pak     : longint;
+                                   method  : byte;
+                                   Attr    : Byte;
+                                   Time    : Longint;
+                                   Name    : string [12];
+                                   end;
+                Variabile : Hdr : Header;
+                Este scris inaintea fiecarui fisier arhivat.In functie de
+                metoda,dupa header urmeaza (method=STORE) fisierul original,
+                necomprimat sau (method=PAK_1) tabela de coduri Code_Table
+                si datele comprimate.
+
+                Tipurile Code_Entry,Aux_Code_Entry
+                ----------------------------------
+                Definitie : Code_Entry = record
+                                       code    : longint;
+                                       clength : byte;
+                                       end;
+                            Aux_Code_Entry = record
+                                           whatchar: char;
+                                           code    : longint;
+                                           clength : byte;
+                                           end;
+                Variabile : Code_Table     : array[0..255] of Code_Entry;
+                            Aux_Code_Table : array[0..255] of Aux_Code_Entry;
+
+                Reprezinta o intrare in tabela de coduri Huffmann,continind
+                codul respectiv(care nu poate depasi 32 de biti) si lungimea
+                lui.Aux_Code_Table este folosit pentru a retine codurile sor-
+                tate in ordinea crescatoare a lungimii codului,lucru folosit
+                pentru a optimiza viteza la (:-) decodificare.
+
+                Tipul Code_Array
+                ----------------
+                Definitie : Code_Array = array[1..32] of byte;
+                Variabila : (locala) CA : Code_Array;
+
+                Folosit pentru a retine codul Huffmann la parcurgerea
+                arborelui Huffmann(fiecare octet retine 0 sau 1).Dupa
+                ce se ajunge la nod terminal,codul din CA va fi copiat
+                in intrarea corespunzatoare din Code_Table(cimpul code).
+
+	2.2. Structuri de program. Descriere.
+                Programul contine urmatoarele unit-uri :
+                UTILS.PAS    - diverse utilitare pentru fisiere,lucru pe biti;
+                COMPRESS.PAS - contine proc principale de arhivare/dezarhivare
+                               listare arhiva;
+                F_TABLE.PAS  - contine proceduri pentru analiza de frecventa;
+                KAPA.PAS     - programul principal;
+
+                Descriere unit-uri :
+
+                unit-ul UTILS.PAS
+                -----------------
+                Contine urmatoarele funct si proc publice :
+
+                FUNCTION Int2Str(v : longint) : STRING;
+                 Conversie de intregi la stringuri.
+                PROCEDURE OpenFile(var F : FILE;Path : PathStr);
+                 Functie 'invelitoare' pentru deschiderea de fisiere.
+                 In caz ca se cere deschiderea unui fisier inexistent
+                 se iese din program cu un mesaj.
+                PROCEDURE CreateFile(var F : FILE;Path : PathStr);
+                 Functie 'invelitoare' pentru crearea de fisiere.
+                 In caz ca fisierul exista, se intreaba suprascrierea lui,
+                 redenumirea sau iesirea din program.
+                PROCEDURE ReadFile(var F : FILE;var buf;count : word);
+                 Functie 'invelitoare' pentru citirea din fisier.
+                 In caz ca exista eroare de citire,se iese cu mesaj.
+                PROCEDURE WriteFile(var F : FILE;var buf;count : word);
+                 Analog,pentru scriere.
+                PROCEDURE SeekFile(var F : FILE;pos : longint);
+                 Analog,pentru mutare pointer in fisier.
+                FUNCTION FilePos(var F : FILE) : longint;
+                 Analog,pentru aflarea pozitiei curente din fisier.
+                FUNCTION SizeFile(var F : FILE) : longint;
+                 Analog,pentru aflarea lungimiii fisierului.
+                PROCEDURE EraseFile(var F : FILE);
+                 Analog,pentru stergerea fisierului.
+                FUNCTION FileExist(Path : PathStr) : boolean;
+                 Verifica daca fisierul precizat prin Path exista.
+                PROCEDURE SetBit(var octet : byte;pos : longint;val : byte);
+                 Seteaza bitul de pe pozitia pos din octetul octet pe valoarea
+                 val.
+                FUNCTION GetBit(octet : longint;pos : longint) : byte;
+                 Returneaza valoarea bitului(0/1) din octet de la pozitia pos.
+                FUNCTION What_DosError(de : integer) : boolean;
+                 Nefolosita.Returneaza sub forma de mesaj eroarea din de(doserror).
+                PROCEDURE InTheBeggining;
+                 Orice apelare a programului duce la afisarea datelor despre
+                 programul KAPA.
+                PROCEDURE Help;
+                 Evidenta :-).
+
+                unit-ul F_TABLE.PAS
+                -------------------
+                PROCEDURE Analyze_4_Frequency(FStr : PathStr);
+                 Analizeaza frecventa fisierului dat de FStr.Rezultatul
+                 parcurgerii fisierului este pus in variabila FTab :
+                 Frequency_Table.In principiu foloseste bufferul de intrare
+                 InBuf,analiza facindu-se in memorie.Proceduri interne
+                 folosite sint Init_F_table,care initializeza tabela de
+                 frecvente(le pune pe toate pe 0) si Analyze_Buffer_Frequency
+                 (Size:Word),care parcurge bufferul InBuf(in prealabil incarcat
+                 cu informatiile din fisier) ; procedura este facuta in assem-
+                 bler si foloseste adresarea indexata cu [di+bx+?] pentru a
+                 incrementa frecventele.Din cauza faptului ca mediul BP nu
+                 permite folosirea instr assembler pe 32 biti,trebuie facut
+                 un artificiu(pentru ca frecventele sint pe 32 de biti).Se
+                 aduna la word-ul inferior.Daca a rezultat carry,se aduna
+                 cu ADC la word-ul superior.
+
+                unit-ul COMPRESS.PAS
+                --------------------
+                FUNCTION  Build_Huffmann_Tree : boolean;
+                 Construieste arborele Huffmann.Intii se afla cele mai mici
+                 2 frecvente.Se folosesc,pentru aceasta 2 var,use1 si use2 si
+                 corespondentii ibuffer[2],fbuffer : array[1..2] of longint.
+                 Initial use1=true,use2=true.Aflarea merge dupa urm.
+                 principiu : se parcurge FTab.Daca use1=true,atunci ibuffer[1]
+                 primeste indexul i pentru care FTab[i].use a fost true si
+                 fbuffer[1] primeste val FTab[i].freq.Apoi use1:=false.Analog pt
+                 use2.Apoi totul decurge ca o aflare normala de minime,tabloul
+                 fbuffer tinind ordonate cele 2 minime.
+                 Daca use1 sau use2 sint true,atunci inseamna ca nu s-a putut
+                 gasi un minim,adica constructia arborelui Huffmann e completa
+                 si se iese.Altfel,Lastindex se incrementeaza(s-a mai adaugat
+                 un nod la arborele Huffmann) si se returneaza false(arborele
+                 Huffmann nu e complet).
+
+                PROCEDURE Build_Code_Table(index : integer;clen : integer);
+                 Se parcurge arborele Huffmann,pe ramuri,adaugindu-se la
+                 CA 0 sau 1 si incrementind lungimea codului clen.Cind se
+                 ajunge la un nod terminal,codul Huffmann pentru caracterul
+                 ASCII respectiv(al nodului terminal,adica al index-lea) se
+                 obtine transformind in cod pe biti in Code_Table[index].code
+                 vectorul CA-ul.
+
+                PROCEDURE Code_To_File; { for verify *only* }
+                 Scopuri pur de verificare.Scrie Code_Table,dupa ce aceasta
+                 a fost construita cu Build_Code_Table intr-un fisier.
+
+                PROCEDURE Huffmann_Pack(Paths,Pathd : PathStr);
+                 Realizeaza comprimarea.Este apelata ca urmare a parametrului
+                 'A'(arhivare) din linia de comanda.PathS poate fi numele unui
+                 fisier sau o masca( de stilul *.*).Arhiva destinatie,data de
+                 PathD este creata.Se cauta cu FindFirst si FindNext toate
+                 fisierele corespunzatoare.Pentru fiecare fisier gasit : se
+                 afla frecventele(Analyze_4_Frequency),se construieste tabela
+                 de coduri(Build_Code_table).Daca Hdr.Pak,care reprezinta
+                 lungimea in biti a fisierului arhivat si se calc. ca suma(FTab[i].
+                 freq*Code_Table[i].clength),este mai mare ca Hdr.UnPak(lungimea
+                 -originala- a fisierului nearhivat) atunci se alege ca metoda
+                 nu arhivarea (PAK_1) ci stocarea(STORE).
+                 In caz de arhivare(method=PAK_1) se scrie headerul si Code_Table
+                 in arhiva,se citeste continutul fisierului in InBuf(intregul
+                 fisier-ramura else sau o parte de 65000 de octeti).Urmeaza
+                 partea de codificare : se parcurge InBuf;pentru fiecare octet
+                 x,se ia Code_Table[x].code si se scrie,pe biti-evident,in
+                 OutBuf.Daca s-a depasit capacitatea de 65000 de octeti ai
+                 OutBuf,se scrie in arhiva.Se afiseaza si un indice de progres
+                 (in procente,care arata cit din sursa a fost adaugat la
+                 arhiva).
+                PROCEDURE Huffmann_UnPak(PathS,PathD : PathStr);
+                 Realizeaza dezarhivarea arhivei PathS ; fisierele vor fi scrise
+                 in calea data de PathD.Daca PathD lipseste,atunci se vor scrie in
+                 directorul curent.
+                 Se parcurge arhiva PathD,si in se citeste headerul.Daca cimpul
+                 de semnatura Hdr.Sign nu corespunde cu 'KAPA!:-)' se iese cu
+                 mesaj de eroare.Altfel,in functie de metoda-Hdr.methhod- se
+                 alege citirea si stocarea sau dezarhivarea.
+                 In caz de dezarhivare,se citeste in Code_Table informatiile
+                 care urmeaza dupa header.Se copiaza Code_Table in Aux_Code_Table
+                 si se sorteaza in ordinea crescatoare a lungimii in biti a
+                 codului(Code_Table[i].clength).Apoi se citesc informatiile
+                 comprimate din arhiva si se decomprima astfel :  se parcurge
+                 Aux_Code_Table de la 0 la 255 si se compara codul(.code) cu
+                 informatia din InBuf.Sortarea facuta anterior ajuta la gasirea
+                 mai rapida a codului->optimizare de viteza.Tot in acest sens
+                 se foloseste si grupul counters : array[1..16] of integer/
+                 xcounters : integer.Se imparte spatiul de cautat 0..255 in
+                 16 zone de 16 indici fiecare.De fiecare data se incrementeaza
+                 xcounters(care e valid in intervalul [1..16].Practic se iau
+                 indicii astfel : 0,16,32,48....,1,17,33,49....,2,18,34,50,etc.
+                 Cind s-a umplut OutBuf(crt_bit>8*65000),atunci informatiile
+                 decomprimate se scriu in fisierul Hdr.FileName.
+
+                PROCEDURE Huffmann_List(PathS : PathStr);
+                 Listeaza continutul unei arhive.Se citeste headerul.Daca
+                 semnatura e valida,atunci se afiseaza numele fisierului +
+                 alte date despre el(lungimea arhivata,rata de arhivare).
+                 In functie de metoda ,(PAK_1) se sare peste lungimea Code_Table
+                 +lungimea fisierului arhivat(Hdr.Pak div 8+1) sau (STORED)
+                 peste Hdr.UnPak div 8.
+
+	2.3. Cod sursa. Comentarii.
+                Vezi sursele.
+	2.4. Teste. Concluzii.
+                Programul are o mica hiba(nu a fost inca proiectat) sa
+                decomprime cod daca acesta depaseste lungimea bufferului
+                InBuf(65004 octeti).Motivul este dificultatea de implementare
+                (necesita o tratare speciala a unui caz pe care nu am reusit
+                sa o fac optim,a trebuit cirpita si ,deci,am scos-o).
+                In rest a rezistat la teste 'din prima'.
+
+3. Manual de utilizare
+                Linia de comanda ar trebui sa arate in felul urmator :
+
+                kapa <comanda> <destinatie> <sursa>
+
+                Comenzile sint :
+                ?,/?,-?,/h,-h   - ajutor;
+                a               - adauga fisierul(sau fisierele specificate de
+                                  o masca de cautare cu * si ?) sursa la arhiva
+                                  specificata in destinatie;
+                Obs : nu se pot ADAUGA fisiere la o arhiva existenta;arhiva,in
+                      caz ca exista,va fi suprascrisa;de asemenea,nu se pot spe
+                      cifica mai mult de 1 fisier pentru sursa ci doar o masca
+                      de cautare,de genul *.txt sau *.* .
+
+                l               - listeaza continutul arhivei sursa;
+                e               - decomprima arhiva sursa in directorul curent
+                                  (daca destinatie lipseste) sau in directorul
+                                  specificat de destinatie
+                Obs : nu se poate specifica ce fisier sa se extraga din arhiva,
+                      ci toate fisierele vor fi extrase.
+
+4. Raport Beta-Site
+		Nu a fost facut - programul a rezistat la toate testele.
+
+5. Performante. Avantaje
+                E cel mai scurt program de comprimare/decomprimare si , in
+                plus, nu se cer bani pentru folosirea lui(oricum,cine ar
+                face-o ?).
+
+6. Deviz
+	6.1. Ore consumate fizic:
+		- specificare     	 1
+		- proiectare             7
+		- implementare    	 4
+		- testare                5
+		- elaborare documentatie 2
+
+			TOTAL            19
+
+	6.2. Ore calculator              11 (implementare+testare+elaborare documentatie)
+
+7. Data. Semnatura.

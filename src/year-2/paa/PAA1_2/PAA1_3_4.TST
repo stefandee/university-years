@@ -1,0 +1,12 @@
+dare
+are
+are
+mare
+vaca
+casa
+masa
+rtype
+usa
+quake
+rabla
+mare

@@ -1,0 +1,35 @@
+program eu;
+const a=4;
+      w=12.4;
+      c='g';
+      
+var r:integer;
+    t:array[1..5] of char;
+    te:record 
+      rea,img:integer
+    end;
+
+procedure pro1(var i,k:integer;h:real);
+begin
+ repeat
+  begin
+   for i:=1 downto 3 step 4 do
+   i:=1;
+  end
+ until 1<5;
+end;
+
+function fun2(i:char):real;
+
+ procedure pro2(t:char); 
+ begin
+ end;
+ 
+begin
+ pro1('s',dfgdfg);
+end;
+
+
+begin
+if 2=1 then a:=3;
+end.

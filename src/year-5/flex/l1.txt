@@ -1,0 +1,97 @@
+lex, flex
+
+$lex -i fis
+
+Structura fisier intrare:
+
+sectziune definitzii
+- forma:
+	nume	definitie (pe acelasi rind)
+	nume trebuie sa incepa in prima coloana
+	definitie = expr regulata
+- linii de forma:
+	%{ ... }% neindentate
+	/* ... */ neindentate
+  ele sint copiate in .c la inceput
+- conditiii de start (comutare de mod). EX asm in pascal
+%%
+sectziune de reguli:
+-forma:
+	sablon	{actiune} <--------------------------------------1
+	sablon trebuie sa inceapa din prima coloana                    
+	actiunea sa inceapa pe ac linie ca sablon
+- inainte de prima regula....
+- liniile indentate dintre reguli vor fi copiate in lex.yy.c
+%%                                                              
+sectziune de cod                                                
+- formata din functii ce vor fi _copiate_ in lex.yy.c la sfirsit
+- functiile pot fi folosite ca actiuni---------------------------1 
+
+*************************************************
+Exemplu:
+
+%%
+[1-9][0-9]*
+
+***************************************************
+
+Functii/var din lex.yy.c, pot fi folos ca actiuni ----------->1
+char *yytext; // returneaza atomul (lexema)
+FILE *yyin; //implicit STDIN
+FILE *yyout; // implicit STDOUT
+int yyleng; //lungimea atomului curent
+
+****************************************************
+
+DIRECTIVE:
+- ECHO  - realizeaza copierea atomului pe yyout.
+- BEGIN nume conditie start - comutarea in alt mod de lucru (v. sect
+definitii). Regulile pot fi prefixate cu o cond de start
+- REJECT - ca actiune a unei reguli pot face verificari suplimentare care
+la fail scriu REJECT 
+- yymore() - concateneaza actualul atom la urmatorul
+- yyles(n) - din atomul crt retin n caract si celelalte le restituie in
+bufferul de IN
+- unput(c) - (re)introd in buff de IN char c
+- input() - return char de la IN
+- YY_FLUSH_BUFFER - goleste buff
+- yy_terminate() - provoaca terminarea fortata a alex si return 0 la cel
+ce a apelat yylex()
+
+***************************************************
+FORMA EXPRESIILOR REGULATE EXTINSE
+(sablon sau definitie)
+
+PRECEDENTZA SCADE DE SUS IN JOSU:
+x - char tiparibil
+. - orice char mai putin New Line
+[xyz] - clasa de char intre []. Semnificatie: unul din x, y, z.
+[x z] - char 'x' sau ' ' sau 'z'
+[abj-oZ] - clasa de char j-o inseamna toate char de la j la o
+[^A-Z] - clasa negata. Adica orice char in afara de [A-Z]
+r* - r=expr regulata; *=star
+r+ - +=plus (1+)
+r? - ?=0 sau una
+r{2,5} - expr r de la 2 la 5 aparitii
+r{2,} - cel putin 2 aparitii
+r{4} - r apare de exact de 4 ori
+{nume_definitie} - se va expanda la definitia asociata
+\ - prefixeaza caracterele care au semnificatie speciala
+\x - daca x = a, b, f, n, r, t, v
+\0 - NULLL
+\123 - caracterul cu codul ASCII 0123
+(r) - 
+rs - cat
+r | s - r sau s
+r / s - r numai daca este urmat de s
+^r - r la inceput de linie
+r$ - r la sfarSHIT de linie
+<s>r - r cu conditia de start s(definita in sectiunea de definitii; pot fi
+mai multe conditii, sau  toate <*> )
+<<EOF>> - end of file
+
+*****************************************
+
+Al IIlea egzemplu:
+
+v ex2.txt

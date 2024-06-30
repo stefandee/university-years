@@ -1,0 +1,2536 @@
+
+
+PROCEDURE preordine(r:TipNod);
+  BEGIN
+{1} listeaza(r);
+{2} FOR fiecare fiu f al lui r,(daca exista vreunul)
+        in ordine de la stinga spre dreapta DO
+      preordine(f)
+  END; { preordine}
+
+PROCEDURE inordine(r:TipNod);                                 {5.3}
+  BEGIN
+    IF r este nod terminal THEN
+        listeaza(r);
+      ELSE
+        BEGIN
+          inordine(cel mai din stinga fiu al lui r);
+          listeaza(r);
+          FOR fiecare fiu f al lui r, cu exceptia celui mai
+              din stinga, in ordine de la stinga spre
+              dreapta DO
+            inordine(f)
+        END
+  END; {inordine}
+
+PROCEDURE preordine(r:TipNod);
+  {listeaza cheile descendentilor lui r in preordine}
+  VAR f:TipNod;
+    BEGIN
+      Write(cheie(r,a));
+      f:=primul_fiu(r,a);
+      WHILE c<>0 DO                                        {5.4}
+        BEGIN
+          preordine(f);
+          f:=frate_drept(f,a)
+        END
+    END; {preordine}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PROCEDURE preordine_nerecursiv(a:TipArbore);
+  VAR m:TipNod;
+      s:TipStiva;
+      gata:boolean;
+  BEGIN
+    initializare(s);
+    m:=radacina(a);
+    gata:=false;
+    WHILE NOT gata DO
+      IF m<>0 THEN
+          BEGIN                                            {5.5}
+            Write(cheie(m,a));
+            push(m,s);
+            m:=primul_fiu(m,a)  {exploreaza fiul sting}
+          END
+        ELSE
+          IF stivid(s) THEN
+              gata:=true
+            ELSE
+              BEGIN
+                m:=frate_drept(virfst(s),a);
+                pop(s)
+              END
+  END; {preordine_nerecursiv}
+
+
+TYPE TipNod=integer;
+     TipArbore=ARRAY[1..maxnod] OF TipNod;
+
+FUNCTION frate_drept(n:TipNod; a:TipArbore):TipNod;
+  VAR i,parinte:TipNod;
+      gata:boolean;
+  BEGIN                                                    {5.6}
+    parinte:=a[n];
+    frate_drept:=0;
+    i:=n;
+    REPEAT
+      i:=i+1;
+      IF a[i]=parinte THEN frate_drept:=i
+    UNTIL(frate_drept<>0) OR (i=maxnod)
+  END;
+
+TYPE TipPointreNod=^TipNodList;
+     TipNodLst=RECORD
+               indice:1..MaxNod;
+               urm   :TipPointerNod
+     END;
+     TipNod=0..MaxNod;
+     TipLista=TipPointerNod;
+     TipArbore=RECORD                                         {5.7}
+              inceput:ARRAY[1..MaxNod] OF TipLista;
+              {chei:ARRAY[1..MaxNod] OF TipCheie;
+              radacina:TipNod
+     END;
+FUNCTION primul_fiu(n:TipNod; a:TipArbore):TipNod;
+  VAR l:TipLista;
+  BEGIN
+    l:=a.inceput[n];
+    IF fin(l) THEN  {n este un nod terminal}               {5.8}
+        primul_fiu:=0
+      ELSE
+        primul_fiu:=furnizeaza(primul(l),l)
+  END; {primul_fiu}
+
+
+
+TYPE Cursor=0..DimMax;
+     TipNod=0..MaxNod;
+     TipArbore=RECORD
+               inceput :ARRAY[1..MaxNod] OF Cursor;
+               {chei   :ARRAY[1..MaxNod] OF TipCheie;
+               radacina:TipNod
+     END;
+
+VAR  Zona:ARRAY[1..DimMax] OF RECORD
+                                 nod:TipNod;
+                                 urm:Cursor
+                               END;
+     Disp:Cursor;
+     A:TipArbore;
+
+FUNCTION primul_fiu(n:TipNod; a:TipArbore):TipNod;
+  VAR l:Cursor; {cursor pentru inceputul listei fiilor lui n}
+  BEGIN
+    l:=a.inceput[n];
+    IF l=0 THEN { n este nod terminal}
+        primul_fiu:=0
+      ELSE
+        primul_fiu:=zona[l].nod
+  END; {primul_fiu}
+
+FUNCTION tata(n:TipNod; a:TipArbore):TipNod;                  {5.9}
+  VAR p:TipNod; {parcurge tatii posibili ai lui n}
+      i:Cursor; {parcurge copiii lui p}
+  BEGIN
+    tata:=0;
+    p:=0;
+    REPEAT
+      p:=p+1;
+      i:=a.inceput[p];
+      WHILE i<>0 AND (tata=0) DO { verifica daca n este
+                                       printre fiii lui p}
+        IF zona[i].nod=n THEN
+            tata:=p
+          ELSE
+            i:=zona[i].urm
+    UNTIL(tata<>0) OR(p=maxnod)
+  END; {tata}
+
+
+TYPE TipIndicatorInceputuri=0..MaxNod1;
+     TipIndicatorZona=0..MazNod2;
+     TipArbore=TipInducatorInceputuri;
+
+VAR ZonaInceputuri:ARRAY[1..MaxNod1] OF RECORD
+                                            cheie:TipCheie;
+                                            inceput:TipInicatorZona
+                                          END;
+                                                           {5.10}
+
+
+     Zona:ARRAY[1..MaxNod2] OF RECORD
+                                 cheie:TipCheie;
+                                 urm:TipIndicatorZona
+                                                                            END;
+     Disponibil1:TipIndicatorInceputuri;
+     Disponibil2:TipIndicatorZona;
+     A:TipArbore;
+
+
+TYPE TipCursor=0..MaxNod;
+     TipArbore=TipCursor;
+
+VAR  Zona:ARRAY[1..MaxNod] OF RECORD
+                                                                                                         cheie:TipCheie;
+                                                                                                         primul_fiu:TipCursor;          {5.11}
+                                                                                                         frate_drept:TipCursor;
+                                                                                                         {tata:TipCursor}
+                                                                           END;
+     Disponibil:TipCursor;
+     R:TipArbore;
+
+FUNCTION creaza2(v:TipCheie; t1,t2:TipArbore):TipArbore;
+  VAR temp:TipCursor; {pastreaza indexul primei locatii disponibile
+                        pentru radacina noului arbore}
+  BEGIN
+    temp:=Disponibil;
+    Disponibil:=Zona[Disponibil].frate_drept;
+    Zona[temp].primul_fiu:=t1;
+    Zona[temp].cheie:=v;                                 {5.12}
+    zona[temp].frate_drept:=0;
+    zona[t1].frate_drept:=t2;
+    zona[t2].frate_drept:=0;
+    creaza2:=temp
+  END; {creaza2}
+
+
+
+
+
+
+
+TYPE TipPointer=^TipNod;
+     TipNod=RECORD
+           cheie:char;                                     {5.13}
+           sting,drept:TipPointer
+         END;
+     TipArboreBinar=TipPointer;
+
+
+
+PROGRAM constructie;
+TYPE ref=^nod;
+     nod=RECORD
+           cheie:integer;
+           sting,drept:ref
+         END;
+VAR n:integer; radacina:ref;
+
+  FUNCTION arbore(n:integer):ref;
+    VAR nodnou:ref;
+        x,ns,nd:integer;
+    BEGIN {constructie arbore perfect echilibrat cu n noduri}
+      IF n=0 THEN
+          arbore:=NIL
+        ELSE
+          BEGIN
+            ns:=n DIV 2; nd:=n-ns-1;
+            Read(x); new(nodnou);
+            WITH nodnou^ DO
+              BEGIN
+                cheie:=x; sting:=arbore(ns);
+                drept:=arbore(nd)
+              END;                                         {5.14}
+            arbore:=nodnou
+          END
+    END; {arbore}
+
+  PROCEDURE tipareste_arbore(t:ref; h:integer);
+    VAR i:integer;
+    BEGIN {tipareste arborele t}
+      IF t<>NIL THEN
+        WITH t^ DO
+          BEGIN
+            tipareste_arbore(sting,h-5);
+            FOR i:=1 TO h DO Write(' ');
+            WriteLn(cheie);
+            tipareste_arbore(drept,h-5)
+          END
+    END; {tipareste_arbore}
+BEGIN {programul principal}
+  Read(n);
+  radacina:=arbore(n);
+  tipareste_arbore(radacina,50)
+END.
+
+
+PROGRAM constructie;
+TYPE ref=^nod;
+     nod=RECORD
+           cheie:integer;
+           sting,drept:ref
+         END;
+VAR i,n,ns,nd,x:integer;
+    radacina,p,q,d,fict:ref;
+    s:ARRAY[1..30] OF {stiva}
+        RECORD
+          n:integer;
+          dr:ref
+        END;
+BEGIN {primul integer este numarul de noduri}              {5.15}
+  Read(n); new(radacina); new(fict); {nod fictiv}
+  i:=1; s[1].n:=n; s[1].dr:=radacina;
+  REPEAT
+    n:=s[i].n; d:=s[i].dr; i:=i-1; {pop}
+    IF n=0 THEN
+        d^.drept:=NIL
+      ELSE
+        BEGIN
+          p:=fict;
+          REPEAT
+            ns:=n DIV 2; nd:=n-ns-1;
+            Read(x); new(q); q^.cheie:=x;
+            i:=i+1; s[i].n:=nd; s[i].dr:=q; {push}
+            n:=ns; p^.sting:=q; p:=q
+          UNTIL n=0;
+          q^.sting:=NIL; d^.drept:=fict^.sting
+        END
+  UNTIL i=0;
+  tipareste_arbore(radacina^.drept,50)
+END.
+
+
+TYPE TipPointerNod= ^TipNod;
+     TipNod=RECORD
+               info: TipInfo;                           {7.3.4.4.[a]}
+               stang,drept,tata: TipPointerNod
+     END;
+ 
+
+TYPE TipIndicator=^TipNod;
+     TipNod=RECORD
+               info: TipInfo;
+               legaturaStg,legaturaDr: BOOLEAN;        {7.3.4.4.[b]}
+               stang,drept: TipIndicator
+     END;
+     TipArboreBinarLeg=TipIndicator;
+
+
+
+PROCEDURE InorderIterativ (n: TipIndicator);
+{Traverseaza arborele binar in inordine incepind cu nodul n}
+
+BEGIN
+  WHILE n<>NIL DO
+    BEGIN
+      WHILE (NOT n^.legaturaStg) AND (n^.stang<>NIL) DO
+        n:=n^.stang;
+
+      viziteaza(n);
+
+      WHILE n^.legaturaDr DO                  {7.3.4.4.[c]}
+        BEGIN
+               n:=n^.drept;
+               viziteaza(n)
+        END;
+
+     n:=n^.drept
+   END
+END; {InorderIterativ}
+
+
+PROCEDURE InlocuiesteSub( VAR n:TipIndicator; r:TipArboreBinarLeg;
+                          VAR t: TipArboreBinarLeg);
+     VAR  CelMaiStg,CelMaiDr: TipIndicator;
+               rStg,rDr: TipIndicator;
+
+     BEGIN
+       {cauta nodurile extreme in arborele original n}
+       CelMaiStg:=n;
+       REPEAT
+         CelMaiStg:=CelMaiStg^.stang
+       UNTIL (CelMaiStg^.legaturaStg) OR (CelMaiStg^.stang = NIL);
+       CelMaiDr:=n;
+       REPEAT                                  {7.3.4.4.[d]}      
+         CelMaiDr:=CelMaiDr^drept
+       UNTIL ((CelMaiDr^.legaturaDr) OR (CelMaiDr^.drept = NIL);
+       n:=r;           {radacina lui r in n}
+       
+       rStg:=n;
+       WHILE rStg^stang<>NIL DO
+         rStg^:=rStg^.stang;
+       rStg^.stang:= CelMaiStg; rStg^.legaturaStg:=TRUE;
+ 
+       rDr:=n;
+       WHILE rDr^.drept<>NIL DO
+         rDr^:=rDr^.drept;
+       rDr^.drept:=CelMaiDr;  rDr^.legaturaDr:=TRUE;
+    END; {InlocuiesteSub}
+
+  
+
+
+
+TYPE TipArboreBinarLegPar=^TipNod;
+     TipNod=RECORD
+       element: TipElement;
+       stang,drept: TipArboreBinarLegPar;            {7.3.4.4.[e]}
+       legatura: BOOLEAN
+     END; 
+
+
+
+
+
+TYPE TipRef=^TipNod;
+     TipNod=RECORD
+           {diferite cimpuri}                              {5.16}
+           stang,drept:TipRef
+         END;
+
+PROCEDURE Preordine(r:TipRef);
+  BEGIN
+    IF r<>NIL THEN
+      BEGIN
+        p(r^);
+        preordine(r^.stang);                               {5.17}
+        preordine(r^.drept)
+      END
+  END; preordine}
+
+PROCEDURE Inordine(r:TipRef);
+  BEGIN
+    IF r<>NIL THEN
+      BEGIN
+        inordine(r^.stang);                                {5.18}
+        p(r^);
+        inordine(r^.drept)
+      END
+  END; {inordine}
+
+
+PROCEDURE Postordine(r:TipRef);
+  BEGIN
+    IF r<>NIL THEN
+      BEGIN
+        postordine(r^.stang);                              {5.19}
+        postordine(r^.drept);
+        p(r^)
+      END
+  END; {postordine}
+
+
+
+
+
+
+
+PROCEDURE Creare(VAR p:TipRef);
+  BEGIN
+    Read(ch); Write(ch);
+    IF ch<>'.' THEN
+        BEGIN
+          new(p);
+          p^.info:=ch;                                     {5.20}
+          creare(p^.stang);
+          creare(p^.drept)
+        END
+      ELSE
+        p:=NIL
+  END; {creare}
+
+
+PROCEDURE ConstrArbParcurgere(p:TipRef);
+ {Constructia unui arbore de parcurgere pornind de la notatia
+  Postfix a unei expresii aritmetice, care se parcurge de la
+  dreapta la stanga}
+  
+  VAR t:TipElement;
+  
+  BEGIN
+    CitesteElement(t);  {urmatorul element in ordine de la 
+                         dreapta la stanga}
+    IF t<>sfarsit THEN
+      BEGIN
+        *construieste un nod nou in p;
+        *plaseaza pe t in nod;
+        IF t este un operator THEN
+             BEGIN
+                              ConstrArbParcurgere(p^.drept);
+               ConstrArbParcurgere(p^.stang)
+             END
+          ELSE
+             BEGIN
+               *se face subarborele drept al lui p, vid;
+               *se face subarborele stang al lui p, vid
+             END
+       END
+  END; {ConstrArbParcurgere}
+
+
+
+TYPE TipRef=^TipNod;
+     TipNod=RECORD
+           cheie:TipCheie;                                  {5.21}
+           stang,drept:TipRef
+         END;
+
+
+
+
+
+FUNCTION Loc(x:TipCheie; VAR t:TipRef):TipRef;
+  VAR gasit:boolean;
+  BEGIN
+    gasit:=false;
+    WHILE(t<>NIL) AND NOT gasit DO                         {5.22}
+      BEGIN
+        IF t^.cheie=x THEN gasit:=true ELSE
+        IF x<t^.cheie THEN t:=t^.stang ELSE
+          t:=t^.drept
+      END;
+    Loc:=t
+  END; {Loc}
+
+FUNCTION LocRec(x:TipCheie; t:TipRef):TipRef;
+  BEGIN
+    IF t=NIL THEN 
+        LocRec=t
+     ELSE
+       IF x<t^.cheie THEN 
+           t:=LocRec(x,t^.stang)                     {5.22.[a]}
+         ELSE
+           IF x>t.cheie THEN
+               t:=LocRec(x,t^.drept)
+             ELSE
+               LocRec:=t
+  END; {LocRec} 
+
+ FUNCTION Loc1(x:TipCheie; VAR t:TipRef):TipRef;
+  BEGIN
+    f^.cheie:=x;
+    WHILE t^.cheie<>x DO
+      IF x<t^.cheie THEN
+          t:=t^.stang                                      {5.23}
+        ELSE
+          t:=t^.drept;
+    Loc1:=t
+  END; {Loc1}
+
+PROCEDURE Inarbior(x:TipCheie; VAR t:TipRef);
+  BEGIN
+    IF t<> NIL THEN {*}}
+        IF x<t^.cheie THEN
+            Inarbior(x,t^.stang)
+          ELSE
+            Inarbior(x,t^.drept)                           {5.24}
+      ELSE {t este NIL}
+        BEGIN
+          new(t); { completarea inlantuirii}
+          WITH t^ DO
+            BEGIN
+              cheie:=x; stang:=NIL; drept:=NIL 
+            END
+        END
+  END; {Inarbior}
+VAR radacina:TipRef;
+    c:TipCheie;
+  BEGIN
+    radacina:=NIL;
+    Read(c);                                               {5.25}
+    WHILE c<>0 DO
+      BEGIN
+        Inarbior(c,radacina);
+        Read(c)
+      END
+  END;
+
+PROCEDURE  InarbiorNerecursiv(x:TipCheie; t:TipRef);
+  VAR q1,q2:TipRef;
+      d:integer;
+  BEGIN
+    q2:=t
+    q1:=q2^.drept;
+    d:=1;
+    WHILE q1<>NIL DO
+      BEGIN
+        q2:=q1;
+        IF x<q1^.cheie THEN
+            BEGIN
+              q1:=q1^.stang;
+              d:=-1.
+            END
+          ELSE
+            BEGIN
+              q1:=q1^.drept;                               {5.26}
+              d:=1
+            END
+      END; { terminare parcurgere}
+    new(q1); {insertie}
+    WITH q1^ DO
+      BEGIN
+        cheie:=x;
+        stang:=NIL;
+        drept:=NIL
+      END;
+    IF d<0 THEN
+        q2^.stang:=q1
+      ELSE
+        q2^.drept:=q1
+  END; {Inarbior_nerecursiv}
+
+
+
+TYPE TipRef=^cuvint
+     cuvint=RECORD
+              cheie:integer;                               {5.27}
+              numar:integer;
+              stang,drept:TipRef
+            END
+radacina:=NIL;
+Read(cuv);
+WHILE cuv<>0 DO                                            {5.28}
+  BEGIN
+    cauta(cuv,radacina);
+    Read(cuv)
+  END;
+
+PROGRAM concordanta;
+TYPE  TipRef=^cuvint;
+      cuvint=RECORD
+               cheie:integer;
+               numar:integer;
+               stang,drept:TipRef
+             END;
+VAR radacina:TipRef; cuv:integer; {*}
+PROCEDURE Imprarbore(r:TipRef);
+  BEGIN
+    IF r<>NIL THEN WITH r^ DO
+      BEGIN
+        Imprarbore(stang);
+        WRITELN(cheie,numar);
+        Imprarbore(drept)
+      END
+  END; {imprarbore}
+
+PROCEDURE Cauta(x:integer; VAR p:TipRef);
+  BEGIN
+    IF p=NIL THEN {cuvintul nu se gaseste,deci insertie}
+        BEGIN
+          new(p);
+          WITH p^ DO
+            BEGIN
+              cheie:=x;                                    {5.29}
+              numar:=1;
+              stang:=NIL;
+              drept:=NIL
+            END
+        END
+      ELSE
+        IF x<p^.cheie THEN
+            Cauta(x,p^.stang)
+          ELSE
+            IF x>p^.cheie THEN
+                cauta(x,p^.drept)
+              ELSE {cuvintul s-a gasit,deci incrementare}
+                p^.numar:=p^.numar+1
+  END; {cauta}
+
+BEGIN {PROGRAM principal}
+  radacina:=NIL; {*}
+  Read(cuv);
+  WHILE cuv<>0 DO
+    BEGIN
+      Cauta(cuv,radacina);
+      Read(cuv)
+    END;
+  Imprarbore(radacina)
+END.
+
+
+PROCEDURE CautaNerecursiv(x:integer; radacina:TipRef);
+  VAR q1,q2:TipRef; d:integer;
+  BEGIN
+    q2:=radacina;
+    q1:=q2^.drept;
+    d:=1;
+    WHILE (q1<>NIL) AND (d<>0) DO
+      BEGIN
+        q2:=q1;
+        IF x<q1^.cheie THEN
+            BEGIN
+              q1:=q1^.stang;
+              d:=-1
+            END
+          ELSE
+            IF x>q1^.cheie THEN
+                BEGIN
+                  q1:=q1^.drept;
+                  d:=1
+                END                                        {5.31}
+              ELSE
+                d:=0
+      END; {terminare cautare}
+    IF d=0 THEN
+        q1^.numar:=q1^.numar+1
+      ELSE
+        BEGIN
+          new(q1);
+          WITH q1^ DO
+            BEGIN
+              cheie:=x;
+              numar:=1;
+              sting:=NIL;
+              drept:=NIL
+            END
+          IF d<0 THEN
+              q2^.stang:=q1
+            ELSE
+              q2^.drept:=q1
+        END
+  END; {cauta_nerecursiv}
+
+
+
+
+
+
+PROGRAM refincrucis;
+
+CONST c1=10; {lungime cuvint}
+      c2=8; {numere pe rind}
+      c4=9999; {numarul maxim de linii}
+
+TYPE  alfa=ARRAY[1..c1] OF char;
+      refcuvint=^cuvint;
+      refnumrind=^numrind;
+      cuvint=RECORD {tip nod arbore}
+               cheie:alfa;
+               primul,ultimul:refnumrind;
+               sting,drept:refcuvint
+             END;
+      numrind=RECORD {tip nod lista liniara}
+                nr:0..c4;
+                urm:refnumrind
+              END;
+
+VAR radacina:refcuvint;
+    k,k1,i:integer;
+    n:integer; {numar curent rind}
+    a:alfa; {tampon pentru cuvintul curent}
+    car:char; {caracterul curent}
+    litere:SET OF char;
+    cifre:SET OF char;
+
+PROCEDURE Cauta(VAR r:refcuvint);
+  VAR r1:refcuvint;
+      x:refnumrind;
+  BEGIN
+    r1:=r;
+    IF r1=NIL THEN
+        BEGIN
+          new(r1); new(x);
+          WITH r1^ DO
+            BEGIN
+              cheie:=a;
+              sting:=NIL;
+              drept:=NIL;
+              primul:=x;
+              ultimul:=x
+            END;
+          x^.nr:=n;
+          x^.urm:=NIL;
+          r:=r1
+        END
+      ELSE                                                 {5.32}
+        IF a<r1^.cheie THEN
+           Cauta(r1^.sting)
+          ELSE
+            IF a>r1^.cheie THEN
+                Cauta(r1^.drept)
+              ELSE
+                BEGIN
+                  new(x);
+                  x^.nr:=n;
+                  x^.urm:=NIL;
+                  r1^.ultimul^.urm:=x;
+                  r1^.ultimul:=x
+                END
+  END; {Cauta}
+
+PROCEDURE ImprArbore(r:refcuvint);
+
+  PROCEDURE ImprCuvint(r:cuvint);
+    VAR l:integer; x:refnumrind;
+    BEGIN
+      Write('  ',r.cheie,r.cheie[1],r.cheie[c1]);
+      x:=r.primul;
+      l:=0;
+      REPEAT
+        IF l=c2 THEN {incepe un rind nou}
+          BEGIN
+            WriteLn;
+            FOR l:=1 TO c1+4 DO Write(' '); {c1+4 blancuri}
+            l:=0
+          END;
+        l:=l+1;
+        Write('   ',x^.nr); {se scrie un numar de rind}
+        x:=x^.urm
+      UNTIL x=NIL;
+      WriteLn
+    END; {imprcuvint}
+
+  BEGIN {imprarbore}
+    IF r<>NIL THEN
+      BEGIN
+        ImprArbore(r^.sting);
+        ImprCuvint(r^);
+        ImprArbore(r^.drept)
+      END
+  END; {imprarbore}
+
+BEGIN {PROGRAM principal}
+  litere:=['a','b','c','d','e','f','g','h','i',
+          'j','k','l','m','n','o','p','q','r',
+          's','t','u','v','w','x','y','z'];
+  cifre:=['0','1','2','3','4','5','6','7','8','9'];
+  radacina:=NIL;
+  n:=0;
+  k1:=c1;
+  Read(car);
+  WHILE NOT Eof('*1') DO
+    BEGIN
+      IF n=c4 THEN n:=0;
+      n:=n+1;
+      Write(n); Write('   '); {inceput de rind}
+      WHILE NOT Eoln DO
+        BEGIN
+          IF car IN litere THEN
+              BEGIN
+                k:=0;
+                REPEAT
+                  IF k<c1 THEN {depune car in a}
+                    BEGIN
+                      k:=k+1;
+                      a[k]:=car
+                    END;
+                  Write(car);
+                  Read(car)
+                UNTIL NOT((car IN litere) OR (car IN cifre));
+                IF k>=k1 THEN
+                    k1:=k
+                  ELSE
+                    REPEAT
+                      a[k1]:=' ';
+                      k1:=k1-1
+                    UNTIL k1=k;
+                cauta(radacina)
+              END
+            ELSE                                           {5.32}
+              BEGIN
+                IF car='''' THEN
+                  REPEAT
+                    Write(car);
+                    Read(car)
+                  UNTIL car='''';
+                Write(car);
+                Read(car)
+              END
+        END;
+      WriteLn;
+      Read(car)
+    END;
+  imprarbore(radacina)
+END.
+
+q:=p;
+IF q^.drept:=NIL THEN
+      p:=q^.stang                                          {5.33}
+  ELSE
+      IF q^.stang:=NIL THEN
+        p:=q^.drept;
+
+PROCEDURE SupriMin(VAR b:RefABO; VAR min:TipElement);
+  VAR temp:RefABO;
+  BEGIN
+    IF b<>NIL THEN
+      IF b^.stang<>NIL THEN
+          SupriMin(b^.stang, min)
+        ELSE
+          BEGIN
+            min:=b^.info;
+            temp:=b;
+            b:=b^.drept;
+            DISPOSE(temp)
+         END
+  END; {SupriMin}
+
+PROCEDURE Suprimare(x:TipCheie; VAR p:TipRef);
+  VAR q:TipRef;
+
+  PROCEDURE Supred(VAR r:TipRef);
+    BEGIN
+      IF r^.drept<>NIL THEN
+          supred(r^.drept)
+        ELSE
+          BEGIN
+            q^.cheie:=r^.cheie;
+            q^.numar:=r^.numar;
+            q:=r;
+            r:=r^.stang
+          END
+    END; {supred}
+
+  BEGIN {suprimare}
+    IF p=NIL THEN
+        WRITELN(' nodul nu se gaseste')                  {5.34}
+      ELSE
+        IF x<p^.cheie THEN
+            Suprimare(x,p^.stang)
+          ELSE
+            IF x>p^.cheie THEN
+                Suprimare(x,p^.drept)
+              ELSE
+                BEGIN
+                  q:=p;
+                  IF q^.drept=NIL THEN
+                      p:=q^.stang
+                    ELSE
+                      IF q^.stang=NIL THEN
+                          p:=q^.drept
+                        ELSE
+                          Supred(q^.stang);
+                  {DISPOSE(q)}
+                END
+  END; {Suprimare}
+
+TYPE TipRef=^TipNod
+        TipNod=RECORD
+           cheie:integer;                                  {5.44}
+           contor:integer;
+           stang,drept:TipRef;
+           ech:(-1,0,+1)
+         END;
+
+PROCEDURE InsertEchilibrat(x:TipCheie; VAR p:TipRef;
+                           VAR h:BOOLEAN);
+  VAR p1,p2:TipRef; {h=fals}
+
+  BEGIN
+    IF p=NIL THEN
+        BEGIN {cuvintul nu e arbore; se insereaza}
+          new(p); h:=TRUE;
+          WITH p^ DO
+            BEGIN
+              cheie:=x; contor:=1;
+              stang:=NIL; drept:=NIL; ech:=0
+            END
+        END
+      ELSE
+        IF x<p^.cheie THEN
+            BEGIN
+              InsertEchilibrat(x,p^.stang,h);
+              IF h THEN {ramura stinga a crescut in inaltime}
+                CASE p^.ech OF
+                  +1: BEGIN
+                        p^.ech:=0; h:=FALSE
+                      END;
+                   0: p^.ech:=-1;
+                  -1: BEGIN {reechilibrare}
+                        p1:=p^.stang;
+                        IF p1^.ech=-1 THEN
+                            BEGIN {cazul 1 stinga}
+                              p^.stang:=p1^.drept; p1^.drept:=p;
+                              p^.ech:=0; p:=p1
+                            END
+                          ELSE
+                            BEGIN { cazul 2 stinga}
+                              p2:=p1^.drept;
+                              p1^.drept:=p2^.stang;
+                              p2^.stang:=p1;
+                              p^.stang:=p2^.drept;
+                              p2^.drept:=p;
+                              IF p2^.ech=-1 THEN
+                                  p^.ech:=+1
+                                ELSE
+                                  p^.ech:=0;
+                              IF p2^.ech:=+1 THEN
+                                  p1^.ech:=-1
+                                ELSE
+                                  p1^.ech:=0;
+                              p:=p2
+                            END;
+                        p^.ech:=0; h:=FALSE
+                      END
+                END {CASE}
+            END                                            {5.45}
+          ELSE
+            IF x>p^.cheie THEN
+                BEGIN
+                  InsertEchilibrat(x,p^.drept,h);
+                  IF h THEN {ramura dreapta a crescut in inaltime}
+                    CASE p^.ech OF
+                      -1: BEGIN
+                            p^.ech:=0; h:=FALSE
+                          END;
+                       0: p^.ech:=+1;
+                      +1: BEGIN {reechilibrare}
+                            p1:=p^.drept;
+                            IF p1^.ech=+1 THEN
+                                BEGIN {cazul 1 dreapta}
+                                  p^.drept:=p1^.stang; p1^.stang:=p
+                                  p^.ech:=0; p:=p1
+                                END
+                              ELSE
+                                BEGIN {cazul 2 dreapta}
+                                  p2:=p1^.stang;
+                                  p1^.stang:=p2^.drept;
+                                  p2^.drept:=p1;
+                                  p^.drept:=p2^.stang;
+                                  p2^.stang:=p;
+                                  IF p2^.ech=+1 THEN
+                                      p^.ech:=-1
+                                    ELSE
+                                      p^.ech:=0;
+                                  IF p2^.ech=-1 THEN
+                                      p1^.ech:=+1
+                                    ELSE
+                                      p1^.ech:=0;
+                                  p:=p2
+                                END;
+                            p^.ech:=0; h:=FALSE
+                          END
+                    END {CASE}
+                END
+              ELSE
+                BEGIN
+                  p^.contor:=p^.contor+1;
+                END
+  END; {InsertEchilibrat}
+
+PROCEDURE SuprimEchilibrat(x:TipCheie; VAR p:TipRef; 
+                           VAR h:BOOLEAN);
+  VAR q:TipRef; {h=fals}
+
+  PROCEDURE Echilibru1(VAR p:TipRef: VAR h:BOOLEAN);
+    VAR p1,p2:TipRef; e1,e2:(-1,0,+1);
+    BEGIN {h=adevarat,ramura stinga a devenit mai mica}
+      CASE p^.ech OF
+        -1: p^.ech:=0;
+         0: BEGIN
+              p^.ech:=+1; h:=FALSE
+            END;
+        +1: BEGIN {reechilibrare}
+              p1:=p^.drept; e1:=p1^.ech;
+              IF e1>=0 THEN
+                  BEGIN {cazul 1 dreapta}
+                    p^.drept:=p1^.stang; p1^.stang:=p;
+                    IF e1=0 THEN
+                        BEGIN
+                          p^.ech:=+1; p1^.ech:=-1;
+                          h:=FALSE
+                        END
+                      ELSE
+                        BEGIN
+                          p^.ech:=0; p1^.ech:=0
+                        END;
+                    p:=p1
+                  END
+                ELSE
+                  BEGIN {cazul 2 dreapta}
+                    p2:=p1^.stang; e2:=p2^.ech;
+                    p1^.stang:=p2^.drept; p2^.drept:=p1;
+                    p^.drept:=p2^.sting;
+                    p2^.stang:=p;
+                    IF e2=+1 THEN
+                        p^.ech:=-1
+                      ELSE
+                        p^.ech:=0;
+                    IF e2=-1 THEN
+                        p1^.ech:=+1
+                      ELSE
+                        p1^.ech:=0;
+                    p:=p2; p2^.ech:=0
+                  END
+            END
+      END  {CASE}                                          {5.46}
+    END; {Echilibru1}
+
+  PROCEDURE Echilibru2(VAR p:TipRef; VAR h:BOOLEAN);
+    VAR p1,p2:TipRef; e1,e2:(-1,0,+1);
+    BEGIN {h=adevarat,ramura dreapta a devenit mai mica}
+      CASE p^.ech OF
+        +1: p^.ech:=0;
+         0: BEGIN
+              p^.ech:=-1; h:=FALSE
+            END;
+        +1: BEGIN  {reechilibrare}
+              p1:=p^.stang; e1:=p1^.ech;
+              IF e1<=0 THEN
+                  BEGIN {cazul 1 stinga}
+                    p^.stang:=p1^.drept; p1^.drept:=p;
+                    IF e1=0 THEN
+                        BEGIN
+                          p^.ech:=-1; p1^.ech:=+1;
+                          h:=FALSE
+                        END
+                      ELSE
+                        BEGIN
+                          p^.ech:=0; p1^.ech:=0
+                        END;
+                    p:=p1
+                  END
+                ELSE
+                  BEGIN {cazul 2 stinga}
+                    p2:=p1^.drept; e2:=p2^.ech;
+                    p1^.drept:=p2^.stang; p2^.stang:=p1;
+                    p^.stang:=p2^.drept;
+                    p2^.drept:=p;
+                    IF e2=-1 THEN
+                        p^.ech:=+1
+                      ELSE
+                        p^.ech:=0;
+                    IF e2=+1 THEN
+                        p1^.ech:=-1
+                      ELSE
+                        p1^.ech:=0;
+                    p:=p2; p2^.ech:=0
+                  END
+            END
+      END {CASE}
+    END; {Echilibru2}
+
+  PROCEDURE Suprima(VAR r:TipRef; VAR h:BOOLEAN);
+    BEGIN {h=false}
+      IF r^.drept<>NIL THEN
+          BEGIN
+            Suprima(r^.drept,h);
+            IF h THEN Echilibru2(r,h)
+          END
+        ELSE
+          BEGIN
+            q^.cheie:=r^.cheie;
+            q^.contor:=r^.contor;
+            r:=r^.stang; h:=TRUE
+          END
+    END; {Suprima}
+
+  BEGIN {SuprimaEchilibrat}
+    IF p=NIL THEN
+        BEGIN
+          WRITE('cheia nu e IN arbore'); h:=FALSE          {5.46}
+        END
+      ELSE
+        IF x<p^.cheie THEN
+            BEGIN
+              SuprimaEchilibrat(x,p^.stang,h); 
+              IF h THEN Echilibru1(p,h)
+            END
+          ELSE
+            IF x>p^.cheie THEN
+                BEGIN
+                  SuprimaEchilibrat(x,p^.drept,h);
+                  IF h THEN Echilibru2(p,h)
+                END
+              ELSE
+                BEGIN {suprima p^}
+                  q:=p;
+                  IF q^.drept=NIL THEN
+                      BEGIN
+                        p:=q^.stang; h:=TRUE
+                      END
+                    ELSE
+                      IF q^.stang=NIL THEN
+                          BEGIN
+                            p:=q^.drept; h:=TRUE
+                          END
+                        ELSE
+                          BEGIN
+                            Suprima(q^.stang,h);
+                            IF h THEN Echilibru1(p,h)
+                          END;
+                  {DISPOSE(q)}
+                END
+  END; {SuprimaEchilibrat}
+
+TYPE TipIndex=0..n;
+VAR  a:ARRAY[1..n] OF integer;                           {5.55}
+     b:ARRAY[TipIndex] OF integer;
+     p,w:ARRAY[TipIndex,TipIndex] OF integer;
+     r:ARRAY[TipIndex,TipIndex] OF TipIndex;
+
+FOR i:=0 TO n-1 DO
+  BEGIN
+    j:=i+1;
+    p[i,j]:=p[i,i]+p[j,j]+w[i,j];                           {5.57}
+    r[i,j):=j
+  END;
+
+FOR h:=2 TO n DO
+  FOR i:=0 TO n-h DO
+    BEGIN
+      j:=i+h;                                              {5.58}
+      {* gaseste acel m care  conduce la o valoare minima al lui  
+       min, care se calculeaza cu relatia min =                   
+       minim(p(i,m-1)+p[m,j)), pentru toti m care satisfac relatia
+       r[i,j-1]<=m<=r[i+1,j) *}
+      p[i,j]:=min+w[i,j];
+      r[i,j]:=m
+    END;
+
+
+
+
+VAR arbore:ARRAY[1..max1] OF
+             RECORD
+               fiu_sting:integer;      {cursor in arbore}
+               fiu_drept:integer;      {cursor in arbore}
+               parinte:integer         {cursor in arbore}
+             END;
+    ultim_nod:integer;                 {cursor in arbore}
+    alfabet:ARRAY[1..max2] OF
+              RECORD                                       {5.60}
+                simbol:char;
+                probabilitate:real;
+                terminal:integer       {cursor in arbore}
+              END;
+    zona:ARRAY[1..max3] OF
+            RECORD
+             greutate:real;
+             radacina:integer          {cursor in arbore}
+            END;
+    ultim_arb:integer;                 {cursor in zona}
+
+WHILE exista mai mult de un arbore IN zona DO
+  BEGIN                                                    {5.61}
+    i:=indexul IN zona al arborelui cu greutatea minima;
+    j:=indexul IN zona al arborelui cu greutatea minima urmatoare;
+    {* creaza un nod nou care are ca fiu sting pe
+        zona[i].radacina si ca fiu drept pe zona[j].radacina *}
+    {* inlocuieste arborele i din zona cu un arbore
+        a carui radacina este nodul nou creat si a carui
+        greutate este zona[i].greutate+zona[j].greutate *}
+    {* surima arborele j din zona *}
+  END;
+
+PROCEDURE greutate_minima(VAR min,min1:integer);
+  { pozitioneaza pe min si min1 pe arborii cei mai usori din zona 
+   Se presupune ca in zona exista cel putin 2 arbori }
+  VAR i:integer;
+  BEGIN
+    IF zona[1].greutate<=zona[2].greutate THEN
+        BEGIN
+          min:=1; min1:=2
+        END
+      ELSE
+        BEGIN                                              {5.62}
+          min:=2; min1:=1
+        END;
+    FOR i:=3 TO ultim_arb DO
+      IF zona[i].gretate<zona[min].greutate THEN
+          BEGIN
+            min1:=min; min:=i
+          END
+        ELSE
+          IF zona[i].greutate<zona[min1].greutate THEN
+            min1:=i
+  END; {greutate_minima}
+FUNCTION creaza(arbsting,arbdrept:integer):integer;
+  BEGIN                                                    {5.63}
+  ultim_nod:=ultim_nod+1; {arborele nou creat este
+                              arbore[ultim_nod]}
+    arbore[ultim_nod].fiu_sting:=zona[arbsting].radacina;
+    arbore[ultim_nod].fiu_drept:=zona[arbdrept].radacina;
+    arbore[ultim_nod].parinte:=0;
+    arbore[zona[arbsting].radacina].parinte:=ultim_nod;
+    arbore[zona[arbdrept].radacina].parinte:=ultim_nod;
+    creaza:=ultim_nod
+  END; {creaza}
+
+PROCEDURE huffman;
+  VAR i,j:integer;
+      radnou:integer;
+  BEGIN
+    WHILE ultim_arb>1 DO
+      BEGIN
+        greutate_minima(i,j);                              {5.64}
+        radnou:=creaza(i,j);
+          { se inlocuieste arborele i prin arborele a carui
+            radacina este radnou }
+        zona[i].greutate:=zona[i].greutate+zona[j].greutate
+        zona[i].radacina:=radnou;
+          { se suprima arborele j din zona }
+        zona[j]:=zona[ultim_arb]
+        ultim_arb:=ultim_arb-1
+      END
+  END; {huffman}
+
+.         eoj
+.         job ar1,an:xx50,pn:puiu
+.         compile pascal
+
+
+  TYPE ref=^nod;
+       nod=RECORD
+             cheie:alfa;                                   {5.65}
+             poz:poz_lin;
+             sting,drept,leg:ref
+           END;
+
+.         eoj
+.         job curs2,an:xx50,pn:puiu
+.         compile pascal
+
+
+PROGRAM arbore_optim;
+CONST n=31; {numar chei}
+      lch=10; { lungime maxima cheie}
+TYPE  index=0..n;
+      alfa=ARRAY[1..lch] OF char;
+VAR ch:char;
+    k1,k2:integer;
+    id:alfa; {identificator sau cheie}
+    chei :ARRAY[1..n] OF alfa;
+    i,j,k:integer;
+    a:ARRAY[1..n] OF integer;
+    b:ARRAY[index] OF integer;
+    p,w:ARRAY[index,index] OF integer;
+    r:ARRAY[index,index] OF index;
+    suma,sumb:integer;
+    litere:SET OF char;
+    cifre:SET OF char;
+
+FUNCTION drum_arb_ech(i,j:index):integer;
+  VAR k:integer;
+  BEGIN
+    k:=(i+j+1) DIV 2; r[i,j]:=k;
+    IF i>=j THEN
+        drum_arb_ech:=b[k]
+      ELSE
+        drum_arb_ech:=drum_arb_ech(i,k-1)+drum_arb_ech(k,j)
+                      +w[i,j]
+  END; {drum_arb_ech}
+
+PROCEDURE arb_opt;
+    VAR x,min:integer;
+        i,j,k,h,m:index;
+    BEGIN {intrare:w; iesire:p,r}
+      FOR i:=0 TO n DO p[i,i]:=w[i,i]; {latime arbore nula(h=0)}
+      FOR i:=0 TO n-1 DO { latime arbore=1 (h=1)}
+        BEGIN
+          j:=i+1;
+          p[i,j]:=p[i,j]+p[j,j];
+          r[i,j]:=j
+        END;
+      FOR h:=2 TO n DO          {h=latimea arborelui considerat}
+        FOR i:=0 TO n-h DO      {indexul sting al arborelui}
+          BEGIN                 {j=indexul sau drept}
+            j:=i+h;
+            m:=r[i,j-1]; min:=p[i,m-1]+p[m,j];
+            FOR k:=m+1 TO r[i+1,j] DO
+              BEGIN
+                x:=p[i,k-1]+p[k,j];
+                IF x<min THEN
+                  BEGIN
+                    m:=k;
+                    min:=x
+                  END
+              END;
+            -
+          END
+    END; {arb_opt}
+
+PROCEDURE tipareste_arbore;
+  CONST ll=120; {latime linie}
+  TYPE  ref=^nod;
+        poz_lin=0..ll;
+        nod=RECORD
+              cheie:alfa;
+              poz:poz_lin;
+              sting,drept,leg:ref
+            END;
+  VAR radacina,curent,urm:ref;
+      q,q1,q2:ref;
+      i,k:integer;
+      u,u1,u2,u3,u4:poz_lin;
+
+  FUNCTION arbore(i,j:index):ref;
+    VAR p:ref;
+    BEGIN
+      IF i=j THEN
+          p:=NIL
+        ELSE
+          BEGIN
+            new(p);
+            p^.sting:=arbore(i,r[i,j]-1);
+            p^.poz:=(((ll-lch)*k) DIV (n-1)) + (lch DIV 2);
+            k:=k+1;
+            p^.cheie:=chei [r[i,j]];
+            p^.drept:=arbore(r[i,j],j)
+          END;
+      arbore:=p
+    END; {arbore}
+
+  BEGIN
+    k:=0; radacina:=arbore(0,n);
+    curent:=radacina;
+    radacina^.leg:=NIL;
+    urm:=NIL;
+    WHILE curent<>NIL DO
+      BEGIN {pornesc in jos cu primele linii verticale}
+        FOR i:=1 TO 3 DO
+          BEGIN
+            u:=0; q:=curent;
+            REPEAT
+              u1:=q^.poz;
+              REPEAT
+                Write(' '); u:=u+1
+              UNTIL u=u1;
+              Write('i'); u:=u+1; q:=q^.leg
+            UNTIL q=NIL;
+            WriteLn
+          END;
+        {se tipareste linia curenta; se determina descendentii
+          nodurilor din lista curenta si se formeaza lista
+          urmatoare}
+        q:=curent; u:=0;
+        REPEAT
+          i:=lch;
+          WHILE q^.cheie[i]=' ' DO i:=i-1;
+          u2:=q^.poz-((i-1) DIV 2); u3:=u2+i;
+          q1:=q^.sting; q2:=q^.drept;
+          IF q1=NIL THEN
+              u1:=u2
+            ELSE
+              BEGIN
+                u1:=q1^.poz; q1^.leg:=urm; urm:=q1
+              END;
+          IF q2=NIL THEN
+              u4:=u3
+            ELSE
+              BEGIN
+                u4:=q2^.poz+1; q2^.leg:=urm; urm:=q2
+              END;
+          i:=0;
+          WHILE u<u1 DO BEGIN Write(' '); u:=u+1  END;
+          WHILE u<u2 DO BEGIN Write('-'); u:=u+1  END;
+          WHILE u<u3 DO
+            BEGIN
+              i:=i+1; Write(q^.cheie[i]); u:=u+1
+            END;
+          WHILE u<u4 DO BEGIN Write('-'); u:=u+1  END;
+          q:=q^.leg
+        UNTIL q=NIL;
+        WriteLn;
+        { se inverseaza lista urmatoare si se face curenta}
+        curent:=NIL;
+        WHILE urm<>NIL DO
+          BEGIN
+            q:=urm; urm:=q^.leg;
+            q^.leg:=curent; curent:=q
+          END                                              {5.66}
+      END
+  END; { tipareste_arbore}
+
+BEGIN {programul principal}
+  {se initializeaza tabela chei si contoarele}
+  chei[ 1]:='ARRAY     '; chei[ 2]:='BEGIN     ';
+  chei[ 3]:='CASE      '; chei[ 4]:='CONST     ';
+  chei[ 5]:='DIV       '; chei[ 6]:='DOWNTO    ';
+  chei[ 7]:='DO        '; chei[ 8]:='ELSE      ';
+  chei[ 9]:='END       '; chei[10]:='FILE      ';
+  chei[11]:='FOR       '; chei[12]:='FUNCTION  ';
+  chei[13]:='GOTO      '; chei[14]:='IF        ';
+  chei[15]:='IN        '; chei[16]:='LABEL     ';
+  chei[17]:='MOD       '; chei[18]:='NIL       ';
+  chei[19]:='OF        '; chei[20]:='PROCEDURE ';
+  chei[21]:='PROGRAM   '; chei[22]:='RECORD    ';
+  chei[23]:='REPEAT    '; chei[24]:='SET       ';
+  chei[25]:='THEN      '; chei[26]:='TO        ';
+  chei[27]:='TYPE      '; chei[28]:='UNTIL     ';
+  chei[29]:='VAR       '; chei[30]:='WHILE     ';
+  chei[31]:='WITH      ';
+  FOR i:=1 TO n DO
+    BEGIN
+      a[i]:=0; b[i]:=0
+    END;
+  b[0]:=0; k2:=lch;
+  litere:=['a','b','c','d','e','f','g','h','i',
+          'j','k','l','m','n','o','p','q','r',
+          's','t','u','v','w','x','y','z'];
+  cifre:=['0','1','2','3','4','5','6','7','8','9'];
+  {se baleaza textul de intrare si se determina a si b}
+  REPEAT
+    Read(ch);
+    IF ch IN litere THEN
+        BEGIN {identificator sau cheie}
+          k1:=0;
+          REPEAT
+            IF k1<lch THEN
+              BEGIN
+                k1:=k1+1; id[k1]:=ch
+              END;
+            Read(ch)
+          UNTIL NOT((ch IN litere) OR (ch IN cifre));
+          IF k1>=k2 THEN
+              k2:=k1
+            ELSE
+              REPEAT
+                id[k2]:=' '; k2:=k2-1
+              UNTIL k2=k1;
+          i:=1; j:=n;
+          REPEAT
+            k:=(i+j) DIV 2;
+            IF chei [k]<=id THEN i:=k+1;
+            IF chei [k]>=id THEN j:=k-1
+          UNTIL i>j;
+          IF  chei [k]=id THEN
+              a[k]:=a[k]+1
+            ELSE
+              BEGIN
+                k:=(i+j) DIV 2; b[k]:=b[k]+1
+              END
+        END
+      ELSE
+        IF ch='''' THEN
+            REPEAT
+              Read(ch)
+            UNTIL ch=''''                                  {5.66}
+          ELSE
+            IF ch='{' THEN
+              REPEAT
+                Read(ch)
+              UNTIL ch='}'
+  UNTIL ch='$';
+  WriteLn('  cuvintele cheie si frecventele lor de aparitie');
+  suma:=0; sumb:=b[0];
+  FOR i:=1 TO n DO
+    BEGIN
+      suma:=suma+a[i]; sumb:=sumb+b[i];
+      WriteLn('    ',b[i-1],'    ',a[i],'    ',chei[i],
+            chei[i,1],chei[i,lch])
+    END;
+  WriteLn('    ',b[n]);
+  WriteLn('   ------  ------');
+  WriteLn('    ',sumb,'    ',suma);
+  { se calculeaza w din a si b}
+  FOR i:=1 TO n DO
+    BEGIN
+      w[i,i]:=b[i];
+      FOR j:=i+1 TO n DO
+        w[i,j]:=w[i,j-1]+a[j]+b[j]
+    END;
+  WriteLn;WriteLn;
+  WriteLn('    lungimea medie a drumului arborelului echilibrat=',
+        conv(drum_arb_ech(0,n))/conv(w[0,n]));
+  tipareste_arbore;
+  arb_opt;
+  WriteLn;WriteLn;
+  WriteLn('    lungimea medie a drumului arborelui optimal=',
+         conv(p[0,n])/conv(w[0,n]));
+  tipareste_arbore;
+  {in continuare se considera numai cuvintele-cheie,punind b=0}
+  FOR i:=0 TO n DO
+    BEGIN
+      w[i,i]:=0;
+      FOR j:=i+1 TO n DO
+        w[i,j]:=w[i,j-1]+a[j]
+    END;
+  arb_opt;
+  WriteLn;WriteLn;
+  WriteLn('    arborele optim considerind numai cuvintele-cheie');
+  tipareste_arbore
+END.
+
+.         link
+.         run
+
+PROGRAM arbore_optim;
+CONST n=31; {numar chei}
+      lch=10; { lungime maxima cheie}
+TYPE  index=0..n;
+      alfa=ARRAY[1..lch] OF char;
+VAR ch:char;
+    k1,k2:integer;
+    id:alfa; {identificator sau cheie}
+    chei :ARRAY[1..n] OF alfa;
+    i,j,k:integer;
+    a:ARRAY[1..n] OF integer;
+    b:ARRAY[index] OF integer;
+    p,w:ARRAY[index,index] OF integer;
+    r:ARRAY[index,index] OF index;
+    suma,sumb:integer;
+    litere:SET OF char;
+    cifre:SET OF char;
+
+FUNCTION drum_arb_ech(i,j:index):integer;
+  VAR k:integer;
+  BEGIN
+    k:=(i+j+1) DIV 2; r[i,j]:=k;
+    IF i>=j THEN
+        drum_arb_ech:=b[k]
+      ELSE
+        drum_arb_ech:=drum_arb_ech(i,k-1)+drum_arb_ech(k,j)
+                      +w[i,j]
+  END; {drum_arb_ech}
+
+PROCEDURE arb_opt;
+    VAR x,min:integer;
+        i,j,k,h,m:index;
+    BEGIN {intrare:w; iesire:p,r}
+      FOR i:=0 TO n DO p[i,i]:=w[i,i]; {latime arbore nula(h=0)}
+      FOR i:=0 TO n-1 DO { latime arbore=1 (h=1)}
+        BEGIN
+          j:=i+1;
+          p[i,j]:=p[i,j]+p[j,j];
+          r[i,j]:=j
+        END;
+      FOR h:=2 TO n DO          {h=latimea arborelui considerat}
+        FOR h:=2 TO n DO        {h=latimea arborelui considerat}
+        FOR i:=0 TO n-h DO      {indexul sting al arborelui}
+          BEGIN                 {j=indexul sau drept}
+            j:=i+h;
+            m:=r[i,j-1]; min:=p[i,m-1]+p[m,j];
+            FOR k:=m+1 TO r[i+1,j] DO
+              BEGIN
+                x:=p[i,k-1]+p[k,j];
+                IF x<min THEN
+                  BEGIN
+                    m:=k;
+                    min:=x
+                  END
+              END
+            p[i,j]:=min+w[i,j];
+            r[i,j]:=m
+          END
+    END; {arb_opt}
+
+PROCEDURE tipareste_arbore;
+  CONST ll=120; {latime linie}
+  TYPE  ref=^nod;
+        poz_lin=0..ll;
+        nod=RECORD
+              cheie:=alfa;
+              poz:poz_lin;
+              sting,drept,leg:ref
+            END;
+  VAR radacina,curent,urm:ref;
+      q,q1,q2:ref;
+      i,k:integer;
+      u,u1,u2,u3,u4:poz_lin;
+
+  FUNCTION arbore(i,j:index):ref;
+    VAR p:ref;
+    BEGIN
+      IF i=j THEN
+          p:=NIL
+        ELSE
+          BEGIN
+            new(p);
+            p^.sting:=arbore(i,r[i,j]-1);
+            p^.poz:=Trunc((ll-lch)*k DIV (n-1))+(lch DIV 2);
+            k:=k+1;
+            p^.cheie:=cheie[r[i,j]];
+            p^.drept:=arbore(r[i,j],j)
+          END;
+      arbore:=p
+    END; {arbore}
+
+  BEGIN
+    k:=0; radacina:=arbore(0,n);
+    curent:=radacina;
+    radacina^.leg:=NIL;
+    urm:=NIL;
+    WHILE curent<>NIL DO
+      BEGIN {pornesc in jos cu primele linii verticale}
+        FOR i:=1 TO 3 DO
+          BEGIN
+            u:=0; q:=curent;
+            REPEAT
+              u1:=q^.poz;
+              REPEAT
+                Write(' '); u:=u+1
+              UNTIL u=u1;
+              Write('i'); u:=u+1; q:=q^.leg
+            UNTIL q=NIL;
+            WriteLn
+          END;
+        {se tipareste linia curenta; se determina descendentii
+          nodurilor din lista curenta si se formeaza lista
+          urmatoare}
+        q:=curent; u:=0;
+        REPEAT
+          i:=lch;
+          WHILE q^.cheie[i]=' ' DO i:=i-1;
+          u2:=q^.poz-((i-1) DIV 2); u3:=u2+i;
+          q1:=q^.sting; q2:=q^.drept;
+          IF q1=NIL THEN
+              u1:=u2
+            ELSE
+              BEGIN
+                u1:=q1^.poz; q1^.leg:=urm; urm:=q1
+              END;
+          IF q2=NIL THEN
+              u4:=u3
+            ELSE
+              BEGIN
+                u4:=q2^.poz+1; q2^.leg:=urm; urm:=q2
+              END;
+          i:=0;
+          WHILE u<u1 DO BEGIN Write(' '); u:=u+1  END;
+          WHILE u<u2 DO BEGIN Write('-'); u:=u+1  END;
+          WHILE u<u3 DO
+            BEGIN
+              i:=i+1; Write(q^.cheie[i]); u:=u+1
+            END;
+          WHILE u<u4 DO BEGIN Write('-'); u:=u+1  END;
+          q:=q^.leg
+        UNTIL q=NIL;
+        WriteLn;
+        { se inverseaza lista urmatoare si se face curenta}
+        curent:=NIL;
+        WHILE urm<>NIL DO
+          BEGIN
+            q:=urm; urm:=q^.leg;
+            q^.leg:=curent; curent:=q
+          END
+      END
+  END; { tipareste_arbore}
+
+BEGIN {programul principal}
+  {se initializeaza tabela chei si contoarele}
+  chei[ 1]:='ARRAY     '; chei[ 2]:='BEGIN     ';
+  chei[ 3]:='CASE      '; chei[ 4]:='CONST     ';
+  chei[ 5]:='DIV       '; chei[ 6]:='DOWNTO    ';
+  chei[ 7]:='DO        '; chei[ 8]:='ELSE      ';
+  chei[ 9]:='END       '; chei[10]:='FILE      ';
+  chei[11]:='FOR       '; chei[12]:='FUNCTION  ';
+  chei[13]:='GOTO      '; chei[14]:='IF        ';
+  chei[15]:='IN        '; chei[16]:='LABEL     ';
+  chei[17]:='MOD       '; chei[18]:='NIL       ';
+  chei[19]:='OF        '; chei[20]:='PROCEDURE ';
+  chei[21]:='PROGRAM   '; chei[22]:='RECORD    ';
+  chei[23]:='REPEAT    '; chei[24]:='SET       ';
+  chei[25]:='THEN      '; chei[26]:='TO        ';
+  chei[27]:='TYPE      '; chei[28]:='UNTIL     ';
+  chei[29]:='VAR       '; chei[30]:='WHILE     ';
+  chei[31]:='WITH      ';
+  FOR i:=1 TO n DO
+    BEGIN
+      a[i]:=0; b[i]:=0
+    END;
+  b[0]:=0; k2:=lch;
+  litere:=['a','b','c','d','e','f','g','h','i',
+          'j','k','l','m','n','o','p','q','r',
+          's','t','u','v','w','x','y','z'];
+  cifre:=['0','1','2','3','4','5','6','7','8','9'];
+  {se baleaza textul de intrare si se determina a si b}
+  REPEAT
+    Read(ch);
+    IF ch IN litere THEN
+        BEGIN {identificator sau cheie}
+          k1:=0;
+          REPEAT
+            IF k1<lch THEN
+              BEGIN
+                k1:=k1+1; id[k1]:=ch
+              END;
+            Read(ch)
+          UNTIL NOT((ch IN litere) OR (ch IN cifre));
+          IF k1>=k2 THEN
+              k2:=k1
+            ELSE
+              REPEAT
+                id[k2]:=' '; k2:=k2-1
+              UNTIL k2=k1;
+          i:=1; j:=n;
+          REPEAT
+            k:=(i+j) DIV 2;
+            IF chei [k]<=id THEN i:=k+1;
+            IF chei [k]>=id THEN j:=k-1
+          UNTIL i>j;
+          IF  chei [k]=id THEN
+              a[k]:=a[k]+1
+            ELSE
+              BEGIN
+                k:=(i+j) DIV 2; b[k]:=b[k]+1
+              END
+        END
+      ELSE
+        IF ch='''' THEN
+            REPEAT
+              Read(ch)
+            UNTIL ch=''''
+          ELSE
+            IF ch='{' THEN
+              REPEAT
+                Read(ch)
+              UNTIL ch='}'
+  UNTIL ch='.';
+  WriteLn('  cuvintele cheie si frecventele lor de aparitie');
+  suma:=0; sumb:=b[0];
+  FOR i:=1 TO n DO
+    BEGIN
+      suma:=suma+a[i]; sumb:=sumb+b[i];
+      WriteLn('    ',b[i-1],a[i],' ',chei[i],chei[i,1],
+            chei[i,lch])
+    END;
+  WriteLn(b[n]);
+  WriteLn('   ------  ------');
+  WriteLn('  ',sumb,suma);
+  { se calculeaza w din a si b}
+  FOR i:=1 TO n DO
+    BEGIN
+      w[i,i]:=b[i];
+      FOR j:=i+1 TO n DO
+        w[i,j]:=w[i,j-1]+a[j]+b[j]
+    END;
+  WriteLn('    lungimea medie a drumului arborelului echilibrat=',
+        drum_arb_ech(0,n) DIV w[0,n]);
+  tipareste_arbore;
+  arb_opt;
+  WriteLn('    lungimea medie a drumului arborelui optimal=',
+         p[0,n] DIV w[0,n]);
+  tipareste_arbore;
+  {in continuare se considera numai cuvintele-cheie,punind b=0}
+  FOR i:=0 TO n DO
+    BEGIN
+      w[i,i]:=0;
+      FOR j:=i+1 TO n DO
+        w[i,j]:=w[i,j-1]+a[j]
+    END;
+  arb_opt;
+  WriteLn('    arborele optim considerind numai cuvintele-cheie');
+  tipareste_arbore
+END.
+
+.         eoj
+.         job curs03,an:xx50,pn:puiu
+.         compile pascal
+
+CONST nn=2*n;
+TYPE  ref=^pagina;
+      indice=0..nn;
+      nod=RECORD
+            cheie:integer;
+            p:ref;
+            contor:integer
+          END;                                             {5.67}
+      pagina=RECORD
+               m:indice;
+               po:ref;
+               e:ARRAY[1..nn] OF nod
+             END;
+
+PROCEDURE cauta(x:integer; a:ref; VAR h:boolean; VAR u:nod);
+  BEGIN
+    IF a=NIL THEN
+        BEGIN {x nu este in arbore}
+          {* atribuie cheia x nodului u,pune pe h pe adevarat
+            indicind pasarea nodului u spre radacina *}
+        END
+      ELSE
+        WITH a^ DO
+          BEGIN {cauta-l pe x in pagina a^}
+            {* cautare binara intr-un tablou liniar *}
+            IF gasit THEN
+                {* incrementeaza contorul de accese *}
+              ELSE                                         {5.68}
+                BEGIN
+                  cauta(x,urmas,h,u);
+                  IF h THEN {un nod u se paseaza}
+                    IF (nr. de noduri a lui a^)<2n THEN
+                        {* insereaza pe u in pagina a^ si h=fals *}
+                      ELSE
+                        {* scindeaza pagina si paseaza-i mijlocul *}
+                END
+          END
+  END; {cauta}
+
+.         eoj
+.         job ar2,an:xx50,pn:puiu
+.         compile pascal
+
+
+PROGRAM arbori_b;
+  { cautare,insertie si suprimare in arbori_b}
+  CONST n=2; nn=4; {dimensiune pagina}
+  TYPE  ref=^pagina;
+        nod=RECORD
+              cheie:integer;
+              p:ref;
+              contor:integer
+            END;
+        pagina =RECORD
+                  m:0..nn; {nr. de noduri}
+                  p0:ref;
+                  e:ARRAY[1..nn] OF nod
+                END;
+  VAR radacina,q:ref; x:integer;
+      h:boolean; u:nod;
+
+  PROCEDURE cauta(x:integer; VAR a:ref; VAR h:boolean; VAR v:nod);
+    { cauta cheia x in arborele-b de radacina a; daca o gaseste
+      incrementeaza controlul,altfel insereaza un nod cu cheia x si
+      contor=1. daca un nod trebuie pasat spre un nivel interior,
+      el este atribuit lui v; h:='arborele a a devenit mai inalt' }
+    VAR k,s,d:integer; q:ref; u:nod;
+
+    PROCEDURE insereaza;
+      VAR i:integer; b:ref;
+      BEGIN {insereaza pe u in dreapta lui a^.e[r] }
+        WITH a^ DO
+          BEGIN
+            IF m<nn THEN
+                BEGIN
+                  m:=m+1; h:=false;
+                  FOR i:=m DOWNTO d+2 DO e[i]:=e[i-1];
+                  e[d+1]:=u
+                END
+              ELSE
+                BEGIN {pagina a^ e plina; scindeaza pagina si
+                        atribuie nodul median lui v}
+                  new(b);
+                  IF d<=n THEN
+                      BEGIN
+                        IF d=n THEN
+                            v:=u                           {5.69}
+                          ELSE
+                            BEGIN
+                              v:=e[n];
+                              FOR i:=n DOWNTO d+2 DO e[i]:=e[i-1];
+                              e[d+1]:=u
+                            END;
+                        FOR i:=1 TO n DO b^.e[i]:=a^.e[i+n]
+                      END
+                    ELSE
+                      BEGIN {insereaza pe u}
+                        d:=d-n; v:=e[n+1];
+                        FOR i:=1 TO d-1 DO b^.e[i]:=a^.e[i+n+1];
+                        b^.e[d]:=u;
+                        FOR i:=d+1 TO n DO b^.e[i]:=a^.e[i+n];
+                      END;
+                  m:=n; b^.m:=n; b^.p0:=v.p; v.p:=b
+                END
+          END {WITH}
+      END; {insereaza}
+
+    BEGIN {cauta cheia x in pagina a^; h:=fals}
+      IF a=NIL THEN
+          BEGIN {nodul cu cheia x nu este in arbore}
+            h:=true;
+            WITH v DO
+              BEGIN
+                cheie:=x; contor:=1; p:=NIL
+              END
+          END
+        ELSE
+          WITH a^ DO
+            BEGIN
+              s:=1; d:=m; {cautare binara}
+              REPEAT
+                k:=(s+d) DIV 2;
+                IF x<=e[k].cheie THEN d:=k-1;
+                IF x>=e[k].cheie THEN s:=k+1;
+              UNTIL d<s;
+              IF s-d>1 THEN {gasit}
+                  BEGIN
+                    e[k].contor:=e[k].contor+1; h:=false
+                  END
+                ELSE
+                  BEGIN {nodul nu e in aceasta pagina}
+                    IF d=0 THEN
+                        q:=p0
+                      ELSE
+                        q:=e[d].p;
+                    cauta(x,q,h,u);
+                    IF h THEN insereaza
+                  END
+            END
+    END; {cauta}
+
+  PROCEDURE suprima(x:integer; VAR a:ref; VAR h:boolean);
+    { cauta si suprima nodul cu cheia x din arborele-b cu radacina
+      a. daca o pagina devine subdimensionata se incearca fie
+      echilibrarea cu o pagina adiacenta (daca e posibil) fie contopirea.
+      h:='pagina a este subdimensionata'}
+    VAR i,k,s,d:integer; q:ref;
+
+    PROCEDURE subdepasire(VAR c,a:ref; VAR s1:integer; VAR h:boolean);
+      { a=pagina subdepasita; c=pagina stramos}
+      VAR b:ref; i,k,mb,mc:integer;
+      BEGIN
+        mc:=c^.m; {h=true; a^.m=n-1}
+        IF s1<mc THEN
+            BEGIN { b:=pagina din dreapta lui a}
+              s1:=s1+1;
+              b:=c^.e[s1].p; mb:=b^.m; k:=(mb-n+1) DIV 2;
+              { k=nr. de noduri disponibile in pagina adiacenta b}
+              a^.e[n]:=c^.e[s1]; a^.e[n].p:=b^.p0;
+              IF k>0 THEN
+                  BEGIN {muta k noduri din b in a }
+                    FOR i:=1 TO k-1 DO a^.e[i+n]:=b^.e[i];
+                    c^.e[s1]:=b^.e[k]; c^.e[s1].p:=b;
+                    b^.p0:=b^.e[k].p; mb:=mb-k;
+                    FOR i:=1 TO mb DO b^.e[i]:=b^.e[i+k];
+                    b^.m:=mb; a^.m:=n-1+k; h:=false
+                  END
+                ELSE
+                  BEGIN {contopeste paginile a si b}
+                    FOR i:=1 TO n DO a^.e[i+n]:=b^.e[i];
+                    FOR i:=s1 TO mc-1 DO c^.e[i]:=c^.e[i+1];
+                    a^.m:=nn; c^.m:=mc-1  {Dispose(b)}
+                  END                                      {5.69}
+            END
+          ELSE
+            BEGIN {b:=pagina din stinga lui a}
+              IF s1=1 THEN b:=c^.p0 ELSE b:=c^.e[s1-1].p;
+              mb:=b^.m+1; k:=(mb-n) DIV 2;
+              IF k>0 THEN
+                  BEGIN {muta k noduri din pagina b in a}
+                    FOR i:=n-1 DOWNTO 1 DO a^.e[i+k]:=a^.e[i];
+                    a^.e[k]:=c^.e[s1]; a^.e[k].p:=a^.p0;
+                    mb:=mb-k;
+                    FOR i:=k-1 DOWNTO 1 DO a^.e[i]:=b^.e[i+mb];
+                    a^.p0:=b^.e[mb].p;
+                    c^.e[s1]:=b^.e[mb]; c^.e[s1].p:=a;
+                    b^.m:=mb-1; a^.m:=n-1+k; h:=false;
+                  END
+                ELSE
+                  BEGIN {contopire pagini a si b}
+                    b^.e[mb]:=c^.e[s1]; b^.e[mb].p:=a^.p0;
+                    FOR i:=1 TO n-1 DO b^.e[i+mb]:=a^.e[i];
+                    b^.m:=nn; c^.m:=mc-1  {Dispose(a)}
+                  END
+            END
+      END; {subdepasire}
+
+  PROCEDURE supr(VAR p:ref; VAR h:boolean);
+    VAR q:ref; {a si k variabile globale}
+    BEGIN
+      WITH p^ DO
+        BEGIN
+          q:=e[m].p;
+          IF q<>NIL THEN
+              BEGIN
+                supr(q,h);
+                IF h THEN subdepasire(p,q,m,h)
+              END
+            ELSE
+              BEGIN
+                p^.e[m].p:=a^.e[k].p; a^.e[k]:=p^.e[m];
+                m:=m-1; h:=m<n
+              END
+        END
+    END; {supr}
+
+    BEGIN {suprima}
+      IF a=NIL THEN
+          BEGIN
+            WriteLn('   cheia nu exista in arbore'); h:=false
+          END
+        ELSE
+          WITH a^ DO
+            BEGIN {cautare binara}
+              s:=1; d:=m;
+              REPEAT
+                k:=(s+d) DIV 2;
+                IF x<=e[k].cheie THEN d:=k-1;
+                IF x>=e[k].cheie THEN s:=k+1;
+              UNTIL s>d;
+              IF d=0 THEN
+                  q:=p0
+                ELSE
+                  q:=e[d].p;
+              IF s-d>1 THEN
+                  BEGIN {gasit; se sterge e[k]}
+                    IF q=NIL THEN
+                        BEGIN {a este o pagina terminala}
+                          m:=m-1; h:=m<n;
+                          FOR i:=k TO m DO e[i]:=e[i+1];
+                        END
+                      ELSE
+                        BEGIN
+                          supr(q,h);
+                          IF h THEN subdepasire(a,q,d,h)
+                        END
+                  END
+                ELSE
+                  BEGIN
+                    suprima(x,q,h);
+                    IF h THEN subdepasire(a,q,d,h)
+                  END
+            END
+    END; {suprima}
+
+  PROCEDURE tiparb(p:ref; l:integer);
+    VAR i:integer;
+    BEGIN                                                  {5.69}
+      IF p<>NIL  THEN
+        WITH p^ DO
+          BEGIN
+            FOR i:=1 TO l DO Write('   ');
+            FOR i:=1 TO m DO Write(e[i].cheie);
+            WriteLn;
+            tiparb(p0,l+1);
+            FOR i:=1 TO m DO tiparb(e[i].p,l+1)
+          END
+    END; {tiparb}
+
+  BEGIN {programul principal}
+    radacina:=NIL; Read(x);
+    WHILE x<>0 DO
+      BEGIN
+        WriteLn('cauta cheia  ',x);
+        cauta(x,radacina,h,u);
+        IF h THEN
+          BEGIN {insereaza noua pagina de baza}
+            q:=radacina; new(radacina);
+            WITH radacina^ DO
+              BEGIN
+                m:=1; p0:=q; e[1]:=u
+              END;
+          END;
+          tiparb(radacina,1); Read(x)
+      END;
+    Read(x);
+    WHILE  x<>0 DO
+      BEGIN
+        WriteLn('sterge cheia  ',x);
+        suprima(x,radacina,h);
+        IF h THEN
+          BEGIN {pagina de baza s-a redus ca dimensiune}
+            IF radacina^.m=0 THEN
+              BEGIN
+                q:=radacina; radacina:=q^.p0
+                {Dispose(q)}
+              END
+          END;
+        tiparb(radacina,1); Read(x)
+      END
+  END.
+
+.         link
+.         run
+
+20,40,10,30,15,35,7,26,18,22,5,42,13,46,27,8,32,38,24,45,25,0,25,45,24,38,32,8,
+27,46,13,42,5,22,18,26,7,35,15,0,
+.         eoj
+.         job arb,an:xx50,pn:puiu
+.         compile pascal
+
+
+TYPE nod=RECORD
+           cheie:integer;
+           {alte cimpuri}                                  {5.70}
+           sting,drept:ref;
+           o:boolean
+         END;
+
+    TYPE nod=RECORD
+           cheie:integer;
+           contor:integer;                                 {5.71}
+           sting,drept:ref;
+           os,OR:boolean
+         END;
+
+PROCEDURE cauta(x:integer; VAR p:ref; VAR h:integer);
+  VAR p1,p2:ref;
+  BEGIN
+    IF p=NIL THEN
+        BEGIN {cheia nu e in arbore; se insereaza}
+          new(p); h:=2;
+          WITH p^ DO
+            BEGIN
+              cheie:=x; contor:=1; sting:=NIL;
+              drept:=NIL; os:=false; od:=false
+            END
+        END
+      ELSE
+        IF x<p^.cheie THEN
+            BEGIN
+              cauta(x,p^.sting,h);
+              IF h<>0 THEN
+                IF p^.os THEN
+                    BEGIN
+                      p1:=p^.sting; h:=2; pq.os:=false;
+                      IF p1^.os THEN
+                          BEGIN {cazul 1 stinga}
+                            p^.sting:=p1^.drept;
+                            p1^.drept:=p; p1^.os:=false;
+                            p:=p1
+                          END
+                        ELSE
+                          IF p1^.od THEN
+                            BEGIN {cazul 2 stinga}
+                              p2:=p1^.drept;
+                              p1^.od:=false;
+                              p1^.drept:=p2^.sting;
+                              p2^.sting:=p1;
+                              p^.sting:=p2^.drept;
+                              p2^.drept:=p;
+                              p:=p2
+                            END
+                    END
+                  ELSE
+                    BEGIN
+                      m:=h-1;
+                      IF h<>o THEN p^.os:=true
+                    END                                    {5.72}
+            END
+          ELSE
+            IF x>p^.cheie THEN
+                BEGIN
+                  cauta(x,p^.drept,h);
+                  IF h<>0 THEN
+                    IF p^.od THEN
+                        BEGIN
+                          p1:=p^.drept; h:=2;
+                          p^.od:=false
+                          IF p1^.od THEN
+                              BEGIN {cazul 1 dreapta}
+                                p^.drept:=p1^.sting;
+                                p1^.sting:=p;
+                                p1^.od:=false;
+                                p:=p1
+                              END
+                            ELSE
+                              IF p1^.os THEN
+                                BEGIN {cazul 2 dreapta}
+                                  p2:=p1^.sting;
+                                  p1^.os:=false;
+                                  p1^.sting:=p2^.drept;
+                                  p2^.drept:=p1;
+                                  p^.drept:=p2^.sting;
+                                  p2^.sting:=p;
+                                  p:=p2
+                                END
+                        END
+                      ELSE
+                        BEGIN
+                          h:=h-1;
+                          IF h<>0 THEN p^.od:=true;
+                        END
+                END
+              ELSE
+                BEGIN
+                  p^.contor:=p^.contor+1: h:=0
+                END
+  END; {cauta}
+
+h:=h(k); i:=0;
+REPEAT
+  IF t[h].cheie=k THEN
+      {* element gasit *}
+    ELSE
+      IF t[h].cheie=liber THEN
+          {* elementul nu e in tabel *}                         {5.73}
+        ELSE
+          BEGIN {coliziune}
+              i:=i+1;
+              h:=h(k)+g(i)
+          END
+UNTIL (gasit) OR (nu e in tabela) OR (tabela plina);
+
+l:=h(k); i:=l; gasit:=false; absent:=false;
+REPEAT
+  IF t[l]=liber THEN
+      absent:=true
+    ELSE
+      IF t[l].cheie=k THEN
+          BEGIN
+            v:=t[l];
+            gasit:=true
+          END                                                   {5.75}
+        ELSE
+          BEGIN
+            l:=l+1;
+            IF l=p THEN l:=0;
+            IF l=i THEN absent:=true
+          END
+UNTIL gasit OR absent;
+
+l:=h(k); r:=1; depus:=false;
+REPEAT
+  IF t[l]=liber THEN
+      BEGIN
+        t[l]:=v;
+        depus:=true
+      END                                                       {5.77}
+    ELSE
+      BEGIN
+        l:=l+r;
+        IF l>=p THEN l:=l-p;
+        r:=r+2
+      END
+UNTIL depus OR (r=p);
+
+.         eoj
+.         job curs05,an:xx50,pn:puiu
+.         compile pascal
+
+
+PROGRAM refincrucis;
+CONST c1=10;  {lungime cuvint}
+      c2=8;   {numere pe linii}
+      c4=9999;{numar maxim linii}
+      p=997;  {lungime tablou dispersie}
+      liber='          ';
+
+TYPE  indice=0..p;
+      alfa=ARRAY[1..c1] OF char;
+      refnumrind=^numrind;
+      cuvint= RECORD
+                cheie:alfa;
+                inceput,sfirsit:refnumrind;
+                leg:indice
+              END;
+      numrind=RECORD
+                nr:0..c4;
+                urm:refnumrind
+              END;
+
+VAR i,init:indice;
+    litere,cifre:SET OF char;
+    k,k1:integer;
+    n:integer; {numar curent al rindului}
+    a:alfa; {tampon pentru cuvintul curent}
+    car:char; {caracterul curent}
+    t:ARRAY[0..p] OF cuvint; {tablou dispersat}
+    depasire:boolean;
+
+FUNCTION h(id:alfa):indice;
+  VAR i,s:integer;
+  BEGIN
+    s:=0;
+    FOR i:=1 TO c1 DO
+      s:=s+Ord(id[i])*Power( 2,i);
+    h:=s MOD p
+  END; {h}
+
+PROCEDURE cauta; {variabile globale:t,a,init,n}            {5.78}
+  VAR l,r:integer;
+      x:refnumrind;
+      f:boolean;
+  BEGIN
+    l:=h(a);
+    f:=false; depasire:=false;
+    r:=1;
+    new(x);
+    x^.nr:=n; x^.urm:=NIL;
+    REPEAT
+      IF t[l].cheie=a THEN {s-a gasit}
+          BEGIN
+            f:=true;
+            t[l].sfirsit^.urm:=x;
+            t[l].sfirsit:=x
+          END
+        ELSE
+          IF t[l].cheie=liber THEN {se creaza un nou element}
+              BEGIN
+                f:=true;
+                WITH t[l] DO
+                  BEGIN
+                    cheie:=a;
+                    inceput:=x;
+                    sfirsit:=x;
+                    leg:=init
+                  END;
+                init:=l
+              END
+            ELSE
+              BEGIN {coliziune}
+                l:=l+r;
+                r:=r+2;
+                IF l>=p THEN l:=l-p;
+                IF r=p THEN
+                  BEGIN
+                    WriteLn('depasire tabel');
+                    depasire:=true
+                  END
+              END;
+    UNTIL f OR depasire
+  END; {cauta}
+
+PROCEDURE imprimare;
+  VAR i,j,m:indice;
+
+  PROCEDURE imprcuvint(r:cuvint);
+    VAR l:integer;
+        x:refnumrind;
+    BEGIN
+      Write(' ',r.cheie,r.cheie[1],r.cheie[c1]);
+      x:=r.inceput;
+      l:=0;
+      REPEAT
+        IF l=c2 THEN
+          BEGIN
+            WriteLn;
+            FOR l:=1 TO c1+1 DO Write(' ');
+            l:=0
+          END;
+        l:=l+1;
+        Write(x^.nr);
+        x:=x^.urm
+      UNTIL x=NIL;
+      WriteLn
+    END; {imprcuvint}
+
+  BEGIN {imprimare}
+    i:=init;
+    WHILE i<>p DO {parcurge t si cauta t[m]=elementul cu cheia minima}
+      BEGIN
+        m:=i;
+        j:=t[i].leg;
+        WHILE j<>p DO
+          BEGIN
+            IF t[j].cheie<t[m].cheie THEN m:=j;
+            j:=t[j].leg
+          END; {s-a gasit elem cu cheia minima}
+        imprcuvint(t[m]); {urmeaza  eliminarea lui t[m]}
+        IF m<>i THEN
+          BEGIN
+            t[m].cheie:=t[i].cheie;
+            t[m].inceput:=t[i].inceput;
+            t[m].sfirsit:=t[i].sfirsit
+          END;
+        i:=t[i].leg
+      END
+  END; {imprimare}
+
+BEGIN {PROGRAM principal}                                  {5.78}
+  litere:=['a','b','c','d','e','f','g','h','i',
+            'j','k','l','m','n','o','p','q','r',
+            's','t','u','v','w','x','y','z'];
+  cifre:=['0','1','2','3','4','5','6','7','8','9'];
+  n:=0;
+  k1:=c1;
+  init:=p;
+  depasire:=false;
+  Read(car);
+  FOR i:=0 TO p-1 DO t[i].cheie:=liber;
+    WHILE NOT(Eof('*1') OR depasire) DO
+      BEGIN
+        IF n=c4 THEN n:=0;
+        n:=n+1;
+        Write(n,' ');
+        WHILE NOT (Eoln OR depasire) DO
+          BEGIN
+            IF car IN litere THEN
+                BEGIN
+                  k:=0;
+                  REPEAT
+                    IF k<c1 THEN
+                      BEGIN
+                        k:=k+1;
+                        a[k]:=car
+                      END;
+                    Write(car);
+                    Read(car)
+                  UNTIL NOT((car IN litere) OR (car IN cifre));
+                  IF k>=k1 THEN
+                      k1:=k
+                    ELSE
+                      REPEAT
+                        a[k1]:=' ';
+                        k1:=k1-1
+                      UNTIL k1=k;
+                  cauta
+                END
+              ELSE
+                BEGIN
+                  IF car='''' THEN
+                      REPEAT
+                        Write(car);
+                        Read(car)
+                      UNTIL car=''''
+                    ELSE
+                      IF car='{' THEN
+                        REPEAT                             {5.78}
+                          Write(car);
+                          Read(car)
+                  Write(car);
+                  Read(car)
+                END
+          END;
+        WriteLn;
+        Read(car)
+      END;
+  imprimare
+END.
+
+.         link
+.         run
+
+
+l:=h(k); r:=1; depus:=false;
+REPEAT
+  IF t[l]=liber THEN
+      BEGIN
+        t[l]:=v;
+        depus:=true
+      END                                                       {5.77}
+    ELSE
+      BEGIN
+        l:=l+r;
+        IF l>=p THEN l:=l-p;
+        r:=r+2
+      END
+UNTIL depus OR (r=p);
+                                                                            `
+.         eoj
+.         job ar3,an:xx50,pn:puiu
+.         compile pascal
+
+VAR i,j,k:integer
+    a:ARRAY[1..n] OF t;
+    x:t;
+
+varianta a:
+
+    i:=1; j:=n;
+    REPEAT
+      k:=(i+j) DIV 2;
+      IF a[k]<x THEN
+          i:=k
+        ELSE
+          j:=k
+    UNTIL(a[k]=x) OR (i>=j);
+
+varianta b:
+
+    i:=1; j:=n;
+    REPEAT
+      k:=(i+j) DIV 2;
+      IF x<=a[k] THEN j:=k-1;
+      IF a[k]<=x THEN i:=k+1
+    UNTIL i>j;
+
+varianta c:
+
+    i:=1; j:=n;
+    REPEAT
+      k:=(i+j) DIV 2;
+      IF x<a[k] THEN
+          j:=k
+        ELSE
+          i:=k+1
+    UNTIL i>=j
+
+TYPE melodie=ARRAY[1..15] OF char;
+     sex=(femeiesc,barbatesc);
+     raspuns
+       RECORD
+         nume,prenume:alfa;
+         s:sex;
+         virsta:integer;
+         preferinta:ARRAY[1..5] OF melodie
+
+VAR top:FILE OF raspuns;
+
+.  eoj

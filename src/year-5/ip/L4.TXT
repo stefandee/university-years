@@ -1,0 +1,214 @@
+
+			FUNCTII SI CLASE GENERICE
+
+	4.1.Generalitati
+	----------------
+	Limbajul C++ ofera un mecanism prin care, in anumite situatii, pot fi 
+transmise ca parametri nu numai date, ci si tipuri. Tipurile care joaca rolul
+echivalent celui jucat de parametrii formali ai unei functii se numesc TIPURI
+GENERICE.
+	Tipurile generice pot fi utilizate atat in combinatie cu definitii de
+functii, cat si cu definitii de clase. Aceasta facilitate ofera un cadru pen-
+tru definirea unor clase generice ca: liste, tablouri etc (in general structuri
+gen colectie de elemente), respectiv a unor functii generice ca: sortari, cau-
+tari. In toate aceste cazuri tipul generic corespunde tipului elementelor ce
+compun structurile de date reprezentate de clasele generice, respectiv prelu-
+crate de functiiloe generice.
+
+	4.2.Functii generice
+	--------------------
+	Sintaxa utilizata pentru definitia unei functii generice este urmatoa-
+rea:
+	template <class nume_tip_generic> tip_returnat nume_functie(parametri)
+	{
+		//instructiunile functiei
+	};
+Aceasta constructie se mai numeste SABLONUL functiei generice.
+	Comportamentul si utilizarea unei functii generice vor fi ilustrate in
+continuare cu ajutorul unui exemplu:
+	Exemplul 4.1.
+	template <class Tg> Tg max(Tg x,Tg y)
+	{
+	  return (x>y)?x:y;
+	};
+	int i,j;
+	Clasa_A a,b;
+	void main()
+	{
+	  j=max(i,0); //1
+	  Clasa_A c=max(a,b); //2
+	}
+	La intalnirea unei referiri a numelui functiei generice compilatorul ge-
+nereaza o instanta, adica o definitie de functie in care, in locul tipului gene-
+ric este trecut tipul concret al datelor care apar in referire.
+	De ex., pentru o referire de forma celei din linia //1 se va genera 
+definitia (in caz ca ea nu exista deja):
+		int max(int x, int y)
+		{
+		   return (x>y)?x:y;
+		}
+si, bineinteles, secventa de apel catre aceasta functie.
+	Functia generica din exemplul de mai sus poate fi utilizata pentru ori-
+ce tip care suporta operatorul '>'.
+	Functiile generice pot fi si supraincarcate. Astfel, pe langa sablonul 
+din exemplul 4.1., utilizatorul poate adauga definitia:
+		char *max(char *x,char *y)
+		{
+		   return (strcmp(x,y)>0)?x:y;
+		}
+La intalnirea unui apel de forma max(sir1,sir2), cu sir1 si sir2 de tip char*,
+compilatorul nu va mai instantia sablonul, ci va genera secventa de apel catre
+functia de mai sus.
+	Obs: in cazul functiilor generate de compilator ca instantieri ale unor
+sabloane, nu se fac conversii implicite ale parametrilor. De ex., in cazul sa-
+blonului 'max', o secventa de forma:
+		int a,b; char c;
+		a=max(b,c);
+va genera eroare de compilare. Solutia pentru asemenea situatii este inserarea 
+dupa sablon a unui prototip de forma:
+		int max(int,int);
+
+	4.3.Clase generice
+	------------------
+	Sintaxa utilizata pentru a defini o clasa generica este:
+		template <class nume_tip_generic> class nume_clasa
+		{
+			//continutul clasei
+		};
+	Declararea unui obiect al unei clase generice se face astfel:
+	nume_clasa<tip_concret> nume_obiect;
+La declararea unui astfel de obiect au loc: pe de o parte instantierea sablonu-
+lui clasei (adica crearea unei definitii de clasa in care tipul generic este in-
+locuit cu tipul concret precizat), iar pe de alta parte crearea unui obiect a-
+partinand clasei obtinute.
+	Exemplul 4.2.
+	template <class T> class Vector
+	{
+	  T *data;
+	  int size;
+	  public:
+	    Vector(int);
+	    ~Vector(){delete data;}
+	    T& operator[](int i){return data[i];}
+	};//end sablon Vector
+
+	template<class T> Vector<T>::Vector(int n)
+	{ //aici se vede sintaxa utilizata pt. a defini functii membru
+	  //ale sablonului in afara
+	  data=new T[n];
+	  size=n;
+	}
+
+	void main()
+	{
+	  Vector<int> x(5);
+	  for(int i=0;i<5;i++) x[i]=i;
+	}//end main
+	Si in cazul claselor generice se poate aplica supraincarcarea, prin a-
+daugarea unor definitii de clase concrete, avand acelasi nume cu sablonul. Ast-
+fel, pentru exemplul 4.2. se poate prevedea o clasa Vector in care elementele sa
+fie siruri de caractere alocate dinamic:
+	class Vector<char *>
+	{
+	  char **data;
+	  int size;
+	  public:
+	    Vector(int);
+	    ~Vector();
+	    char*& operator[](int i){return data[i];}
+			void aloca(int,int);
+	};
+	Vector<char *>::Vector(int n)
+	{
+	  data=new char*[n];
+	  size=n;
+	  for(int i=0;i<n;i++) data[i]=NULL;
+	}
+	Vector<char *>::~Vector()
+	{
+	  for(int i=0;i<n;i++) if(data[i]) delete data[i];
+	  delete data;
+	}
+	void Vector<char *>::aloca(int i,int n)
+	{
+	  if(data[i]) delete data[i];
+	  data[i]=NULL;
+	  if(n) data[i]=new char[n];
+	}
+	void main()
+	{
+	  Vector<int> x(5);
+	  Vector<char *> y(5);
+	  char t[10];
+	  for(int i=0;i<5;i++)
+	  {
+	    x[i]=i;
+	    scanf("%s",t);
+	    y.aloca(i,strlen(t)+1);
+	    strcpy(y[i],t);
+	  }
+	}//end main
+	Ca principiu, definitiile care supraincarca sablonul unei clase se pre-
+vad pentru cazurile in care tipul concret este un pointer, deoarece la aceste
+tipuri trebuie realizate, in plus fata de tipurile simple, alocari/dealocari 
+dinamice.
+
+	4.4.Teme
+	--------
+	4.4.1.Sa se implementeze, cu ajutorul sabloanelor, structura de date 
+"lista dublu inlantuita", tipul generic fiind tipul campului de informatie din
+nodurile listei. Lista va avea asociat un cursor (un pointer care indica nodul 
+curent al listei). Initial lista este vida; dupa adaugarea primului nod cursorul
+va fi pozitionat pe acesta. Ulterior deplasarea cursorului va fi determinata de
+operatiile executate asupra listei. Ca operatii se vor prevedea urma-
+toarele:
+	/-'count': returnarea numarului de elemente din lista;
+	/-'empty': test daca lista este vida;
+	/-'isfirst': test daca cursorul este pe primul nod;
+	/-'islast': test daca cursorul este pe ultimul nod;
+	/-'pos': returneaza numarul de ordine al nodului curent (pozitia cursoru-
+lui);
+	-'item': returneaza continutul campului de informatie din nodul curent;
+	/-'put': insereaza un nod in lista, dupa nodul curent;
+	-'put_i_th': insereaza un nod in lista pe pozitia i;
+	/-'swap': schimba intre ele continuturile campurilor de informatie ale
+nodurilor curent si cel de pe pozitia i data ca parametru;
+	/-'advance': muta cursorul cu o pozitie inainte (spre sfarsitul listei);
+	/-'reverse': muta cursorul cu o pozitie inapoi;
+	-operatorul de indexare []: va returna referinta la campul de informatie
+din nodul de pe pozitia i specificata ca index;
+	-constructor implicit si distructor.
+	Operatiile vor fi executate in mod interactiv, prin intermediul unui me-
+niu simplu afisat pe ecran. Dupa executia fiecarei operatii se va afisa continu-
+tul listei si pozitia cursorului.
+	La executia operatiilor de inserare de noduri nodul adaugat devine nod
+curent.
+	Operatorul de indexare va fi utilizat pentru a initializa cu valori cam-
+purile de informatie ale nodurilor.
+	Lista se va instantia astfel incat sa functioneze cu elemente de tip 
+int, double si char*. 
+	Obs: pentru tipul char* se pot adopta doua solutii: fie se adauga dupa
+sablon o definitie de supraincarcare (ca in exemplul de mai sus), fie se cons-
+truieste o clasa String care sa implementeze operatiile cu siruri de caractere
+necesare pt. aceasta tema, urmand ca tipul String sa se dea ca tip concret la
+instantierea sablonului.
+
+	4.4.2.Sa se implementeze, cu ajutorul sabloanelor, structura de date 
+"arbore binar ordonat", tipul generic fiind tipul campului de informatie din
+nodurile arborelui. Ca operatii se vor prevedea urmatoarele:
+	-'count': returnarea numarului de elemente din arbore;
+	-'empty': test daca arborele este vid;
+	-'put': adauga un nod in arbore;
+	-'afisare': afiseaza arborele pe ecran astfel incat radacina sa se afle
+in stanga ecranului, iar fiecare nivel inferior decalat spre dreapta ecranului;
+	-traversarea arborelui in preordine, postordine si inordine, cu tipa-
+rirea campului de informatie din noduri;
+	-constructor implicit si distructor.
+	Operatiile vor fi executate in mod interactiv, prin intermediul unui me-
+niu simplu afisat pe ecran. 
+	Arborele se va instantia pentru aceleasi tipuri ca si lista din tema
+de mai sus.	
+
+	---------------------------
+	!!! Termen: 3 saptamani !!!
+	---------------------------

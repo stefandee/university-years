@@ -1,0 +1,146 @@
+Lucrarea 3
+----------
+
+
+			Exemple de prelucrare a sirurilor de caractere
+			----------------------------------------------
+
+
+Analizorul Lexical
+------------------
+
+       Sa se realizeze un program care  preia un text de la tastatura
+pina la intilnirea caracterului EOF, afisind toate simbolurile intilnite.
+ Multimea simbolurilor recunoscute este :
+- identificator (ID) - o succesiune de litere si cifre, incepind cu o litera
+- numar (NR)  - o secventa de cifre
+- operator (OP) - unul din operatorii <, >, >=, <=, ==, +, -, /, *, =
+- sfirsit de fisier (SF) - EOF
+Blancurile si sfirsiturile de linie sint ignorate. Delimitarea unui simbol
+din intrare se face de catre functia alex().
+
+
+
+
+# include <stdlib.h>
+# include <stdio.h>
+# include <ctype.h>
+# define ID  1
+# define NR  2
+# define OP  3
+# define SF  4
+#define EROARE 5
+char c , sir[32];
+int val , simbol;
+
+int alex(){
+
+ int i;
+
+ if( c != EOF )
+ {
+   while( isspace( c))  c=getchar();
+   if ( isalpha(c) )
+   {
+     i=0;
+     while( isalnum( c ))
+     {
+       sir[i++]=c;
+       c=getchar();
+     }
+     sir[i]='\0';
+    return ID;
+
+   }
+   else if ( isdigit( c ))
+   {
+     val=c - '0';
+     while( isdigit( c = getchar() ) )
+     {
+       val = val * 10 + c - '0';
+     }
+     return  NR;
+   }
+   else
+     switch( c )
+     {
+ 	case '<':case '>': case '=': if((c=getchar())=='=')
+				     c=getchar();return OP;
+
+	case '+':case '-': case '/': case '*' : c=getchar();
+	return OP;
+	default:if( c != EOF ) {printf("caracter ilegal\n");
+				c=getchar(); return EROARE;}
+		 else return SF;
+
+     } /*switch*/
+   }
+   else return SF;
+}
+
+void main(){
+
+  c=getchar();
+  while(1)
+  {
+    switch( alex() )
+    {
+      case ID: printf("identificatorul %s\n",sir);break;
+      case NR: printf("numarul %d\n",val);break;
+      case OP: printf("operator\n");break;
+      case SF: printf("sfirsit introducere\n");exit(0);
+    }
+  }
+}
+
+
+
+Probleme propuse
+----------------
+
+1. Un numar real este construit dupa urmatoarea diagrama :
+				      ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+				      ³                           ³
+  nr.real  Ú + ¿                      ³ ÚÄ EÄ¿ Ú + ¿              ³
+ÄÄÄÄÄÄÄÄÄ>ÄÅÄÄÄÅÂ>cifraÄÂ>ùÄÂ>cifraÄÂ>ÁÄ´    ÃÄÅÄÄÄÅÄÂ>cifraÄÂÄÄÄÄÁÄ>
+	   À - ÙÀÄÄÄÄÄÄÄÙ   ÀÄÄÄÄÄÄÄÙ   ÀÄ eÄÙ À - Ù ÀÄÄÄÄÄÄÄÙ
+
+Scrieti o functie care converteste un sir de caractere, ce respecta aceasta
+diagrama, in valoarea reala corespunzatoare. Functia primeste ca parametru
+sirul de convertit si returneaza valoarea reala calculata. Functia elimina
+eventualele spatii ce preced numarul.
+
+2. Se da un sir de cuvinte separate prin blancuri, sir care e terminat cu ca-
+racterul EOF. Sa se tipareasca in ordine alfabetica toate palinword-urile care
+apar in text. Se defineste un palinword, ca fiind un cuvint ce contine cel
+putin doua palindroame de lungime minim 3 caractere. Un palindrom este o sec-
+venta de caractere, care citita de la stinga si de la dreapta este
+identica .
+Obs: Palindroamele sa nu fie continute unul intr-altul.
+Ex: CAIACUL nu este palinword (palindroame :AIA, CAIAC)
+    FETELE, PAPAGAL sint palinworduri (palindroame :ETE, ELE, rsp. PAP, APA)
+
+
+3. Se considera un dictionar, dat sub forma a doua tablouri tab1 si tab2.(Cu-
+vintului tab1[i] ii corespunde tab2[i]). Sa se scrie un program care comple-
+teaza cele doua tablouri, citind linii de forma:
+      cuv1,cuv2      . Ultima linie contine ca unic caracter '%'.
+Ulterior se citeste un text in limba 1, terminat cu EOF, pentru care se afi-
+seaza traducerea in limba 2. Atunci cind nu exista cuvintul de tradus in dic-
+tionar, se afiseaza cuvintul de tradus cu majuscule.
+
+4. Sa se scrie un program care editeaza un text X intr-un text Y. Textul se
+pastreaza sub forma unui tablou de siruri. Editarea presupune stergerea sau
+inlocuirea unor linii specificate sau insertia unor linii noi. Programul
+accepta in mod repetat comenzi de forma:
+  I,m      Insertia unei linii de text dupa linia m
+  D,m,n    Stergerea liniilor de la m la n
+  R,m,n    Inlocuirea liniilor de la m la n
+  P,m      Afisarea textului editat incepind cu linia m
+  E	   Terminarea editarii
+Ind: -Folosim un tablou bidimensional de caractere: tab[maxlin][maxcol], unde
+tab[i] este un sir de caractere terminat cu '\0'.
+     -Insertia unei linii dupa linia m  presupune mutarea continutului
+lui tab[i] in tab[i+1] pentru toti indicii m<i<maxlin, citirea unui sir din
+intrare si copierea lui in tab[m+1].
+     -O linie goala contine sirul ""(caracterul '\0')

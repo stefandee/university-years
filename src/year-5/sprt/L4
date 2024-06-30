@@ -1,0 +1,126 @@
+
+				LUCRAREA 4
+
+			TRATAREA INTRERUPERII DE CEAS
+
+    Dupa cum s-a mentionat in lucrarile anterioare, executia paralela, concu-
+renta a proceselor este asigurata prin time-slice, UC revenind fiecarui proces
+cite o cuanta de timp.
+    Aceasta inseamna ca la epuizarea fiecarei cuante, semnalata de generarea 
+unei intreruperi de ceas, executia procesului activ se intrerupe si se 
+selecteaza un nou proces pentru executie, deci se apeleaza alocatorul UC.
+    Daca lucrarea doi a schitat algoritmul necesar implementrii scheduler-ului
+, permitind realizarea unui "multitasking cooperativ", deci cedarea UC la 
+cererea explicita a procesului activ, lucrarea de fata va prezenta etapele 
+pentru realizarea "multitaskingului fortat", in care deci, la fiecare 
+intrerupere de ceas, se face comutarea proceselor.
+
+    1. Intreruperea de ceas standard
+    
+    Sistemul de intreruperi al calculatoarelor compatibile IBM PC este
+realizat cu un controlor de tip I8259A. Acest circuit gestioneaza cererile
+de intrerupere pe care le cumuleaza pe opt nivele de intrerupere , 
+deservindu-le in ordinea prioritatii, ce descreste cu numarul nivelului.
+Intreruperea UC de catre I8259 se face pe linia de intrerupere mascabila INT.
+Procesorul poseda inca o linie de intrerupere NMI, nemascabila, care este 
+actionata de coprocesor ( daca exista ) sau de o eroare de paritate aparuta la 
+memoria sistemului.
+    LA nivelul 0 al I8259 este legata iesirea circuitului de ceas I8253, care
+genereaza cite o cerere de intrerupere la fiecare cuanta de 55 ms, ce apare
+ca intrerupere BIOS INT 08H. Secventa de tratare a acestei intreruperi
+consta in :
+    - incrementarea unui contor de ceas aflat in zona BIOS la 0000:46CH
+    - decrementarea contorului pentru oprirea motorului unitatii de disc 
+flexibil
+    - generarea unei intreruperi ( soft ) 1CH, care cuprinde doar un IRET, dar
+care poate fi inlocuita cu o rutina a utilizatorului
+    - achitarea intreruperii prin transmiterea octetului EOI ( End Of Interrupt 
+) la circuitul I8259, care marcheaza terminarea tratarii intreruperii si
+posibilitatea ca acest circuit sa ia in considerare urmatoarea cerere de 
+intrerupere; fara transmiterea unui octet de achitare, circuitul nu va mai 
+recunoaste nici o cerere de intrerupere.
+    Deci secventa de tratare a intreruperii de ceas va trebui astfel 
+modificata, incit pe linga operatiile de mai sus, sa realizeze si schimbarea
+contextului ( in lucrarile ulterioare se va prezenta si o actiune in plus, de
+gestionare a proceselor ce au solicitat serviciul de intirziere delay ).
+    
+    2. Tratarea intreruperii de ceas in executiv
+
+    Deoarece la fiecare cuanta de timp trebuie sa se faca toate operatiile din 
+secventa standard si in plus schimbarea contextului, se pune problema raportului 
+intre regia de sistem si valoarea cuantei, care ar trebui sa fie cit mai mic, 
+insemnind ca UC sa fie ocupata cel mai mult de rularea proceselor si nu de
+comutarea lor. Daca tratarea intreruperii dureaza mai mult decit o cuanta, 
+cite o intrerupere de timp se pierde.
+    Cuanta de timp se poate reprograma, prin reprogramarea circuitului de ceas
+I8253: o cuanta mare rezolva un raport bun, dar comutarea proceselor s-ar face
+rar, viteza de reactie, vitala in sisteme timp real fiind scazuta; o cuanta
+prea mica, ocupa UC cu schimbarea contextului si nu cu rularea proceselor,
+putindu-se pierde intreruperi. Cuanta de executie a unui proces se poate
+modifica si fara reprogramarea circuitului de ceas, prin apelul alocatorului
+UC , din rutina de tratare a intreruperii de ceas, numai dupa un numar fixat
+de cuante elementare.
+
+    2.1. Initializarea vectorilor de intrerupere
+    
+    La aparitia unei intreruperi de ceas, codul rutinei de tratare e executat
+de procesul ce a fost gasit activ. Alocatorul UC apelat la sfirsitul rutinei 
+va da comanda urmatorului proces. 
+    Ar fi corecta varianta ca tratarea specifica executivului sa se realizeze 
+ca rutina a intreruperii utilizator 1CH ? 
+    In aceasta varianta, dupa aparitia primei intreruperi de timp ce ar 
+intrerupe primul proces, s-ar trece la executia codului procesului al doilea, 
+nemairevenind din 1CH pentru achitarea intreruperii, EOI; deci nu s-ar mai 
+recunoaste nici o intrerupere si procesul doi ar rula la infinit.
+    Din aceasta cauza, achitarea intreruperii trebuie facuta inainte de apelul
+alocatorului UC, deci rutina standard de tratare trebuie apelata din
+cea a executivului, la inceputul ei, apoi facindu-se apelul alocatorului UC.
+Aceasta duce la urmatoarele initializari ale vectorilor de intrerupere in 
+functia de initializare a executivului:
+    - se gaseste adresa rutinei standard pentru intreruperea 08C ( getvect )
+    - se initializeaza cu aceasta adresa un vector nefolosit ( setvect )
+    - se initializeaza vectorul intreruperii 08H cu adresa secventei de 
+tratare ceas a executivului ( setvect ). 
+    Aceste initializari se fac cu intreruperile dezactivate, deci precedate de
+un disable(), inainte de lansarea in executie a primului proces al aplicatiei
+( prin longjmp ), care se determina anterior. Nu e necesar ca dupa 
+initializarea vectorilor, sa se activeze intreruperile, deoarece trecerea la 
+executia primului proces, realizeaza aceasta.
+    Rutina de tratare a intreruperii de ceas nu este disponibila proceselor,
+deci va fi privata in varianta conceperii executivului ca obiect.
+    E necesar ca executivul sa-si gestioneze un ceas de timp real, printr-o
+variabila ( privata ) ce se initializeaza de asemenea la initializarea execu-
+tivului, actualizindu-se la fiecare intrerupere de ceas.
+
+    2.2. Rutina executivului de tratare a intreruperii de ceas 
+
+    Trebuie sa fie neintreruptibila, deci se declara interrupt si trebuie sa 
+cuprinda:
+    - generarea intreruperii soft pentru executia rutinei standard de tratare
+( geninterrupt )
+    - actualizarea ceasului executivului ( incrementare )
+    - apelul alocatorului UC, pentru lansarea unui alt proces.
+    Rutina va actualiza si lista proceselor intirziate, problema care se va
+prezenta la lucrarea referitoare la nivelul functiilor de timp-real.
+
+    2.3. Refacerea vectorilor de intreruperi
+    
+    Functia de iesire din executiv va reface adresa rutinei standard de 
+tratare a intreruperii de ceas ( un apel setvect inclus intre o dezactivare
+si o activare a intreruperilor ).
+
+    2.4. Functia de citire a ceasului de timp real 
+    
+    Desi e o functie specifica de timp real se prezinta aici, anterior amintin-
+du-se initializarea si actualizarea ceasului. Valoarea ceasului de timp-real
+e necesar a fi cunoscuta de catre procese; executivul va implementa o functie
+( publica ) ce returneaza valoarea ceasului.
+
+    3. Mersul lucrarii
+	 
+    Se vor scrie functiile ( secventele ) prezentate la punctul 2.
+    Se va concepe si verifica o aplicatie lucrind in "multitasking fortat"-
+dar atentie, nu exista inca drivere de intrare-iesire !
+    Orice scriere, citire in procese va trebui sa fie intercalata intre un
+P si V pe un semafor de I/E, deci executate in excludere mutuala; aceasta
+deoarece functiile DOS si BIOS apelate la citire/ scriere nu sunt reentrante.

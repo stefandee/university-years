@@ -1,0 +1,386 @@
+Lucrarea nr 12
+
+
+
+		Tipul abstract arbore binar ordonat
+
+
+
+  1. Aplicatie
+
+  Sa se realizeze un program care raspunde la urmatoarele comenzi:
+   'a' - Citeste o linie de forma
+                  identificator , numar ;
+         unde numar este un numar intreg si retine in evidenta identi-
+         ficatorul impreuna cu numarul asociat lui.
+   't' - Citeste o linie ce contine un identificator. Daca acesta se ga-
+         seste in evidenta se tipareste valoarea asociata lui , in caz
+         contrar se tipareste un mesaj de eroare.
+   's' - Citeste o linie ce contine un identificator si il sterge din
+         evidenta.
+   'l' - Tipareste in ordine alfabetica identificatorii din evidenta
+         impreuna cu valorile asociate lor
+   '+' - citeste doua linii , fiecare continind un identificator. In
+         cazul in care ambii se afla in evidenta , se tipareste suma
+         lor. In caz ca unul sau ambii identificatori lipsesc din
+         evidenta se tipareste un mesaj de eroare.
+   '-' - citeste doua linii , fiecare continind un identificator. In
+         cazul in care ambii se afla in evidenta , se tipareste dife-
+         renta lor. In caz ca unul sau ambii identificatori lipsesc din
+         evidenta se tipareste un mesaj de eroare.
+   '*' - citeste doua linii , fiecare continind un identificator. In
+         cazul in care ambii se afla in evidenta , se tipareste produsul
+         lor. In caz ca unul sau ambii identificatori lipsesc din
+         evidenta se tipareste un mesaj de eroare.
+   '/' - citeste doua linii , fiecare continind un identificator. In
+         cazul in care ambii se afla in evidenta , se tipareste rezultatul
+         impartirii lor. In caz ca unul sau ambii identificatori lipsesc din
+         evidenta se tipareste un mesaj de eroare.
+   'f' - se termina programul
+
+  Observatii:
+   - in tabela identificatorii sint pastrati in mod ordonat
+   - se vor prezenta si comenta structurile de date folosite
+   - se va prezenta si comenta structura de ansamblu a programului ,
+     fisiere componente , functiile si efectul lor
+
+
+
+  2. Rezolvare
+
+       1. fisierul     arbore.h
+
+
+typedef struct pn
+{
+   char *lexema;
+   int valoare;
+   struct pn *sting,*drept;
+}nod;
+
+#define Max   20
+
+void sterge( char* );
+void listare( void );
+nod *cauta( char*);
+void introdu( char*,int );
+
+
+2. fisierul arbore.c
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <conio.h>
+#include "arbore.h"
+
+
+static nod * root = NULL;
+
+nod *prezent(nod *t,char *id)
+{
+
+  if( t == NULL ) return 0;
+  else
+     if( strcmp( t->lexema, id ) < 0 )
+       return prezent( t->drept,id );
+      else
+	  if( strcmp(t->lexema,id) > 0 )
+	   return prezent( t->sting,id );
+       else return t;
+}
+
+
+nod *adauga(nod *t,char *id,int v)
+{
+
+     if( t == NULL )
+	if( ( t=(nod*)malloc(sizeof(nod))) == NULL ||
+	(t->lexema=(char*)malloc(strlen(id)+1)) == NULL)
+	{
+	  printf(" eroare: memorie insuficienta\n");
+	  exit( 1 );
+	}
+	else
+	{
+	  strcpy(t->lexema,id);
+	  t->valoare = v;
+	  t->sting=t->drept=NULL;
+	}
+     else
+	 if( strcmp( t->lexema,id ) < 0 )
+	    t->drept = adauga( t->drept,id,v );
+	 else
+	    if( strcmp( t->lexema,id ) > 0 )
+	    t->sting = adauga( t->sting,id,v );
+	      else printf("identificatorul %s apare in evidenta\n",id);
+     return t;
+}
+
+
+nod *supred( nod *t, nod *p )
+{
+  nod *q;
+
+  if ( t->drept != NULL )
+       t->drept = supred( t->drept , p );
+   else
+   {
+      free( p->lexema );
+      q = t;
+      p->lexema = t->lexema ;
+      p->valoare = t->valoare;
+      t = t->sting;
+      free( q );
+   }
+  return t;
+
+}
+
+ 
+nod *elimina( nod *p , char *id)
+{
+  nod *q , *q1;
+  char *s;
+
+  if( p == NULL )
+    printf(" eroare: %s nu apare in evidenta\n",id);
+   else
+     if( strcmp( p->lexema,id) < 0 )
+	 p->drept = elimina( p->drept,id );
+       else
+	 if( strcmp( p->lexema,id ) > 0 )
+	   p->sting = elimina( p->sting,id );
+	  else
+	   if( p->sting == NULL )
+	    {
+	     q = p->drept;
+	     free( p->lexema );
+	     free( p );
+	     return q;
+
+	     }
+	    else
+	     if( p->drept == NULL )
+	     {
+	       q = p->sting;
+	       free( p->lexema );
+	       free( p );
+	       return q;
+	     }
+	      else
+	       p->sting = supred( p->sting , p );
+  return p;
+}
+
+
+void tipareste(nod *t)
+{
+ if( t != NULL )
+ {
+    tipareste(t->sting);
+    printf("%s : %d\n",t->lexema,t->valoare);
+    tipareste(t->drept);
+ }
+}
+
+void listare( void )
+{
+  tipareste( root );
+}
+
+nod *cauta( char *s)
+{
+  return prezent( root, s );
+}
+
+void sterge( char *s )
+{
+  root = elimina( root,s );
+}
+
+void introdu( char *s, int v)
+{
+  root = adauga( root, s, v );
+}
+
+
+       3.fisierul main.c
+
+       # include <stdio.h>
+       # include <ctype.h>
+       # include <string.h>
+       # include <conio.h>
+       # include "arbore.h"
+
+       void getlin( char *s , int *val )
+       {
+        int i = 0, j;
+        char temp[ Max ];
+
+        gets( temp );
+        s[ i ] = '\0' ; *val = 0;
+        while( temp[ i ] != '\0' )
+          if( isalpha( temp[ i ] ))
+           {
+             j = 0;
+             while( isalnum( temp[ i ])) s[ j++ ] = temp[ i++ ];
+             s[ j ] = '\0';
+           }
+           else
+             if( isdigit( temp[i] ))
+               while( isdigit( temp[i] ))
+               {
+                 *val = *val * 10 + temp[i] - '0' ;
+                 i++;
+               }
+               else i++;
+       }
+
+      void ad( void )
+      {
+       int val;
+       char s[ Max ];
+
+       getlin( s , &val );
+       if( strlen( s ) != 0 ) introdu( s , val );
+        else printf(" Eroare : linie incorecta \n");
+      }
+
+      void ti( void )
+      {
+	char s[ Max ];
+	nod *p;
+	int val;
+
+        getlin( s , &val );
+        if( strlen( s ) != 0 )
+         {
+           if( ( p = cauta( s )) != NULL )
+             printf(" identificator : %s valoare : %d \n",p->id,p->valoare);
+            else printf(" Eroare: identificator nedefinit \n");
+        }
+         else printf(" Eroare: linie incorecta \n");
+      }
+
+      void st( void )
+      {
+        char s[ Max ];
+        int val;
+
+          getlin(s , &val );
+          if( strlen( s ) != 0 )  sterge( s );
+           else printf(" Eroare: linie incorecta \n");
+
+       }
+
+       void oper( char c )
+       {
+        char s1[ Max ] , s2[ Max ];
+        int val;
+        nod *p1 , *p2;
+
+        getlin(s1 , &val);
+        getlin(s2, &val);
+
+        if(( strlen( s1 ) != 0 ) && ( strlen( s2 ) != 0))
+          if((( p1 = cauta( s1 )) != NULL) &&
+             (( p2 = cauta( s2 )) != NULL ))
+          {
+            switch( c )
+            {
+              case '+' : val = p1->valoare + p2->valoare ; break;
+              case '-' : val = p1->valoare - p2->valoare ; break;
+              case '*' : val = p1->valoare * p2->valoare ; break;
+              case '/' :  if( p2-> valoare != 0 )
+                                val = p1->valoare / p2->valoare ;
+                           else printf(" Eroare: Impartire la 0\n") ;
+                           break;
+            }
+            printf(" Rezultatul operatiei e %d \n", val);
+          }
+           else printf(" Eroare: linie eronata \n ");
+      }
+
+       void meniu(void)
+       {
+	 char o;
+
+         while( 1 )
+         {
+          clrscr();
+          printf(" a ....... adauga in evidenta un id si val asociata \n");
+          printf(" t ....... tipareste valoarea asociata unui id \n");
+          printf(" s ....... sterge un id \n");
+          printf(" l ....... listeaza  id-rii si valorile asociate lor \n");
+          printf(" + ....... calculeaza suma pt. 2 id \n");
+          printf(" - ....... calculeaza diferenta pt. 2 id \n");
+          printf(" * ....... calculeaza produsul pt. 2 id \n");
+          printf(" / ....... calculeaza impartirea pt. 2 id \n");
+          printf(" f ....... termina programul \n");
+          printf("\n Introduceti optiune :"); o = getchar(); getchar();
+          switch(tolower(o))
+          {
+            case 'a': ad();break;
+            case 't': ti();break;
+            case 's': st();break;
+            case 'l': listare();break;
+            case '+': case '-' : case '*' : case '/' : oper(o); break;
+            case 'f' : return;
+            default : printf(" Eroare : Comanda inexistenta \n");
+         }
+         getchar();
+        }
+       }
+
+       void main( void )
+       {
+
+        meniu();
+
+       }
+
+
+
+  3. Prezentarea programului
+
+     Problema a fost prezentata anterior in lucrarea 9, ea fiind reluata si
+  rezolvata folosind arbori binari ordonati.
+     Fisierul arbore.h contine definitia de tip pentru un nod al arborelui,
+  precum si declaratiile functiilor ce apartin tipului abstract arbore
+  binar ordonat.
+     Fisierul arbore.c contine definitia tipului abstract lista.Functia prezent
+  cauta un identificator in arbore returnind pointerul nodului in care s-a
+  gasit identificatorul. Functia tipareste parcurge arborele in inordine
+  afisind continutul arborelui. Elimina sterge un nod din arbore ,iar
+  adauga va introduce un nod in arbore. Aceste functii au ca si parametru
+  formal radacina arborelui prelucrat, radacina care nu este disponibila in
+  exteriorul fisierului in care a fost declarata.
+     Folosind aceste functii se definesc cauta, sterge si introdu cu rolul de
+  cautare , stergere si introducere a unui identificator, precum si functia
+  listare , care va lista identificatorii din arbore.
+  Functia meniu afiseaza meniul programului , preia un caracter ,
+  reprezentind o comanda , dupa care functie de acesta apeleaza procedura
+  ce executa comanda tastata.
+     Functia oper are ca si parametru operatorul de executat .Functia citeste
+  doi identificatori gaseste in lista valorile asociate lor, dupa care
+  executa si afiseaza rezultatul operatiei.
+
+
+  4. Probleme propuse
+
+
+  1. Clasamentuljucatorilor de tenis este alcatuit pe baza rezultatelor din
+  turnee. Dupa fiecare turneu disputat , jucatorii sint rasplatiti cu un
+  numar de puncte functie de clasificarea lor  d.ex: locul I 10 puncte,
+  locul II 8 puncte ,etc. La orice moment clasamentul ia in evidenta primii
+  k jucatori. In momentul in care un jucator iese din evidenta clasamentului,
+  numarul de puncte adunate de acesta se pierde. Sa se realizeze un program
+  care efectueaza urmatoarele: citeste rezultatele unui turneu disputat,
+  actualizeaza clasamentul, elimina jucatorii care sint situati mai jos
+  de locul k si tipareste situatia actualizata. Sa se analizeze diferite posi-
+  bilitati de implementare a clasamentului de tenis.
+
+  2. Sa se rezolve problema 2 din lucrarea 9 folosind arbori binari ordonati.

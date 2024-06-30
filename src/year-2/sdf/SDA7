@@ -1,0 +1,366 @@
+
+                         Lucrarea nr.7
+                             Liste
+
+     1.Scopul  lucrarii:  ilustrarea  principalelor  tehnici   de 
+implementare  a  acestor structuri de date avansate,precum  si  a 
+principalelor sale aplicatii.
+
+     2.Aspecte teoretice
+
+     2.1.Definitia si operatii asupra listelor
+
+     O  lista  L  e o secventa de zero sau  mai  multe  elemente, 
+numite noduri, toate fiind de acelasi tip de baza T.
+          L=a1,a2,...,an (n>=0)
+     Daca n>=1, a1 se spune ca este primul nod al listei, iar an, 
+ultimul nod. Daca n=0, lista este vida.
+     O proprietate importanta a unei liste este aceea ca nodurile 
+sale  pot  fi ordonate liniar functie de pozitia  lor  in  cadrul 
+listei.  Se  spune ca ai precede pe ai+1  (i=1,2,...,n-1),iar  ai 
+succede pe ai-1 (i=2,3,...,n), ai aflindu-se pe pozitia i.
+     Se postuleaza existenta pozitiei urmatoare ultimului element 
+al  listei si se introduce functia FIN(L) ce va  returna  pozitia 
+urmatoare pozitiei n din lista L de n elemente.
+     Folosind  notatiile anterioare si notind x:T un nod al  lis-
+tei,  iar  p  fiind de tip pozitie, se  introduce  urmatorul  set
+reprezentativ de operatori aplicabili obiectelor de tip lista:
+     INSEREAZA(L,x,p)-insereaza in lista L nodul x, in pozitia p;
+                      daca  L=a1,a2,...,an,  in  urma  insertiei:
+                      p<FIN(L),L=a1,...,ap-1,x,ap+1,...,an
+                      p=FIN(L),L=a1,...,an,x
+                      p>FIN(L),rezultatul insertiei este imprevi-
+                               zibil.
+
+     2.2.Tehnici de implementare a listelor
+     2.2.a.Implementarea listelor cu ajutorul tipului tablou
+
+     O   lista  se  asimileaza  cu  un  tablou,  nodurile   fiind 
+elementele tabloului memorate in locatii succesive de memorie. In 
+aceasta  reprezentare,  lista  poate fi  usor  traversata,  noile 
+noduri pot fi inserate la sfirsitul listei. Insertia unui nod  in 
+interiorul   listei   presupune  deplasarea   tuturor   nodurilor 
+urmatoare  cu  o pozitie spre sfirsitul listei,  iar  suprimarea, 
+deplasarea   tuturor  nodurilor  urmatoare  cu  o  pozitie   spre 
+inceputul listei.
+     Tipul  Lista  se defineste ca un articol  cu  doua  cimpuri: 
+-primul e un tablou cu elementele de tip Nod, cu lungimea  aleasa 
+astfel incit sa poata acoperi cea mai mare dimensiune de lista ce 
+apare in respectiva aplicatie;
+-al doilea e pozitia ultimului nod al listei
+     Functia FIN(l) va returna valoarea ultim+1.
+     Declaratiile   cele   mai  importante   intr-o   astfel   de 
+implementare sint:
+
+const LungMax=100;
+type  Lista=record noduri:array [1..LungMax] of Nod;
+                   ultim:integer {0..lungmax}
+            end;
+      Pozitie=integer;
+function FIN(var l:Lista):Pozitie;
+     begin
+          FIN:=l.ultim+1
+     end;
+
+     Cu  declaratiile  de  mai  sus,  implementarea  operatorilor 
+prezentati anterior devine simpla.
+
+     2.2.b.Implementarea listelor cu ajutorul tipului pointer
+     Structuri recursive de tip lista
+
+     Cu ajutorul tipului pointer, se defineste structura unui nod 
+al  listei liniare care apare ca o structura recursiva,  avind  o 
+componenta de tip identic cu al structurii complete.
+
+type PointerNod=^Nod;
+     Nod=record cheie:TipCheie;
+                urmator:PointerNod;
+                info:TipInfo
+         end;
+var  inceput:PointerNod;
+
+     Caracteristica  unei astfel de structuri consta in  prezenta 
+unei  singure inlantuiri. Cimpul cheie serveste la  identificarea 
+nodului, cimpul urmator e pointer de inlantuire la nodul urmator, 
+iar cel info contine informatia utila.
+     Variabila inceput indica spre primul nod al listei; in unele 
+situatii in locul lui inceput se utilizeaza un nod fictiv,  adica 
+o  variabila de tip nod cu cimpurile cheie si  info  neprecizate, 
+dar cimpul urmator indicind spre primul nod al listei.
+     De asemenea uneori e util a se pastra pointerul spre ultimul 
+nod al listei.
+     O  varianta  este  a  listelor  circulare  la  care  dispare 
+notiunea de prim, ultim nod, lista fiind un pointer ce se  plimba 
+pe lista.
+
+     2.2.b.1.Tehnici  de  insertie  a nodurilor si  de  creare  a
+listelor inlantuite
+     a)insertia unui nod la inceputul listei
+
+     Daca  inceput e variabila pointer ce indica spre primul  nod 
+al listei,  iar q o variabila auxiliara de tip pointer,  secventa 
+urmatoare realizeaza insertia la inceputul listei si actualizeaza 
+pointerul inceput:
+
+     new(q); {creaza spatiu pentru un nou nod}
+     q^.urmator:=inceput;
+     {asignarea cimpurilor cheie si info}
+     inceput:=q;
+
+     Secventa e corecta si pentru insertia intr-o lista vida, caz 
+in  care inceput=nil (nil fiind pointerul vid, care nu se  refera 
+la nici o variabila indicata).
+
+     b)insertia unui nod la sfirsitul listei
+
+     Devine  mai  simpla daca se pastreaza  o  variabila  sfirsit 
+indicind spre ultimul nod al listei:
+
+     new(q); {creaza spatiu pentru noul nod ultim al listei}
+     sfirsit^.urmator:=q;
+     q^.urmator:=nil;
+     {asignarea cimpurilor cheie si info}
+     sfirsit:=q;
+
+     Pentru  insertia la sfirsitul listei e necesara existenta  a 
+cel putin un nod, care se creaza prin procedura de la  paragraful 
+anterior.
+
+     c)insertia unui nod dupa unul indicat
+
+     E simpla pentru ca se cunoaste pointerul spre nodul anterior 
+si  spre cel urmator celui ce se insereaza (pointerul spre  nodul 
+urmator e valoarea cimpului urmator al nodului indicat).
+
+     d)insertia unui nod in fata unui nod indicat
+
+     Printr-un artificiu, se reduce acest caz la cel anterior: se
+insereaza un nod dupa cel indicat, cheia si informatia din  nodul
+indicat fiind atribuite noului nod inserat si fiind inlocuite  cu
+valorile nodului ce trebuia inserat.
+
+     2.2.b.2.Tehnici de suprimare
+
+     Pentru  suprimarea  nodului  urmator  celui  indicat  de   o 
+variabila pointer q, prin atribuirea:
+
+     q^.urmator:=q^.urmator^.urmator;
+
+se exclud din lista legaturile la si de la nodul de suprimat.
+     Pentru suprimarea nodului anterior unuia precizat, se  aduce 
+nodul  precizat in cel de suprimat si se suprima succesorul  lui, 
+deci cel indicat initial de variabila pointer q:
+
+     q^:=q^.urmator^.
+
+     2.2.b.3.Traversarea unei liste inlantuite
+
+     Daca  nodul  de  inceput al listei e  indicat  de  variabila 
+inceput,  o variabila auxiliara q, care parcurge  toate  nodurile 
+listei  pina  cind  valoarea ei devine nil,  permite  accesul  la 
+fiecare nod si efectuarea operatiei specifice traversarii.
+
+     2.2.c.Implementarea listelor cu ajutorul cursorilor
+
+     Implementarea  e specifica limbajelor ce nu  definesc  tipul 
+pointer  (Fortran,  Algol, Basic). Pointerii pot fi  simulati  cu 
+ajutorul  cursorilor, care sint valori intregi ce indica  pozitia 
+in cadrul tablourilor.
+     Mai multe liste ce contin acelasi tip Nod de elemente se vor 
+grupa intr-un tablou cu elemente articole cu doua cimpuri: primul 
+de tip Nod, iar al doilea de tip intreg, folosit ca si cursor.
+
+const LMax=1000; {valoare mai mare decit suma dimensiunilor maxime
+                                        ale listelor}
+type  Cursor=0..LMax;
+      Articol=record nodl:Nod;
+                     urmator:Cursor
+              end;
+      Lista=cursor;
+var   zona:array [1..LMax] of articol;
+      l,disponibil:Lista;
+
+     Pentru fiecare lista existenta in tabloul zona se declara  o 
+variabila  intrega l (de tip Lista), reprezentind  cursorul  spre 
+intrarea din tablou ce contine primul nod al listei (zona[l].nodl 
+este  primul nod al listei).Nodul succesor e indicat de  cursorul 
+prezent  in  cimpul  urmator al nodului curent.  Ultimul  nod  al 
+listei  e in elementul de tablou ce contine in cimpul  urmator  o 
+valoare invalida (0, tabloul avind primul indice 1).
+     Analog se defineste o lista a liberilor, continind intrarile 
+libere  din  tablou inlantuite, o variabila  disponibil  indicind 
+spre prima intrare libera.  
+
+     2.3.Aplicatii ale listelor inlantuite
+     2.3.1.Liste ordonate si reorganizarea listelor
+     a)cautarea intr-o lista neordonata; tehnica fanionului
+
+     Se  considera o lista simplu inlantuita, cu nodurile de  tip 
+Nod.  Daca inceput indica spre primul nod al listei, iar  ordinea 
+cheilor  in  lista  este aleatoare, cautarea  unei  chei  implica 
+traversarea  listei. Functia booleana gasit  returneaza  valoarea 
+true si pointerul spre nodul cu cheia egala cu cea cautata,  daca 
+un astfel de nod exista si valoarea false in caz contrar:
+
+function gasit(val:TipCheie;var poz:PointerNod):boolean;
+     var found:boolean;
+     begin
+          poz:=inceput;found:=false;
+          while (poz<>nil) and not found do
+               if poz^.cheie=val then found:=true
+                                 else poz:=poz^.urmator;
+          gasit:=found
+     end;
+
+     Cautarea  se  poate  perfectiona  prin  utilizarea   metodei 
+fanionului,  lista prelungindu-se cu un nod fictiv numit  fanion, 
+la  creare  lista  continind acest unic nod.  In  functia  gasit, 
+inainte  de baleierea listei, informatia cautata se introduce  in 
+cheia nodului fanion, astfel incit va exista cel putin un nod  cu 
+cheia cautata:
+
+var fanion:PointerNod;
+     ...
+function gasit(val:TipCheie;var poz:PointerNod):boolean;
+     begin
+          poz:=inceput;fanion^.cheie:=val;
+          while poz^.cheie<>val do poz:=poz^.urmator;
+          gasit:=poz<>fanion
+     end;
+
+     b)crearea unei liste ordonate; tehnica celor doi pointeri
+
+     In  continuare  se prezinta o metoda  foarte  simpla  pentru 
+crearea  unei  liste ordonate, tipurile PointerNod si  Nod  fiind 
+cele  definite  anterior. Lista se initializeaza cu  doua  noduri 
+fictive pointate de doua variabile pointer, inceput si fanion:
+
+var inceput, fanion:PointerNod;
+procedure init;
+     begin
+          new(inceput);
+          new(fanion);
+          inceput^.urmator:=fanion
+     end;
+
+     Pentru  introducerea  unei  noi  chei  in  lista,   pastrind 
+ordonarea,  se va scrie o functie gasit, care daca gaseste  cheia 
+in  lista  returneaza valoarea true si pointerii  p1  spre  nodul 
+gasit  si  p2  spre cel anterior, respectiv  in  cazul  negasirii 
+cheii,  valoarea false si pointerii p1 si p2 spre nodurile  intre 
+care trebuie facuta insertia:
+
+function gasit(val:TipCheie;var p1,p2:TipPointer):boolean;
+     begin
+          p2:=inceput;
+          p1:=p2^.urmator;
+          fanion^.cheie:=val;
+          while p1^.cheie<val do 
+               begin
+                    p2:=p1;
+                    p1:=p2^.urmator
+               end;
+         gasit:=(p^.cheie=val) and (p1<>fanion)
+     end;
+
+     Fragmentul de program ce insereaza o noua cheie este:
+
+     var p1,p2,p3:PointerNod;val:TipCheie;
+          ...
+     if not gasit(val,p1,p2) then
+          begin
+               new(p3);
+               p2^.urmator:=p3;
+               with p3^ do 
+                    begin
+                         cheie:=val;
+                         {info}
+                         urmator:=p1
+                    end
+               end;
+
+     Pentru  o tiparire a cheilor dintr-o lista  ordonata  astfel 
+creata, pointerul ce parcurge nodurile trebuie sa fie initializat 
+cu  valoarea  pointerului  spre primul  nod  efectiv  al  listei, 
+urmator  celui  inceput, iar parcurgerea listei se face  pina  la 
+intilnirea nodului fanion:
+
+     var p:PointerNod;
+          ...
+     p:=inceput^.urmator;
+     while p<>fanion do
+          begin
+               {prelucrare nod}
+               p:=p^.urmator
+          end;
+
+     c)tehnica de cautare in lista cu reordonare
+
+     In  compilatoare, structurile de date de tip  lista  liniara 
+sint   foarte  avantajoase  in  crearea  si  exploatarea   listei 
+identificatorilor.  Conform  principiului  localizarii,  aparitia 
+unui  identificator oarecare in textul sursa, poate fi urmata  cu 
+mare probabilitate de una sau mai multe reaparitii.
+     Pornind  de  la  acest principiu,  s-a  conceput  metoda  de 
+cautare cu reordonare, care consta in aceea ca ori de cite ori un 
+identificator  se  cauta si se gaseste in lista, el se  aduce  la 
+inceputul listei, astfel incit la proxima aparitie, deci cautare, 
+el  se  va  gasi la inceputul listei, iar daca nu  s-a  gasit  se 
+insereaza la inceputul listei.
+
+     Aplicatii
+
+     1.Informatiile  despre  abonatii telefonici  (nume,  adresa, 
+numar  de  telefon)  se  pastreaza  in  trei  liste  identice  ca 
+informatii,  ordonate alfabetic dupa numele  abonatilor,  listele 
+fiind implementate cu:tablou, pointeri, cursori.
+     Sa  se  realizeze  un  program  interactiv  care  realizeaza  
+operatiile:
+     -adaugarea unui nou abonat
+     -scoaterea din evidenta a unui abonat
+     -afisarea numarului de telefon al unui abonat
+     -afisarea datelor unui abonat cu un numar dat
+     -afisarea intregii liste
+     Operatiile  se  executa in paralel asupra  tuturor  celor  3 
+liste,  afisind  pentru  comparatie  timpii  de  executie  pentru 
+fiecare varianta( initial listele sint vide).
+
+     2.Se  prelucreaza  un  fisier  text  oarecare,   contorizind 
+pentru  fiecare identificator, numarul de aparitii. Se va  masura 
+timpul de prelucrare a fisierului pentru fiecare din variantele:
+     -lista  neordonata, cu nod fanion si insertie  la  inceputul 
+listei
+     -lista ordonata avind doua noduri fictive
+     -lista reordonata dupa fiecare cautare.
+     Se  vor  afisa  informatiile din cele trei  liste,  in  urma 
+prelucrarii.
+
+     3.Se considera tipul de date abstract lista, implementat in urmatoarele
+variante:
+     a.tablou neordonat cu un nod fanion
+     b.tablou ordonat, prelucrat prin tehnica binara
+     c.cu ajutorul cursorilor, ca lista ordonata
+     d.cu ajutorul pointerilor, ca lista neordonata simplu inlantuita
+     e.similar d, dar ca lista ordonata
+     f.similar e, dar cu doua noduri fictive
+     g.cu ajutorul pointerilor, folosind tehnica reordonarii
+     h.cu ajutorul pointerilor, ca lista circulara dublu inlantuita
+     g.cu ajutorul pointerilor, ca lista ordonata dublu inlantuita.
+     Pentru fiecare varianta sa se scrie operatorii de insertie, cautare,
+suprimare si parcurgere.
+     Sa se redacteze un program interactiv, avind urmatoarele optiuni:
+     S - construieste o secventa aleatoare, de lungime data, de chei
+     I - insereaza cheile secventei in listele corespunzatoare tuturor
+secventelor
+     C - cauta cheile secventei in liste
+     D - sterge cheile secventei din liste
+     P - parcurge listele , afisind cheile
+     X - terminare.
+     Pentru optiunile I, C, D, P se vor afisa timpii de executie,
+corespunzatori fiecarei implementari si se vor face aprecieri asupra
+performantelor.
+Obsevatie: programul poate fi scris astfel incit sa prelucreze o singura
+lista, fiind rulat pentru fiecare implementare; in acest caz insa, pentru
+ca secventele de test sa fie aceleasi, vor fi introduse anterior in fisiere,
+optiunea S a programului, aducind cheile unui fisier indicat, intr-un tablou
+din memorie.

@@ -1,0 +1,95 @@
+
+				CAP. 3
+				------
+
+^In LISP argumentele unei proceduri sunt transmise prin valoare (ca
+^in limbajul C). La INTRAREA ^in procedur'a parametrii sunt lega'ti la
+argumente devenind VARIABILE LEGATE, iar la ie'sirea din procedur'a
+variabilele legate de procedur'a primesc vechile valori. Variabilele
+folosite ^intr-o procedur'a dar care nu sunt parametrii se numesc
+VARIABILE LIBERE ^in raport cu acea procedur'a 'si valoarea lor este
+determinat'a lexical.
+
+[Primitiva LET]
+
+LET leag'a variabile 'si le d'a valori. (SETQ doar d'a valori!)
+
+Sintax'a:
+
+(let ((<parametru 1> <valoare initiala 1)
+      (<parametru 1> <valoare initiala 1)
+      ...
+      (<parametru n> <valoare initiala n))
+  <corpul lui let>)
+
+Legarea este valabil'a doar ^in interiorul corpului lui let.
+
+! LET calculeaz'a toate valorile ini'tiale ^inainte de legare !
+(atribuirea se face "^in paralel", spre deosebire de SETQ care
+atribuie pe m'asur'a ce evalueaz'a).
+
+Exit'a varianta LET* care leag'a variabilele dar atribuie valorile
+secven'tial (ca procedura SET).
+
+'Si SET are varianta PSET care atribuie valorile ^in "paralel".
+
+[Primitiva FUNCALL]
+
+FUNCALL permite apelul indirect al fun'ctiilor.
+
+(setq operatie '+)
+
+(funcall operatie 2 3 4)
+
+(setq operatie '*)
+
+(funcall operatie 2 3 4)
+
+[Recursivitate]
+
+Atunci c^and o procedur'a se apeleaz'a pe sine, direct sau indirect,
+pentru a rezolva o parte din problem'a, avem de a face cu
+recursivitate.
+
+Calculul lui m^n (n ^intreg) se poate face recursiv cu formula:
+
+      { m * m^(n-1),      pentru n > 0
+m^n = {
+      { 1,                pentru n = 0
+
+Programul implementat ^in LISP este:
+
+(defun our-expt (m n)
+  (cond ((zerop n) 1)				; n=0?
+	(t (* m (our-expt m (- n 1))))))	; apel recursiv
+
+[Probleme]
+
+1. Implementa'ti recursiv fun'ctia factorial.
+
+2. Implementa'ti recursiv 'sirul lui Fibonacci.
+
+3. Implementa'ti recursiv fun'ctia member, care testeaz'a dac'a un
+element este membru al unei liste.
+
+4. Implementa'ti fun'ctia (trim-head l n) care elimin'a din lista l
+primele n elemente.
+
+5. Implementa'ti fun'ctia (trim-tail l n) care elimin'a din lista l
+ultimele n elemente.
+
+6. Implementa'ti (count-atoms l) care num'ar'a to'ti atomii listei l,
+inclusiv cei din eventualele liste imbricate.
+
+7. Presupune'ti c'a + 'si - pot fi folosite doar pentru a incrementa
+sau decrementa un num'ar cu unu (eventual scrie'ti procedurile inc 'si
+dec). Scrie'ti o procedur'a recursiv'a pentru adunarea a dou'a numere
+^intregi pozitive.
+
+8. Implementa'ti procedura reverse.
+
+9. Implementa'ti predicatul presentp care determin'a dac'a un atom
+apare oriunde ^in interiorul unei liste.
+
+10. Implementa'ti procedura squash care prime'ste o expresie
+simbolic'a 'si returneaz'a lista tuturor atomilor g'asi'ti.

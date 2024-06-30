@@ -1,0 +1,110 @@
+		TEME1
+                -----
+
+	1. Sa se realizeze un editor de texte, care editeaza un text X intr-un 
+text Y. Editarea se face avind la dispozitie comenzile:
+	. I, m     - insertia unei linii dupa linia m
+     	. D, m, n  - stergerea liniilor intre m si n
+ 	. R, m, n  - inlocuirea liniilor de la m la n
+ 	. E 	   - terminarea procesului de editare
+
+	2. Sa se genereze toate planificarile posibile de disputare a unui tur-
+neu avind n concurenti, stiind ca doi concurenti se intilnesc o singura data, 
+iar un concurent disputa un singur joc pe zi.
+
+	3. Pentru elaborarea unui test de aptitudini se dispune de un set de n
+intrebari, fiecare fiind cotata cu un numar de puncte. Sa se elaboreze toate 
+chestionarele avind intre a si b puncte distincte, fiecare chestionar totalizind
+intre p si q puncte. Intrebarile sint date prin numar si punctaj.
+
+	4. Intr-un grup de persoane fiecare persoana se cunoaste pe sine si 
+cunoaste eventual si alte persoane din grup. Sa se formeze si sa se afiseze toa-
+te echipele posibile de persoane astfel incit pentru o echipa fiecare dintre
+persoane sa fie cunoscuta de cel putin un membru  al acelei echipe, altul decit 
+persoana insasi.
+
+	5. Se da un grup de orase si conexiunile dintre ele. Sa se gaseasca 
+drumurile care trec prin toate orasele, parcurgindu-le o singura data.
+
+	6. Se cunosc pozitiile oraselor unei tari, date prin coordonatele lor. 
+Sa se gaseasca configuratia unei retele telefonice astfel incit:
+	- orice oras sa fie conectat la reteaua telefonica.
+	- costul retelei (proportional cu lungimea liniilor telefonice) sa fie
+minim.
+
+	7. Se da o harta cu n tari. Sa se gaseasca numarul minim de culori cu
+care pot fi colorate tarile, astfel ca doua tari vecine sa nu fie colorate cu 
+aceeasi culoare. Sa se gaseasca o posibilitate de afisare a hartii colorate, 
+care sa fie cit mai sugestiva.
+
+	8. Se considera o cale ferata de forma celei din figura. Pe linia de 
+intrare se afla n vagoane numerotate de la 1 la n. Notam cu I operatia de 
+introducere a vagoanelor de pe prima pozitie pe linia de intrare in stiva si cu 
+S cea de extragere din virful stivei catre iesire. Alte operatii nu sint permi-
+se. Pentru un anumit numar de vagoane dat, programul va realiza urmatoarele:
+	1) Dindu-se la intrare o secventa de forma :
+  	    ISSI...
+sa se raspunda daca secventa respectiva de operatii poate fi executata
+	2) Dindu-se o permutare oarecare a numerelor 1...n, sa se spuna daca ea 
+poate fi obtinuta pe linia de iesire, pornind de la n vagoane aflate in ordine 
+pe linia de intrare. In caz afirmativ sa se dea succesiunea de operatii I si S 
+care duce la configuratia respectiva.
+	3) Sa se tipareasca toate secventele de vagoane, care pot fi obtinute
+pe linia de iesire, pentru n dat initial.
+       _______                 ______
+       _______оо             оо______  
+       iesire  оо         оо   intrare
+                 оо     оо 
+                   оо оо
+                    |-|
+		    |-|	
+                    |-|  stiva
+
+	9. Descendenti dupa parinte: Petre stie ca este fiul lui Ion si mai stie
+ca este frate cu Virgil si Matei. Copiii lui Petre sint Ilie si Marcu,iar ai lui
+Virgil sint: Ionel si Petrica. Filip stie ca este fiul lui Matei si frate cu 
+Ioana. Sabin este fiul lui Ionel.
+	Ion doreste sa stie numele tuturor nepotilor sai.
+	Filip vrea sa stie daca pe bunicul lui il cheama Ilie.
+	Ionel vrea sa stie daca este var cu Alexandru.
+	Sa se scrie programul care pe baza unor informatii de acest tip este in 
+masura sa raspunda la urmatoarele genuri de intrebari:
+	1) Care sint nepotii bunicului "nume"?
+	2) "Nume1" este bunicul lui "nume2"?
+	3) "Nume1" este var primar cu "nume2"?
+ 	Se va verifica daca datele de intrare sint consistente. Se considera ca 
+doua persoane sint diferite daca au nume diferite.
+	Date de intrare: Datele se citesc dintr-un fisier cu numele REGULI.DAT,
+avind cite o regula pe fiecare linie. Regulile sint de forma:
+		"nume1"=FIU("nume2")
+			sau
+		"nume1"=FRATE("nume2")
+unde "nume1" si "nume2" sint siruri de maxim 20 de litere (literele mici si cele
+mari se considera identice). Este permisa folosirea unor separatori de forma 
+spatiu si tab.
+	Detectarea caracterului $ la inceputul unei linii reprezinta sfirsitul 
+sirului de reguli. Dupa ce s-au citit toate regulile, de pe liniile urmatoare
+se citesc tipul intrebarii (1,2 sau 3) si informatiile aferente acestuia, 
+separate prin virgula. Fiecare intrebare se citeste de pe o linie.
+	Date de iesire: Se vor scrie la consola datele de iesire sub forma:
+		"nume1"=BUNIC("nume2",...,"numep")
+pentru primul tip de intrebare, sau
+		ESTE, NU ESTE sau EROARE
+pentr celalalte doua tipuri de intrebari.
+	Raspunsurile sint scrise pe linii distincte.
+
+	10. Se da un dictionar scris intr-un alfabet pentru care nu se stie
+daca exista o ordine intre litere sau nu. Sa sse stabileasca pe baza 
+dictionarului daca exista sau nu ordine intre literele alfabetului.
+
+	11. Un dreptunghi D, cu laturile paralele cu axele este precizat prin
+coordonatele ecran (intregi) a doua virfuri opuse.
+	 Sa se scrie un program care calculeaza si afiseaza aria si perimetrul 
+conturului reuniunii D1 U D2 U ...
+	 Se va crea un fisier text pentru datele de test continind drept linii 
+4-pleti cu coordonatele virfurilor unui dreptunghi in ordinea x1,y1,x2,y2.
+
+	12. Un numar de 2n+1 persoane participa la discutii ce dureaza N zile.
+Sa se gaseasca variantele de asezare la masa astfel incit o persoana sa nu aiba
+in 2 zile diferite aceeasi vecini.
+acestuia

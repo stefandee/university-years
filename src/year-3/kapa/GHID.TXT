@@ -1,0 +1,98 @@
+                   
+
+                        PROIECT SDAA
+   
+                      < TITLU PROIECT >
+
+       < NUME STUDENT, AN STUDIU, GRUPA, SEMIGRUPA >
+
+               < DATA PREDARII PROIECTULUI >
+
+      		
+
+1. Specificatii de definitie
+
+	1.1. Enunt tema
+		< Cuprinde enuntul temei de proiect asa cum apare el
+ 		in lista de teme. Eventual precizari de ordin general >
+	1.2. Descriere cerinte
+		< Cuprinde detalierea enuntului temei, cu precizarea 
+		modului de abordare, a constrangerilor, a cerintelor
+		si a rezultatelor. Se recomanda a fi redactat in forma unui 
+		caiet de sarcini >
+ 	1.3. Intrari, iesiri
+		< Precizeaza datele necesare la intrare si cele ce vor fi
+		vizualizate in urma prelucrarii >
+	1.4. Interfata utilizator
+		< Se prezinta cerintele referitoare la interfata cu 
+		cu utilizatorul. Aceasta poate fi una simpla orientata
+		spre meniu sau una complexa realizata sub Turbo Vision.
+		In ori care din cazuri se prezinta natura dialogului cu 
+		utilizatorul >
+	1.5. Cerinte de performanta
+		< Se precizeaza cerintele de performanta impuse proiecta-
+		rii: viteza, dimensiune memorie, interfata grafica, faci-
+		litati de salvare si reluare, etc.>
+ 	
+	Obs. Specificatiile de definitie se semneaza de catre cadrul
+didactic inaintea trecerii la fazele urmatoare ale realizarii proiectului,
+urmand a fi documentul care sta la baza receptiei (predarii lucrarii).
+
+2. Specificatii de realizare
+
+	2.1. Structuri de date. Descriere.
+		< Se realizeaza o descriere a structurilor de date utilizate
+		cu precizarea tuturor elementelor necesare intelegerii 
+		structurilor de program si a codului >
+	2.2. Structuri de program. Descriere.
+		< Cuprinde descrierea structurilor de program avute in vedere
+		in faza de conceptie si de implementare a programului . Este
+		vorba despre module, proceduri, unit-uri, obiecte, fisiere, etc
+		functie de natura conceptiei. Se va acorda o atentie
+		particulara interfetelor dintre structurile avute in vedere >
+	2.3. Cod sursa. Comentarii.
+		< Codul sursa comentat, in acord cu specificatiile anterioare>
+	2.4. Teste. Concluzii.
+		< Prezentarea comportamentului programului in faza de testare 
+		cu precizarea naturii testelor realizate. Concluzii referitoare 
+		la punerea la punct a programului >
+
+3. Manual de utilizare
+		< Cuprinde o descriere de principiu a utilizarii progra-
+		mului. Descrierea trebuie sa se refere la un utilizator 
+		care realizeaza exploatarea programului fara a fi intere-
+		sat in nici un fel de detaliile de implementare > 
+
+4. Raport Beta-Site
+		< Se intocmeste de catre un alt student care in baza 
+		specificatiilor de definitie si a manualului de utilizare,
+ 		realizeaza un test al programului. Se evidentiaza erorile si
+		se remediaza de catre proiectant. 
+		Raportul va evalua comportamentul programului in relatie cu 
+		specificatiile de definire >
+
+5. Performante. Avantaje
+		< Scurta prezentare a performantelor si avantajelor
+		programului pornind de la premisa ca el concureaza la
+		o licitatie >
+
+6. Deviz
+	6.1. Ore consumate fizic:
+		< Cuprinde orele consumate fizic de catre proiectant
+		in realizarea produsului >
+
+		- specificare     	 _____
+		- proiectare      	 _____
+		- implementare    	 _____
+		- testare         	 _____
+		- elaborare documentatie _____
+
+			TOTAL            ____
+
+	6.2. Ore calculator              ____
+
+		< Cuprinde orele efectiv consumate pe calculator. 
+		Sunt independente de orele consumate fizic rapor-
+		tate la punctul 5.1 >
+
+7. Data. Semnatura.

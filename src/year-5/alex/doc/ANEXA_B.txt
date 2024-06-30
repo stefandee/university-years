@@ -1,0 +1,71 @@
+
+ 
+ 
+Anexa B
+
+Gramatica limbajului sursa propus 
+pentru lucrarile de laborator
+
+
+Program_sursa	r program identificator ; Bloc .	
+Bloc	r Sec_iune_const  Sec_iune_var  Sec_iune_decl_subprog  Instr_comp	
+Sec_iune_const	r e | const  Lista_decl_const 	
+Lista_decl_const	r Declar_const | Lista_decl_const Declar_const	
+Sec_iune_var	r e | var Lista_decl_var 	
+Lista_decl_var	r Declar_var |  Lista_decl_var Declar_var	
+Sec_iune_decl_subrog	r e | Lista_decl_subprog	
+Lista_decl_subprog	r Decl_subprog | Lista_decl_subprog Decl_subprog	
+Decl_subprog	r Declar_func_ie | Declar_procedura	
+Declar_const	r identificator  = Expresie_statica ;	
+Declar_var	r Lista_id : Tip ;	
+Lista_id	r identificator  | Lista_id , identificator 	
+Tip	r Tip_simplu | Tip_tablou | Tip_struct	
+Tip_simplu	r integer | real | char	
+Tip_tablou	r array [ Expresie_statica .. Expresie_statica ] of Tip_simplu	
+Tip_struct	r record Lista_cƒmp end	
+Lista_cƒmp	r Decl_simpla | Lista_cƒmp ; Decl_simpla	
+Decl_simpla	r Lista_id : Tip_simplu	
+Declar_func_ie	r function Antet_subprog : Tip_simplu ; Bloc ;	
+Declar_procedura	r procedure Antet_subprog ; Bloc ;	
+Antet_subprog	r identificator  Param_form	
+Param_form	r e | ( Lista_param_form )	
+Lista_param_form	r Declar_par | Lista_param_form ; Declar_par 	
+Declar_par	r Declar_simpla | var  Declar_simpla	
+Expresie_statica	r Termen_static | Expresie_statica Op_ad Termen_static 	
+Termen_static	r Factor_static | Termen_static Op_mul  Factor_static 	
+Factor_static	r identificator | Constanta | ( Expresie_statica )	
+Op_ad	r + | -	
+Op_mul	r * | / | div | mod	
+Constanta	r const_num | const_car 	
+Instr_comp	r begin Lista_instr  end | begin Lista_instr ; end	
+Lista_instr	r Instr | Lista_instr ; Instr	
+Instr	r Instr_atrib | Instr_if | Instr_while | Instr_repeat | Instr_for | Instr_case | Instr_comp | Apel_proc | Instr_read | Instr_print 	
+Instr_atrib	r Variabila := Expresie	
+Variabila	r identificator | identificator [ Expresie ] | identificator . identificator	
+Expresie	r Termen | Expresie Op_ad Termen	
+Termen	r Factor | Termen Op_mul Factor	
+Factor	r identificator | Constanta | identificator ( Lista_expresii ) | ( Expresie )      | identificator [ Expresie ] | identificator . identificator	
+Lista_expresii	r Expresie | Lista_expresii , Expresie	
+Instr_if	r if Condi_ie then Instr Ramura_else	
+Ramura_else	r e | else Instr	
+Condi_ie	r Expr_logica | not Expr_logica	
+Expr_logica	r Expr_rel | Expr_logica Op_log Expr_rel	
+Op_log	r and | or	
+Expr_rel	r Expresie Op_rel Expresie | ( Condi_ie)	
+Op_rel	r < | > | <= | >= | = | <>	
+Instr_while	r while Condi_ie do Instr	
+Instr_repeat	r repeat Instr until Condi_ie	
+Instr_for	r for Variabila := Expresie Sens Expresie Pas do Instr	
+Sens	r to | downto	
+Pas	r e | step Expresie	
+Instr_case	r case Expresie of Lista_altern end	
+Lista_altern	r Lista_ramuri | Lista_ramuri otherwise: Instr	
+Lista_ramuri	r Ramura | Lista_ramuri Ramura	
+Ramura	r Lista_val : Instr ;	
+Lista_val	r Constanta | Lista_val , Constanta	
+Instr_print	r print ( Lista_elem )	
+Lista_elem	r Element | Lista_elem , Element	
+Element	r Expresie | const_§ir	
+Instr_read	r read ( Lista_variab )	
+Lista_variab	r Variabila | Lista_variab , Variabila	
+Apel_proc	r identificator | identificator ( Lista_expresii )	

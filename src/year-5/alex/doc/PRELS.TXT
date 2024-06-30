@@ -1,0 +1,54 @@
+Prelucrarea identificatorilor
+	cât_timp ch este litera sau cifra executa
+	   *pune ch în car_atom
+	   apel carurm
+	€
+	*cauta car_atom în tabela tab_cheie
+	daca s-a gasit atunci
+	   cod_lexical = cod_cuv_cheie
+	altfel
+	   cod_lexical = cod_identif
+	   atribut = car_atom
+	€		 
+Prelucrarea numerelor întregi
+	val_int = 0;
+	cât_timp ch este cifra executa
+	   val_int = val_int * 10 + val(ch)
+	   apel carurm
+	€
+	cod_lexical = cod_nr_int
+	*depune val_int în tabela tab_const
+	atribut = *indicele în tab_const unde a fost depusa valoarea
+	Obs: prin val(ch) s-a notat valoarea în reprezentare interna întreaga a cifrei ch. În cazul utilizarii sistemului ASCII pentru reprezentarea caracterelor, aceasta valoare este data de diferenta cod_ASCII( ch )-cod_ASCII( '0' ).
+Prelucrarea operatorilor '<', '<=', '<>'
+	selecteaza ch dintre
+		.  .  .
+	   '<': apel carurm
+		cod_lexical = cod_op_rel
+		daca ch este '=' atunci
+		 atribut = op_mic_egal
+		 apel carurm
+		altfel
+		 daca ch este '>' atunci
+			atribut = op_diferit
+			apel carurm
+		 altfel atribut = op_mic
+		     €
+		€
+		   .  .  .
+	€
+Prelucrarea comentariilor
+	Presupunând ca delimitatorii pentru comentarii sunt '{' si '}', atunci secventa de prelucrare este:
+	selecteaza ch dintre
+		.  .  .
+	   '{':  cât_timp ch nu este '}' si ch nu este EOF executa
+		apel carurm
+		 €
+		 daca ch este '}' atunci
+		apel carurm
+		apel alex_manual
+		 altfel
+		*trateaza eroare "sfârsit neasteptat" (comentariul nu a fost închis);
+		 €
+		.  .  .
+	€

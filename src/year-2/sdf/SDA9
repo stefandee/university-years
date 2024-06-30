@@ -1,0 +1,215 @@
+
+                                Lucrarea nr. 9
+
+                                  TDA TABELA
+
+
+     Introducere: Lucrarea prezinta aspectele principale legate de definirea
+TDA tabela, metodele de implementare si performantele acestora.
+
+     1.Aspecte teoretice
+
+     1.1.Definitia TDA tabela
+
+     Descriere:
+     Tabela consta dintr-o secventa finita de elemente. Fiecare element are
+cel putin o cheie care identifica in mod unic intrarea in tabela si care este
+un cimp al elementului.
+
+     Notatii:
+     tipElement - tipul elementelor tabelei
+     tipCheie   - tipul cheii
+     t          - tabela
+     e          - valoare a lui tipElement
+     k          - valoare a lui tipCheie
+     b          - valoare booleana
+     contor     - valoare intreaga
+
+     Operatori:
+     CreazaTabelaVida(t)
+         - procedura care face pe t vid
+     TabelaVida(t) -> b
+         - functie booleana care returneaza "true" daca tabela e goala
+     TabelaPlina(t) -> b
+         - functie booleana care returneaza "true" daca tabela e plina
+     CheieElemTabela(e) -> k
+         - functie ce returneaza cheia elementului e
+     CheieGasita(t,k) -> b
+         - functie ce returneaza "true" daca cheia k se gaseste in t
+     InserElemTabela(t,e)
+         - procedura care insereaza pe e in t, presupunind ca acesta nu exista
+     SuprimaElemTabela(t,k)
+         - procedura ce suprima din tabela t elementul cu cheia k, presupunind
+           ca acest element exista
+     FurnizeazaElemTabela(t,k) -> e
+         - functie care returneaza elementul cu cheia k, presupunind ca
+           elementul exista
+     TraverseazaTabela(t,Vizitare(ListaArgumente)
+         - procedura ce executa procedura Vizitare pentru fiecare element al
+           tabelei t
+     DimensTabela(t) -> contor
+         - functie ce returneaza numarul de elemente din tabela; se poate
+           actualiza o variabila contor la fiecare insertie si suprimare
+     Actualizare(t,e)
+         - procedura ce actualizeaza intrarea din tabela ce contine elementul
+           e; se poate scrie prin apelul operatorilor anterior definiti :
+           SuprimaElemTabela(t,CheieElemTabela(e)) si InserElemTabela(t,e)
+
+     1.2.Tehnici de implementare a TDA tabela
+
+     1.2.1.Implementarea cu ajutorul tablourilor ordonate
+
+     Aceasta implementare este avantajoasa atunci cind se realizeaza multe
+consultari, verificari sau rapoarte asupra tabelei ( care folosesc cautarea
+binara ce este O(log2(n)) ) si numarul de insertii si suprimari este redus
+( la aceste operatii trebuie mutate toate elementele urmatoare, cu o pozitie
+spre indici mai mari, respectiv mai mici, deci O(n) ).
+     Ca un dezavantaj apare si faptul ca pentru rezervarea spatiului de memorie
+statica al tabloului, trebuie evaluat numarul de insertii ce se vor face.
+
+     1.2.2.Implementarea cu ajutorul tablourilor neordonate
+
+     Implementarea e avantajoasa pentru operatiile de insertie ( O(1),insertia
+se fac la sfirsitul tabloului ) si suprimare ( O(1), ultima intrare ocupata se
+suprapune peste cea ce se suprima ), dar dezavantajoasa pentru cele de cautare
+( cautaea se face liniar, deci O(n) ), traversare ordonata ( inainte trebuie
+facuta sortarea, deci O(n*log2(n)) -> O(n^2). De asemenea trebuie cunoscuta
+dimensiunea maxima a tabloului.
+
+     1.2.3.Implementarea cu ajutorul listelor inlantuite ordonate
+
+     Cautarea secventiala care este O(n) se efectueaza inainte de insertii sau
+suprimari, ducind la timpi mari, O(n), pentru aceste operatii.
+     Implementarea este avantajoasa cind se realizeaza traversari frecvente in
+ordinea cheilor si cind nu se cunoaste numarul maxim de elemente.
+
+     1.2.4.Implementarea cu ajutorul listelor inlantuite neordonate
+
+     Implementarea este avantajoasa cind se fac multe insertii ( se efectueaza
+la inceputul listei, deci O(1) ) si cind nu se cunoaste dimensiunea maxima a
+tabloului. Suprimarile ( O(n), din cauza cautarii secventiale ), traversarile
+ordonate ( ce presupun realizarea sortarii ) se realizeaza in timpi mult mai
+mari.
+
+     1.2.5.Implementarea bazata pe tehnica dispersiei
+
+     Pentru "tabloul dispersat", care contine noduril cu care se lucreaza,
+se rezerva static un volum constant de memorie. In general, dimensiunea p a
+tabloului ( indicii variind intre 0 si p-1 ) este mult mai mica decit numarul
+valorilor din tipCheie, deci a cheilor posibile.
+     Se defineste o functie de asociere H, care e de fapt o functie de
+dispersie:
+     H : tipCheie -> 0_p-1,
+ce asociaza fiecarei chei cite un indice de tablou.
+     Prin metoda dispersiei, care se mai numeste si "transformarea cheilor" sau
+"hashing" ( amestecare ), pentru inregistrarea unui element cu cheia k, se
+determina indicele l=H(k), apoi se depune elementul la intarea l. Pentru o alta
+cheie k_prim, avind acelasi indice asociat l=H(k)=H(k_prim), se ajunge la
+"situatia de coliziune", care se poate rezolva prin mai multe metode.
+     Pentru cautarea unei chei k, se verifica daca elementul de la intrarea
+H(k) are cheia cautata, in caz negativ, s-a ajuns la coliziune.
+     pentru aplicarea tehnicii dispersiei, care duce la performante foarte bune,
+trebuie solutionate doua probleme:
+     - definirea functiei de dispersie H
+     - rezolvarea situatiilor de coliziune.
+
+     1.2.5.1.Alegerea functiei de dispersie
+
+     Functia de dispersie trebuie sa fie usor calculabila si sa repartizeze cit
+mai uniform cheile in tabloul dispersat, astfel incit probabilitatea coliziu-
+nilor sa fie cit mai mica.
+     Foarte des se foloseste functia:
+     H(k)=ord(k) mod p,
+unde ord(k) precizeaza numarul de ordine al cheii k in multimea tuturor cheilor.
+In cazul cheilor siruri de caractere se pot folosi functiile:
+     H(k)=( suma(i=1,length(k)) 2^i * ord(k[i]) ) mod p, sau
+     H(k)=( suma(i=1,length(k)) ord(k[i]) ) mod p.
+     Se demonstreaza ca pentru repartitia cit mai uniforma a cheilor, dimensiu-
+nea p a tabloului trebuie sa fie numar prim. Daca p e o putere a lui 2, calculul
+indicelui l s-ar face mai rapid, dar posibilitatea de aparitie a coliziunilor
+ar fi mult mai mare.
+
+     1.2.5.2.Tratarea situatiei de coliziune
+
+     Se folosesc mai des doua variante de tratare a situatiilor de coliziune:
+     a) inlantuirea directa
+     Se inlantuie intr-o lista toate nodurile ce conduc la acelasi indice
+( indice primar ) prin functia de dispersie, memoria suplimentara alocata
+numindu-se zona de depasire. Dezavantajele variantei sint necesitatea
+unei prelucrari in plus, a listei si definirii fiecarei intrari a tabloului
+cu un cimp in plus, de inlantuire spre aceasta lista.
+     b) adresare deschisa
+     La aparitia coliziunii, se parcurge tabloul t pina la gasirea unei intrari
+libere, dupa algoritmul:
+
+     l:=H(k); nr_incercari:=0;
+     repeat
+       if t[l].cheie=k then
+         {element gasit}
+       else
+         if t[l].cheie=liber then
+           {elementul nu e in tablou, se introduce}
+         else
+           begin  {tratarea coliziunii}
+             inc(nr_incercari);
+             l:=H(k)+g(nr_incercari)
+           end
+     until *gasit or *s-a introdus or *tabela e plina;
+
+     O varianta pentru functia g(nr_incercari) este cea care duce la testarea
+indicilor consecutivi din tablou, acesta fiind exploatat circular, deci
+indicele testat la pasul nr_incercari este:
+     l=(H(k)+nr_incercari) mod p,
+incercarea initiala, considerindu-se ca pasul 0.
+     Dezavantajul acestei adresari liniare este ca are tendinta de a ingramadi
+nodurile in continuarea celor existente, coliziunile aparind mai des.
+     Adresarea patratica cu indicele la pasul nr_incercari:
+     l=(H(k)+nr_incercari^2) mod p,
+elimina dezavantajul anterior, dar conduce la probabilitatea ( mica ) de a nu
+se putea gasi nici o intrare libere, desi tabele nu e plina.
+
+     1.2.5.3.Analiza tehnicii dispersiei
+
+     Se demonstreaza ca numarul de incercari pentru gasirea unei intrari libere,
+daca tratarea coliziunilor repartizeaza uniform cheile in spatiul liber, este:
+     E=1/f*ln(1-f),
+unde f este factorul de umplere al tabloului dispersat ( raportul dintre numarul
+de chei existente in tablou si dimensiunea p a acestuia ).
+     Formula ilustreaza performantele foarte bune ale metodei dispersiei, de
+exemplu 2.56 incercari la un factor de umplere de 0.9.
+     Daca rezolvarea coliziunilor se face prin adresare directa, formula devine:
+     E=(1-f/2)/(1-f),
+pastrind inca performante bune, de exemplu 5.5 incercari la un factor de
+umplere de 0.9.
+     In ciuda performantelor bune, metoda dispersiei are dezavantajele:
+     - dimensiunea tabloului trebuie estimata anterior, lucru ce nu e posibil
+intotdeauna ( caz in care se folosesc liste sau arbori ), ajungindu-se fie la
+risipa, fie la depasirea memoriei alocate; in plus, pentru performante bune,
+alocarea initiala trebuie facuta cu 10% mai mult decit e necesar;
+     - suprimarea cheilor este dificila, mai putin in cazul inlantuirii directe.
+
+     2.Aplicatii
+
+     Se cere sa se construiasca o tabela hashing continind identificatorii
+dintr-un text ( fisier ), fiecare identificator avind asociat si contorul de
+aparitii.
+     a)Sa se evalueze performantele referitoare la timpul de constructie si
+factorul maxim de incarcare al tabelei; intr-o rulare separata sa se stabileasca
+corespondenta intre numarul de incercari pentru rezolvarea coliziunii si fac-
+torul de incarcare al tabelei.
+     Se vor aborda ambele variante prezentate in lucrare pentru functia H
+( pentru chei siruri de caractere ), precum si cele trei metode de rezolvare a
+coliziunilor.
+     Testele se vor face cu pentru diferite lungimi ale tabelei ( inclusiv
+numere prime si puteri ale lui 2 ).
+     b)Folosind aplicatiile de la lucrarile anterioare, sa se compare perfor-
+mantele implementarii tabelei prin tehnica dispersiei cu cele ale implementari-
+lor prin tablouri si liste ordonate si neordonate.
+     c)Care ar fi algoritmul si performanta suprimarii unui identificator din
+tabela, in fiecare din cele trei metode de tratare a coliziunilor.
+     d)Sa se scrie secventa ce implementeaza tehnica redispersiei - in momentul
+in care tabela de dispersie e plina, se genereaza un tablou mai mare, in care
+se copiaza toate elementele, zona ocupata anterior, eliberindu-se.
+     Discutie asupra performantelor acestei tehnici raportate la cele ale unei
+tabele ce are alocat de la inceput un spatiu foarte mare; e posibila 
+implementarea in limbajele Pascal si C ?

@@ -1,0 +1,83 @@
+                                  LUCRAREA 6
+
+                                   GRAFURI
+
+      Aplicatii
+
+      1. Sa se scrie un program interactiv care realizeaza prelucrarea unui
+graf neorientat,cu nodurile caracterizate prin cate o cheie alfanumerica unica,
+prin urmatoarele comenzi:
+      V - face graful vid ( cu eliberarea spatiului ocupat, daca e cazul )
+      I - creaza nodul cu cheia data
+      N - suprima   - " -
+      A - creaza arcul dintre doua noduri cu cheile precizate
+      S - suprima             - " -
+      L - listeaza nodurile si arcele grafului
+      T - traverseaza graful in adancime, listand nodurile in ordinea
+          parcurgerii
+      C -   - " -             prin cuprindere,      - " -
+     *B - determina componentele conexe ale grafului
+     *P - determina punctele de articulatie ale componentei conexe care
+          contine cele mai multe noduri
+      X - terminare.
+
+      Parametrii comenzilor se furnizeaza interactiv si se valideaza.
+      Graful se va implementa folosind - o matrice de adiacente
+                                       - structuri de adiacente ( cazul 3 ).
+      Se vor compara cele doua implementari dpdv al timpilor de executie ( O )
+si al spatiului de memorie utilizat.
+
+
+      2. Sa se scrie un program interactiv care realizeaza prelucrarea unui
+graf ponderat neorientat,cu nodurile caracterizate prin cate o cheie
+alfanumerica unica, iar arcele printr-o pondere intreaga, prin urmatoarele
+comenzi:
+      V - face graful vid ( cu eliberarea spatiului ocupat, daca e cazul )
+      I - creaza nodul cu cheia data
+      N - suprima   - " -
+      A - creaza arcul de pondere data, dintre doua noduri cu cheile precizate
+      S - suprima arcul dintre      - " -
+      L - listeaza nodurile si arcele grafului
+      T - traverseaza graful in adancime, listand nodurile in ordinea
+          parcurgerii
+      C -   - " -             prin cuprindere,      - " -
+     *B - determina o padure de arbori de acoperire minimi cu
+               - algoritmul lui Prim
+               - metoda cautarii bazate pe prioritate
+               - algoritmul lui Kruskal
+     *P - determina drumurile minime corespunzatoare unui nod cu cheia data
+      X - terminare.
+
+      Parametrii comenzilor se furnizeaza interactiv si se valideaza.
+      Graful se va implementa folosind - o matrice de adiacente
+                                       - structuri de adiacente ( cazul 3 ).
+      Se vor compara cele doua implementari dpdv al timpilor de executie ( O )
+si al spatiului de memorie utilizat.
+
+
+      3. Sa se scrie un program interactiv care realizeaza prelucrarea unui
+graf ponderat orientat,cu nodurile caracterizate prin cate o cheie
+alfanumerica unica, iar arcele printr-o pondere intreaga, prin urmatoarele
+comenzi:
+      V - face graful vid ( cu eliberarea spatiului ocupat, daca e cazul )
+      I - creaza nodul cu cheia data
+      N - suprima   - " -
+      A - creaza arcul de pondere data, dintre doua noduri cu cheile precizate
+      S - suprima arcul dintre      - " -
+      L - listeaza nodurile si arcele grafului
+      T - traverseaza graful in adancime, listand nodurile in ordinea
+          parcurgerii
+      C -   - " -             prin cuprindere,      - " -
+     *B - determina drumurile minime corespunzatoare unui nod cu cheia data
+          cu algoritmul lui Dijkstra
+     *P - determina drumurile minime corespunzatoare tuturor perechilor de
+          noduri si traseele drumurilor cu algoritmul lui Floyd
+     *G - determina centrul componentei conexe ce contine nodul cu cheia
+          minima si inchiderea tranzitiva ( Warshall )
+      X - terminare.
+
+      Parametrii comenzilor se furnizeaza interactiv si se valideaza.
+      Graful se va implementa folosind - o matrice de adiacente
+                                       - structuri de adiacente ( cazul 3 ).
+      Se vor compara cele doua implementari dpdv al timpilor de executie ( O )
+si al spatiului de memorie utilizat.

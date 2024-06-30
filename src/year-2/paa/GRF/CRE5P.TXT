@@ -1,0 +1,245 @@
+
+
+
+PROCEDURE Dijkstra;
+
+  {determina costurile celor mai scurte drumuri care conecteaza
+   nodul 1 cu toate celelalte noduri ale unui graf orientat}
+
+  BEGIN
+    M := [1];
+    FOR i := 2 TO n DO {initilizarea lui D}
+      D[i] := COST[1,i];                          ( 5.1 )
+    FOR i := 1 TO n - 1 DO
+      BEGIN
+        alege un nod x apartinind multimii N - M astfel incit 
+          D[x] sa fie minim;
+        adauga pe x lui M;
+        FOR fiecare nod y din N - M DO
+          D[y] := min(D[y],D[x] + COST[x,y])
+      END
+  END; {Dijkstra}
+
+
+
+
+
+
+PROCEDURE Floyd(VAR A: ARRAY[1..n,1..n] OF REAL;
+                COST: ARRAY[1..n,1..n] OF REAL);
+
+  {procedura determina matricea drumurilor minim A pornind de la
+   matricea ponderilor COST}
+
+  VAR i,j k: INTEGER;
+
+  BEGIN
+    FOR i := 1 TO n DO
+      FOR j := 1 TO n DO
+        A[i,j] := COST[i,j];                    ( 5.2 )
+    FOR i := 1 TO n DO
+      A[i,i] := 0;
+    FOR k := 1 TO n DO
+      FOR i := 1 TO n DO
+        FOR j := 1 TO n DO
+          IF A[i,k] + A[k,j] < A[i,j] THEN
+            A[i,j] := A[i,k] + A[k,j]
+  END; {Floyd}
+
+
+
+
+
+
+
+ 
+
+
+PROCEDURE Floyd1(VAR A: ARRAY[1..n,1..n] OF REAL;
+                 COST: ARRAY[1..n,1..n] OF REAL;
+                 VAR Drum: ARRAY[1..n,1..n] OF INTEGER);
+
+  {procedura primeste matricea COST si determina matricea A care
+   contine lungimile drumurilor minime si matricea Drum care 
+   contine nodul intermediar al fiecarui drum de la i la j(daca
+   exista}
+
+  VAR i,j,k: INTEGER;
+
+  BEGIN 
+    FOR i := 1 TO n DO
+      FOR j := 1 TO n DO
+        BEGIN
+          A[i,j] := C[i,j];                         ( 5.3 )
+          Drum[i,j] := 0
+        END;
+    FOR i := 1 TO n DO
+      A[i,i] := 0;
+    FOR k := 1 TO n DO
+      FOR i := 1 TO n DO
+        FOR j := 1 TO n DO
+          IF A[i,k] + A[k,j] < A[i,j] THEN
+            BEGIN
+              A[i,j] := A[i,k] + A[k,j];
+              Drum[i,j] := k
+            END
+  END; {Floyd1}
+ 
+
+
+
+PROCEDURE Traseu(i,j: INTEGER);
+
+  {afiseaza traseul de la nodul i la nodul j}
+
+  VAR k: INTEGER;
+
+  BEGIN                                           ( 5.4 )
+    k := Drum[i,j];
+    IF k <> 0 THEN
+      BEGIN
+        Traseu(i,k);
+        WRITELN(k);
+        Traseu(k,j)
+      END
+  END; {Traseu}
+
+
+
+
+
+
+
+PROCEDURE Warshall(A: ARRAY[1..n,1..n] OF BOOLEAN;
+                   VAR T: ARRAY[1..n,1..n] OF BOOLEAN);
+
+  {procedura construieste in T inchiderea tranzitiva a lui A}
+
+  VAR i,j,k: INTEGER;
+
+  BEGIN
+    FOR i := 1 TO n DO
+      FOR j := 1 TO n DO
+        T[i,j] := A[i,j];                         ( 5.5 )
+    FOR k := 1 TO n DO
+      FOR i := 1 TO n DO
+        FOR j := 1 TO n DO
+          IF T[i,j] = FALSE THEN
+            T[i,j] := T[i,k] AND T[k,j]
+  END; {Warshall}
+   
+
+
+
+
+
+PROCEDURE CautInAdincime(x: Nod);
+
+  VAR k: Nod;
+
+  BEGIN
+    marc[x] := vizitat;
+    FOR fiecare nod k din L(x) DO                 ( 5.6 )
+      IF marc[k] = nevizitat THEN
+        CautInAdincime(k)
+  END; {CautInAdincime}
+
+
+
+
+
+BEGIN
+  FOR x := 1 TO n DO
+    marc[x] := nevizitat;
+  FOR x := 1 TO n DO                              ( 5.7 )
+    IF marc[x] = nevizitat THEN
+      CautInAdincime(x)
+END;
+
+
+
+
+
+
+
+
+
+
+PROCEDURE SortTopologic(x: Nod);
+
+  {afiseaza nodurile accesibile din x,in ordine topologica 
+   inversa}
+
+  VAR k: Nod;
+
+  BEGIN
+    marc[x] := vizitat;
+    FOR fiecare nod k din L(x) DO                 ( 5.7a )
+      IF marc[k] = nevizitat THEN
+        SortTopologic(k);
+    WRITELN(x)
+  END; {SortTopologic}
+
+
+
+
+
+
+FUNCTION Tarjan(k: INTEGER): INTEGER;
+
+  VAR t: legatura;
+      m,min: INTEGER;
+
+  BEGIN
+    id := id + 1; marc[k] := id; min := id;
+    Stiva[p] := k; p := p + 1;
+    t := Stradj[k];
+    WHILE t <> z DO
+      BEGIN                                       ( 5.8 )
+        IF marc[t^.nume] = 0 THEN
+          m := Tarjan(t^.nume);
+        ELSE
+          m := marc[t^.nume];
+        IF m < min THEN
+          min := m;
+        t := t^.urm
+      END;
+    IF min = marc[k] THEN
+      BEGIN
+        REPEAT
+          p := p - 1; WRITE(nume(Stiva[p]));
+          marc[Stiva[p]] = N + 1
+        UNTIL Stiva[p] = k;
+        WRITELN
+      END;
+    Tarjan := min;
+  END; {Tarjan}
+
+
+
+
+
+
+IF capacitate[k,t] > 0 THEN
+  prioritate := capacitate[k,t] - flux[k,t];
+ELSE                                              ( 5.9 )
+  prioritate := -flux[k,t];
+IF prioritate > marc[k] THEN prioritate := marc[k];
+
+
+
+
+
+REPEAT
+  CautPrioritar(1,N);
+  y := N; x := parinte[N];
+  WHILE x <> 0 DO
+    BEGIN                                         ( 5.10 )
+      flux[x,y] := flux[x,y] + marc[N];  
+      flux[y,x] := -flux[x,y];
+      y := x; x := parinte[y]
+    END
+UNTIL marc[N] = 1 - maxint;
+
+
+

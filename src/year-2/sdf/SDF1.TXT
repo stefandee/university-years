@@ -1,0 +1,375 @@
+LUCRAREA 1
+----------
+
+                Prezentarea mediului de dezvoltare TC2.0
+		----------------------------------------
+        Mediul integrat de dezvoltare TC contine un compilator, un editor, un 
+editor si alte utilitare.
+
+1.Lansarea in executie
+
+>[cale] tc <enter>    ,cale= catalogul in care se afla tc.exe
+ex:>h:\public\tc2\tc
+
+2.Informatii ajutatoare
+
+F1     - informatii ajutatoare 
+Alt-F1 - fereastra de informatii anterioara
+Ctrl-F1- informatii despre obiectul pe care este pozitionat cursorul
+Esc    - inchide fereastra ajutatoare
+
+3.Ecranul principal - este impartit in
+
+-meniul principal -se selecteaza prin F10
+-fereastra de editare
+-fereastra de mesaje -afiseaza mesaje de eroare sau atentionare
+-linie de referinte rapida -tastele si semnificatia lor
+
+4.Meniul principal:File,Edit,Run,Compile,Project,Options,Debug,Break/Watch
+
+-selectarea unui meniu: -prin F10, tastele <-,-> si tasta ENTER
+                        -Alt+prima litera a meniului dorit (ex: Alt+O = Options)
+                        -prin tasta universala corespunzatoare
+4.1.File (Alt+F)
+-opereaza cu fisiere, directoare si permite iesirea in DOS
+
+-Load(F3)    - incarca un fisier in editor
+-Pick(Alt+F3)- permite selectarea si incarcarea in editor a unui fisier 
+dintr-o lista continind ultimele 8 fisiere editate
+-New         - creaza in editor un fisier nou (gol), avind implicit numele
+NONAME.C
+-Save(F2)    - salveaza pe disc fisierul editat
+-Write To    - salveaza pe disc, sub numele specificat de utilizator, fisierul 
+curent 
+-Directory   - afiseaza lista intrarilor intr-un catalog specificat, permi-
+tind incarcarea in editor a fisierului selectat
+-Change Dir  - afiseaza catalogul curent si permite schimbarea sa
+-OS Shell    - permite iesirea temporara din mediul integrat pentru executia
+unor comenzi DOS. Revenirea se face tastind EXIT.
+-Quit(Alt+X) - paraseste mediul integrat si revine in DOS
+
+4.2.Edit (Alt-E)
+- permite editarea fisierului sursa. Comenzile sint compatibile cu cele ale
+editorului Wordstar.
+
+4.3.Run (Alt-R)
+- permite controlul executiei programului si initierea unei sesiuni de
+depanare (in acest ultim caz, optiunea Debug/Source Debugging trebuie
+pozitionat pe ON)
+   Run (Ctrl-F9)          - executa programul. La nevoie (daca sursa a fost
+     modificata de la ultima compilare), realizeaza intii compilarea si link-
+     editarea sa. Daca nu se doreste depanarea programului, este recomandata
+     stabilirea optiunii Debugger/Source Debugging pe None sau Standalone,
+     intrucit in caz contrar, executia va fi influentata de informatiile de
+     depanare
+   Program Reset(Ctrl-F2) - incheie sesiunea de depanare curenta. Se dezaloca
+     memoria alocata programului si se inchid toate fisierele utilizate.
+   Go to cursor (F4)      - executa programul pina la linia pe care este pozi-
+     tionat cursorul, fara a stabili punct de intrerupere permanent.
+   Trace Into (F7)        - executa instructiunea urmatoare din program. Daca
+     aceasta contine un apel de functie, se va executa apelul, respec-
+     tiv bara de executie se muta la inceputul funtiei respective. Aceasta
+     trasare se poate realiza doar daca functia a fost compilata cu optiunea
+     Options/Compiler/Code Generation/Obj debug information pe ON si codul ei
+     sursa disponibil.
+   Step Over (F8)         - executa instructiunea urmatoare din program, fara
+     trasare in interiorul functiilor.
+   User Screen (Alt-F5)   - afiseaza ecranul utilizatorului.Revenirea in mediul
+     Turbo C se face apasind orice alta tasta.
+
+4.4.Compile (Alt-C)
+- compileaza si creaza fisierul executabil
+   Compile to OBJ(Alt-F9) - compileaza sursa C creind un fisier obiect,al ca-
+     rui nume este obtinut din numele sursei C sau din numele ultimului fisier
+     incarcat
+   Make Exe File          - creaza fisierul executabil efectuind compilarea si
+     linkeditarea fisierelor actualizate. Numele se obtine, in ordine descres-
+     catoare a prioritatii, din numele fisierului proiect, din numele sursei C 
+     sau din numele ultimului fisier incarcat.
+   Link Exe File          - realizeaza editarea de legaturi, creind fisierul e-
+     xecutabil
+   Build All              - creaza fisierul executabil, compilind si legind
+     neconditionat toate fisierele projectului.
+   Primary C File         - incarca in editor fisierul sursa sau header in ca-
+     re s-au depistat erori la compilare. Optiunea Options/Environment/Message
+     Tracking trebuie sa fie pozitionata pe All Files.
+   Get Info               - afiseaza informatii despre ultima compilare efec-
+     tuata:-catalogul curent
+	   -fisierul sursa curent
+	   -dimensiunea fisierului
+	   -utilizarea memoriei
+	   -numarul de linii compilate
+	   -numarul mesajelor de eroare/avertisment
+	   -codul de iesire al programului
+
+4.5.Project (Alt-P)
+- permite controlul programelor cu surse multiple
+   Project Name           - permite specificarea unui fisier project
+   Break Make On          - permite specificarea conditiilor de intrerupere
+     a operatiunii de creare a fisierului executabil:
+       -Warnings     - la generarea unor mesaje de avertisment
+       -Errors       - la aparitia unor erori(implicit)
+       -Fatal errors - la aparitia unor erori fatale
+       -Link         - inaintea efectuarii editarii de legaturi
+   Auto Dependencies      - daca aceasta optiune este pozitionata pe ON, uti-
+     litarul Project-Make verifica automat ca toate fisierele obiect cu sursa C
+     din project sa fie corespunzatoare ultimei versiuni ale sursei. In caz
+     contrar (Off-implicit), nu se fac astfel de verificari.
+   Clear Project          - sterge numele projectului si aduce fereastra de
+     mesaje la starea initiala
+   Remove Messages        - sterge fereastra de mesaje
+
+4.6.Options (Alt-O)
+- permite stabilirea optiunilor de compilare, definirea unor macrouri, incar-
+carea fisierelor de configurare etc.
+- submeniuri:-Compiler
+	     -Linker
+	     -Environment
+	     -Directories
+	     -Arguments
+	     -Save Options
+	     -Retrieve Options
+
+4.6.1.Compiler
+- permite stabilirea optiunilor la compilatore
+   Model                - stabilirea modelului de memorie (implicit SMALL)
+   Defines              - deschide o fereastra in care se pot introduce
+     macrodefinitii pentru preprocesor.
+   Code generation      - permite stabilirea optiunilor pentru creearea fi-
+     sierului obiect:
+	- Calling convention  - stabileste metoda de apel utilizata:
+	   -C(implicit)
+	   -Pascal
+	- Instruction set     - specificarea procesorului pentru care se va
+	   genera codul:
+	   - 80186/80286(implicit)
+	   - 8088/8086
+	- Floating point      - permite stabilirea modului de lucru in vir-
+	   gula flotanta:
+	   - 8087/80287
+	   - Emulation (implicit)
+	   - None (nu se utilizeaza virgula flotanta)
+	- Default char type   - stabileste tipul declaratiilor char:
+	   - signed   - cu semn (implicit)
+	   - unsigned - fara semn
+	- Alignment           - stabilirea modului de aliniere
+	   - byte   - la octet, datele vor fi aliniate in functie de urma-
+	   toarea adresa disponibila (implicit)
+	   - word   - la cuvint, datele care nu sint de tipul char vor fi
+	   aliniate la adrese pare (mareste viteza de executie)
+	- Generate underbars  - stabileste daca se vor adauga liniute de su-
+	   bliniere in fata simbolurilor globale trecute in fisierul obiect
+	   (implicit ON -da)
+	- Merge duplicate strings - stabileste daca se vor suprapune sirurile
+	   identice cu nume diferite (implicit Off -nu)
+	- Standard stack Frame    - permite generarea unui cod standard pentru
+	   I/O din functii (implicit ON). Codul astfel obtinut va fi mai mare
+	   dar cu posibilitati mai mari de depanare.
+	- Test stack overflow     - permite generarea codului astfel incit sa
+	   se testeze depasirea de stiva (implicit OFF)
+	- Line numbers            - permite includerea numarului de linie in
+	   fisierul obiect (implicit OFF)
+	- Obj debug information   - stabileste daca fisierul .OBJ va include
+	   informatii de depanare (implicit ON)
+   Optimization         - permite stabilirea modului de optimizare a codului
+     generat
+	- Optimize for  - permite selectia intre doua metode de optimizare
+	    - Size - dimensiune (implicit)
+	    - Speed - viteza
+	- Use register variables - valideaza/invalideaza utilizarea variabi-
+	   lelor register. (implicit ON)
+	- Register optimization  - elimina incarcarile redundante, memorind
+	   si reutilizind continutul registrilor (implicit OFF)
+	- Jump optimization - reduce dimensiunea codului, eliminind salturi-
+	   le redundante si optimizind buclele (implicit OFF)
+   Source             - permite stabilirea modului in care compilatorul
+     prelucreaza codul sursa
+	- Identifier length - stabileste numarul de caractere semnificative
+	   sintr-un identificator (implicit 32)
+	- Nested comments   - permite comentariile incuibarite (implicit OFF)
+	- ANSI keywords only- cind e activa, optiunea determina recunoasterea
+	   doar a cuvintelor cheie din standardul ANSI, cele specifice TC2.0
+	   fiind tratate ca identificatori normali (implicit OFF)
+   Errors             - stabileste modul in care sint tratate mesajele
+	- Errors:stop after - specifica numarul de erori dupa care se va opri
+	   compilarea (0..255, implicit 25, 0=> compilare pina la sfirsitul
+	   codului sursa)
+	- Warnings:stop after - numarul de mesaje de avertisment dupa care se
+	   opreste compilarea (0..255, implicit 100)
+	- Display Warnings - permite afisarea mesajelor de avertisment (im-
+	   plicit ON)
+   Names               - permite modificarea numelor implicite de segment,
+     grup si clasa pentru sectiunile de cod, date si BSS
+
+4.6.2.Linker
+- stabileste optiunile pentru editarea de legaturi
+   Map file            - permite crearea fisierelor .MAP (implicit OFF)
+   Initialize segments - permite initializarea segmentelor neinitializate
+     (implicit OFF)
+   Default libraries   - daca este activa, aceasta optiune determina in cazul
+     unei editarii de legaturi mixte cu module create de alte compilatoare,cau-
+     tarea rutinelor nedefinite din program si in bibliotecile acestora din
+     urma. In caz contrar (implicit OFF), ele sint cautate doar in bibliote-
+     cile standard Turbo C
+   Graphics libraries  - permite crearea unor programe cu sursa unica utili-
+     zind biblioteca grafica (implicit ON). Daca este pozitionata pe OFF, fi-
+     sierele .BGI din biblioteca grafica trebuie specificate intr-un fisier
+     proiect.
+   Warn duplicate symbols - valideaza/invalideaza mesajele pentru simboluri
+     dublu definite din fisierul obiect (implicit OFF)
+   Stack warning          - valideaza/invalideaza afisarea mesajului pentru
+     depasire de stiva (implicit ON)
+   Case sensitive link  - valideaza/invalideaza deosebirea literelor mici
+     de cele mari in timpul editiei de legaturi (implicit ON)
+
+4.6.3.Environment
+- permite stabilirea mediului de lucru Turbo C
+   Message tracking     - stabileste in ce fisiere vor fi urmarite erorile a
+     caror mesaje sint afisate in fereastra de mesaje:
+       - Current File - fisierul editat curent (implicit)
+       - All Files    - toate fisierele din project
+       - None         - nu se face urmarire
+   Keep messages        - stabileste modul de pastrare a mesajelor de eroare/
+     avertisment
+   Config auto save     - daca este activa (implicit ON), configuratia este
+     salvata(daca a fost modificata) in fisierul de configurarre nu doar la
+     iesirea din mediu, ci si la comenzile Run/Run si File/OS Shell (impli-
+     cit OFF)
+   Backup files  	-daca este activa (implicit ON), fiecare salvare de-
+     termina crearea unui fisier .BAK cu versiunea anterioara a fisierului
+     editat curent
+   Tab size             - stabileste dimensiunea de tabulare
+   Zoomed windows	- mareste dimensiunea ferestrelor ecran si de mesaje
+     la intreg ecranul
+   Screen size          - stabileste numarul de linii pe ecran:
+       -25 (implicit)
+       -40 - doar pentru adaptoare EGA si VGA
+
+4.6.4.Directories
+- stabileste unde se gasesc fisierele necesare mediului integrat
+   Include directories  - stabileste cataloagele ce contin fisierele header
+     standard. Cataloage multiple se despart prin ;
+   Library directories  - stabileste cataloagele ce contin fisierele de lan-
+     sare si de biblioteca
+   Output directory     - stabileste  catalogul unde se vor afla fisierele
+     .OBJ,.MAP si .EXE (implicit directorul curent)
+   Turbo C directory    - stabileste catalogul in care se afla fisierele cu
+     informatii de ajutor (.HLP) si de configurare (.TC). Ultimul este cautat
+     intii in catalogul curent
+   Pick file name       - permite incarcarea /crearea unui fisier de selectie
+     Acesta va fi actualizat automat la iesirea din mediu. Numele fisierului
+     de selectie va fi salvat in fisierul de configurare la comanda Options/
+     Save options
+   Current pick file    - este doar informationala
+
+4.6.5.Arguments
+- stabileste optiunile liniei de comanda pentru programul curent executat
+(nu sint permise redirectari)
+
+4.6.6.Save options
+- salveaza optiunile curente in fisierul de configurare
+
+4.6.7.Retrieve options
+- incarca un fisier de configurare
+
+4.7.Debug (Alt-D)
+- controleaza sesiunea de depanare a programului executabil
+   Evaluate (Ctrl-F4)   - permite evaluarea si, optional, modificarea valo-
+     rii unei expresii. Exista diferiti specificatori de format pentru afi-
+     sare
+   Find function	- permite afisarea in ferestrea editorului a defini-
+     tiei unei functii. Se poate utiliza doar in cadrul unei sesiuni de depa-
+     nare
+   Call stack (Ctrl-F3) - afiseaza intr-o fereastra sub forma de meniu cu ba-
+     ra de selectie, lista functiilor apelate pina in punctul curent de exe-
+     cutie a programului. Permite vizualizarea liniei executate curent
+     dintr-o anumita functie.
+   Source debugging     - determina informatiile de depanare ce vor fi intro-
+     duse in fisierul executabil
+       - On - depanare cu depanatorul integrat sau cu Turbo Debugger
+	 (implicit)
+       - Standalone  - depanare doar cu Turbo Debugger
+       - None  -nu exista informatii de depanare
+   Display swapping     - stabileste cazurile in care Turbo C realizeaza au-
+     tomat balansul intre ecranul editorului si cel al utilizatorului in
+     cadrul unei sesiuni de depanare
+   Refresh display      - reface continutul ecranului editorului , in cazul
+     in care acesta a fost stricat accidental
+
+4.8.Break/Watch (Alt-B)
+- este o completare a meniului Debug. Faciliteaza depanarea prin lucrul cu
+puncte de intrerupere si supravegherea expresiilor
+   Add Watch (Ctrl-F7)  - permite introducerea unei expresii de supraveghere
+     in ferestra de urmarire
+   Delete Watch         - permite stergerea expresiei curente din fereastra
+     de urmarire
+   Edit Watch           - permite editarea intr-o fereastra separata a expre-
+     siei curente din fereastra de urmarire
+   Remove All Watches   - sterge fereastra de urmarire
+   Toggle Breakpoint(Ctrl-F8) - permite stabilirea/anularea unui punct de in-
+     trerupere in linia in care este pozitionat cursorul
+   Clear All Breakpoints- sterge toate punctele de intrerupere din program
+   View Next Breakpoint - deplaseaza (fara executie) cursorul la urmatorul
+     punct de intrerupere din program
+
+
+		   Exemplu de program C
+
+     Sa se scrie un program ce executa operatiile unui calculator de buzunar
+simplu : adunare, scadere, inmultire si impartire a doua numere reale.
+Se preiau linii de forma :
+   numar  operator  numar
+si se afiseaza rezultatul calculului matematic.
+
+# include <stdlib.h>
+# include <stdio.h>
+# define PROMPT ':'
+
+void main( void )
+{
+  float a,b;
+  char oper;
+  float result;
+
+  while ( putchar( PROMPT ) , ( scanf("%f%c%f",&a,&oper,&b) != EOF))
+  {
+    switch( oper )
+    {
+      case '+': result=a+b; break;
+      case '-': result=a-b; break;
+      case '*': result=a*b; break;
+      case '/': result=a/b; break;
+      default : printf("operator ilegal %c\n",oper);
+		exit(1);
+   }
+    printf("rezultatul e %f\n", result);
+  }
+  exit(0);
+}
+
+		Mersul lucrarii
+
+	Sa se editeze, compileze si depaneze programul enuntat. Deasemenea sa 
+se incerce diferitele facilitati ale mediului TC2.0.
+
+		Probleme propuse
+
+1. Sa se scrie programul Pascal care afiseaza continutul unui fisier text
+ si adauga dupa fiecare cuvint intilnit lungimea acestuia.
+
+2. Se da un text care se termina cu caracterul EOF . Sa se gaseasca identifi-
+catorii din text care apar de doua sau mai multe ori.
+
+3.* Sa se scrie programul Pascal care determina toate posibilitatile de u-
+nire a 2n puncte de pe cerc, doua cite doua, astfel incit liniile de legatura 
+sa nu se intersecteze in interiorul sau pe conturul cercului.
+
+4. Sa se scrie un program pentru prelucrarea rimelor , folosit in scrierea 
+poeziilor. Cuvintele se considera plasate intr-un dictionar. sa se imple-
+menteze functiile:
+   - adaugCuvint( cuvint ) - adauga un cuvint la dictionar in cazul in care
+   acesta nu este prezent 
+   - gasesteRima( sufix ) - afiseaza lista ordonata a tuturor cuvintelor din 
+dictionar care au un anumit sufix
+
+

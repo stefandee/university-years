@@ -1,0 +1,325 @@
+			Lucrarea nr.6
+		     ALGORITMI RECURSIVI
+
+	1.Scopul lucrarii: prezentarea conceptului de  recursivitate 
+si a citorva clase de algoritmi recursivi, pentru intelegerea  si 
+rutinarea  acestei  tehnici puternice de programare,  ce  permite 
+scrierea unor solutii clare, concise si rapide, care pot fi  usor 
+intelese si verificate.
+
+     2.Aspecte teoretice
+
+     2.a.Ce este recursivitatea ?
+
+     Recursivitatea,  folosita cu multa eficienta in  matematica, 
+s-a impus in programare, odata cu aparitia unor limbaje de  nivel 
+inalt,   ce  permit  scrierea  de  module  ce   se   autoapeleaza 
+(PASCAL,LISP,ADA,ALGOL,C sint  limbaje recursive, spre  deosebire 
+de FORTRAN,BASIC,COBOL, nerecursive).
+     Recursivitatea e strins legata de iteratie, dar daca  itera
+tia  e  executia  repetata a unei portiuni de  program,  pina  la 
+indeplinirea  unei  conditii  (while, repeat,  for  din  PASCAL), 
+recursivitatea presupune executia repetata a unui modul, insa  in 
+cursul  executiei lui (si nu la sfirsit, ca in cazul  iteratiei), 
+se  verifica o conditie a carei nesatisfacere,  implica  reluarea 
+executiei modulului de la inceputul sau. Atunci un program recur
+siv poate fi exprimat:
+	    P=M(Si,P)  ,  unde M este multimea  ce  contine   in
+structiunile Si si pe P insusi.
+     Structurile de program necesare si suficiente in  exprimarea 
+recursivitatii sint procedurile si subrutinele ce pot fi  apelate 
+prin nume. Recursivitatea poate fi directa - un modul P contine o 
+referinta  la  el insusi, sau indirecta - un modul  P  contine  o 
+referinta la un modul Q ce include o referinta la P.
+
+     2.b.Parametrii-valoare si parametrii-variabila
+
+     Discutia  se face pentru cazul implementarii  recursivitatii 
+in PASCAL, dar lucrurile sint similare pentru C.
+     In PASCAL, exista doua tipuri de parametri formali (ce  apar 
+in  antetul  unei proceduri sau functii) : valoare  si  variabila 
+(ultimii au numele precedat de cuvintul cheie var).
+     Apelul  recursiv al unei proceduri (functii) face ca  pentru 
+toti parametrii-valoare sa se creeze copii locale apelului curent  
+(in  stiva) ,  acestea  fiind referite si asupra  lor  facindu-se 
+modificarile in timpul executiei curente a procedurii (functiei). 
+Cind  executia  procedurii (functiei) se  termina,  copiile  sint 
+extrase  din  stiva,  astfel incit  modificarile  operate  asupra 
+parametrilor-valoare  nu afecteaza parametrii efectivi  de  apel, 
+corespunzatori.
+
+     De  asemenea  pentru  toate variabilele  locale  se  rezerva 
+spatiu la fiecare apel recursiv.
+     In cazul parametrilor-variabila, nu se creaza copii  locale, 
+ci  operarea se face direct asupra spatiului de  memorie  afectat 
+parametrilor efectivi, de apel.
+     De retinut:
+     -pentru fiecare apel recursiv al unei proceduri (functii) se 
+creaza  copii  locale ale parametrilor  valoare  si  variabilelor 
+locale, ceea ce poate duce la risipa de memorie;
+     -orice parametru-variabila poate fi suprimat prin  referirea 
+directa in procedura (functie) a variabilei ce figura ca  parame
+tru de apel.
+
+     2.c.Verificarea si simularea programelor recursive
+
+     Se face ca in cazul celor nerecursive, printr-o demonstratie 
+formala, sau testind toate cazurile posibile.
+     Se  verifica  intii daca toate cazurile particulare  (ce  se 
+executa  cind  se indeplineste conditia de terminare  a  apelului 
+recursiv) functioneaza corect.
+     Se  face apoi o verificare formala a  procedurii  (functiei) 
+recursive,  pentru restul cazurilor, presupunind ca toate  compo
+nentele din codul procedurii (functiei) functioneaza corect.
+     Verificarea  e  deci inductiva.Acesta e un avantaj  al  pro
+gramelor  recursive, ce permite demonstrarea  corectitudinii  lor 
+simplu si clar.
+     Exemplificare:
+     Functia recursiva de calcul a factorialului:
+
+     function fact(n:integer):integer;
+	  begin
+	       if n=1 then fact:=1
+		      else fact:=n*fact(n-1)
+	  end;
+
+     Demonstrarea corectitudinii cuprinde doi pasi:
+	  -pentru  n=1  valoarea 1 ce se  atribuie  factorialului 
+este corecta
+	  -pentru  n>1,  presupunind corecta  valoarea  calculata 
+pentru predecesorul lui n de fact(n-1), prin inmultirea  acesteia 
+cu n se obtine valoarea corecta a factorialului lui n.
+
+     2.d.Tehnica eliminarii recursivitatii
+
+     Orice  program recursiv poate fi transformat in unul  itera
+tiv, dar algoritmul sau poate deveni mai complicat si mai greu de 
+inteles. De  multe  ori, solutia unei probleme poate fi elaborata 
+mult  mai  usor, mai clar si mai simplu de  verificat,  printr-un 
+algoritm recursiv.
+
+     Dar  pentru  implementare, poate fi  necesara  transformarea 
+algoritmului recursiv in unul nerecursiv, in situatiile:
+     -solutia problemei trebuie scrisa intr-un limbaj nerecursiv; 
+un  caz  particular sint compilatoarele ce  "traduc"  un  program 
+recursiv  dintr-un limbaj de nivel inalt in cod masina  (nerecur
+siv)
+     -varianta  recursiva  ar  duce la o viteza  de  executie  si 
+spatiu  de memorie prea mari, transformarea in  una  nerecursiva, 
+eliminind dezavantajele.
+     Se  va prezenta una din metodele de eliminare  a  recursivi
+tatii ce foloseste o structura de date de tip stiva.
+     In scrierea unei varianta nerecursive, trebuie parcursi toti 
+pasii implicati in varianta recursiva, prin tehnici nerecursive.
+     Recursivitatea implica folosirea a cel putin unei stive.  La 
+fiecare apel recursiv sint depuse in stiva niste date, care  sint 
+extrase  la revenirea din acel apel. E simplu daca datele  pentru 
+un  apel se organizeaza intr-un record, un apel insemnind  intro
+ducerea in stiva a unui record, revenirea, extragerea lui.
+     Se  prezinta  eliminarea recursivitatii  pentru  un  program 
+simplu, care citeste caracterele tastate pe o linie, tiparindu-le 
+apoi in ordine inversa.
+
+     program var_recursiva;
+	  procedure prel_car;
+	       var car:char;
+	       begin
+		    read(car);
+		    if not eoln then prel_car;
+		    write(car)
+	       end;
+	  begin
+	       prel_car
+	  end.
+
+     program var_nerecursiva;
+	  begin
+	       *initializeaza stiva
+	       while not eoln do
+		    begin
+			 read(car);
+			 push(car)
+		    end;
+	       while not stiva_goala do
+		    begin
+			 pop(car);
+			 write(car)
+		    end
+	  end.
+
+
+     3.Exemple de algoritmi recursivi
+
+     3.1.Algoritmi de traversare si inversare a unei structuri
+
+     Traversarea si inversarea unei structuri inseamna efectuarea 
+unor operatii oarecare asupra tuturor elementelor unei  structuri 
+in ordine directa, respectiv in ordine inversa.
+     Desi  mai  uzuale  sint variantele iterative,  caz  in  care 
+inversarea  echivaleaza cu doua traversari directe (o salvare  in 
+stiva  urmata de parcurgerea stivei), variantele  recursive  sint 
+mai  elegante si concise. Se pot aplica structurilor de tip   ta
+blou,  lista, fisier si pot fi o solutie pentru  diverse probleme 
+(transformarea unui intreg dintr-o baza in alta, etc).
+     Intr-o forma generala, algoritmii se pot scrie:
+
+     procedure traversare(element:tip_element);  {apelul initial}
+	  {al procedurii se face cu primul element al structurii}
+	  begin
+	       prelucrare(element);
+	       if element <> ultimul_din_structura then
+				   traversare(element_urmator)
+	  end;
+
+     procedure inversare(element:tip_element);   {apelul initial}
+	  {al procedurii se face cu primul element al structurii}
+	  begin
+	       if element <> ultimul_din_structura then
+				   traversare(element_urmator);
+	       prelucrare(element)
+	  end;
+
+     De  observat importanta ca parametrul formal al  celor  doua 
+proceduri sa fie de tip valoare, pentru a nu fi alterat de apelul 
+recursiv.
+
+     3.2.Algoritmi care implementeaza definitii recursive
+
+     O  definitie recursiva e cea in care un obiect se  defineste 
+prin el insusi. Definitia contine o conditie de terminare,  indi
+cind  modul  de parasire a definitiei si o  parte  ce  precizeaza 
+definirea recursiva propriu-zisa.
+     Ca  exemple: algoritmul lui Euclid de aflare  a  c.m.m.d.c., 
+factorialul, ridicarea la o putere intrega (prin inmultiri  repe
+tate),  definirea recursiva a unei expresii  aritmetice,  curbele 
+recursive, un mod de a privi permutarile, etc.
+
+
+     3.3.Algoritmi de divizare
+
+     Tehnica  divizarii ("divide and conquer"),  fundamentala  in 
+elaborarea  algoritmilor, consta in descompunerea  unei  probleme 
+complexe in mai multe subprobleme a caror rezolvare e mai  simpla 
+si  din  solutiile carora se poate  determina  solutia  problemei 
+initiale  (exemple:  gasirea  minimului  si  maximului  valorilor 
+elementelor  unui  tablou, cautarea  binara,  sortare  Quicksort, 
+turnurile din Hanoi).
+     Un algoritm de divizare general s-ar putea scrie:
+
+     procedure rezolva(x:problema);
+	  begin
+	       if {x e divizibil in subprobleme} then
+		    begin
+			 {divide pe x in parti x1,...,xk}
+			 rezolva(x1); {...} rezolva(xk);
+			 {combina solutiile partiale intr-o} 
+					  {solutie pentru x}
+		    end
+	       else {rezolva pe x direct}
+	  end;
+
+     3.4.Algoritmi cu revenire (backtracking)
+
+     Metoda se aplica problemelor in care solutia se poate repre
+zenta sub forma unui vector x=(x1,x2,...xn) c S=S1 x S2 x...x Sn, 
+unde  multimile Si sint finite, S numindu-se  spatiul  solutiilor 
+posibile.  In particular, Si sint identice avind acelasi numar  M 
+de  elemente. Pentru fiecare problema concreta sint date  anumite 
+relatii intre componentele vectorului x, numite conditii interne.
+     Determinarea  tuturor  solutiilor  rezultat  se  poate  face 
+generind toate solutiile posibile si verificind apoi care  satis
+fac  conditiile interne. Dar timpul de calcul ar fi  foarte  mare 
+(daca  multimile Si ar avea numai cite 2 elemente, timpul  ar  fi 
+proportional cu 2**n).
+     Metoda  backtracking  urmareste evitarea  genararii  tuturor 
+solutiilor.  Elementele vectorului x primesc valori pe rind,  lui 
+x1 i se atribuie valori, doar daca x1,x2,...,xi-1 au primit deja, 
+valorile atribuite trebuind sa verifice conditiile de continuita
+te   referitoare la x1,x2,...,xi. Doar apoi se trece la  calculul 
+lui xi+1. In cazul neindeplinirii conditiilor de continuitate, se 
+alege  urmatoarea  valoare  posibila pentru xi, daca  Si  a  fost 
+epuizat, se micsoreaza i, incercind o alta alegere pentru xi-1.
+
+     procedure backtracking(i:integer); {gaseste valoarea lui xi}
+	  var posibilitate:integer; {pentru toate valorile}
+				    {posibile ale lui xi}
+	  begin
+	       for posibilitate:=1 to M do
+		    begin
+			 if acceptabila then
+			      begin
+				   inregisteaza_posibilitatea;
+				   if i<n then backtracking(i+1)
+				   else afiseaza_solutia:
+				   sterge_inregistrarea
+			      end
+		    end
+	  end;
+
+     Pe acesta metoda se bazeaza rezolvarea unor probleme clasice 
+ca:  "opt regine", a "relatiilor stabile", colorarea unei  harti, 
+taierea unui fir de lungime l in parti de lungimi date, etc.
+     O varianta a acestei metode este cea in care, pentru un xi c 
+vector solutie , xi+1 poate fi ales dintr-un numar M de posibili
+tati:
+
+     procedure back1(i:posibilitate);
+	  begin
+	       if acceptabila then
+		    begin
+			 inregistreaza;
+			 if solutie_incompleta then for k:=1 to M
+			      do back1(posibilitate_k)
+			 else tipareste_solutia;
+			 sterge_inregistrarea
+		    end
+	  end;
+
+     Aceasta  varianta  se foloseste la  rezolvarea  problemelor: 
+"saritura  calului", iesirea dint-un labirint, etc.  Se  preteaza 
+atunci cind pasul initial este definit si/sau numarul de pasi  ai 
+solutie nu este cunoscut.
+
+     3.5.Algoritmi "inlantuie si limiteaza" (Branch and Bound)
+
+     Sint  inruditi cu cei backtracking, mai numindu-se si  back
+tracking cu constringeri.
+
+
+     4.Aplicatii
+
+4.1.Pentru  problema clasica de determinare a tuturor  solutiilor 
+de iesire dintr-un labirint:
+a)sa  se  scrie programul de aflare a optimului (drumul  cel  mai 
+scurt de iesire)
+b)sa  se scrie un program pentru determinarea tuturor  solutiilor 
+si a optimului de iesire dintr-un labirint tridimensional.
+
+4.2.Sa  se  generalizeze programul TAIETURA (prezentat  la  curs) 
+astfel  incit  sa  se gaseasca toate variantele,  precum  si  cea 
+optima  pentru taierea unui fir de lungime L in parti de  lungimi 
+L1,L2,...,Ln date, in conditiile:
+a)nu  exista nici un fel de restrictie in ce priveste numarul  de 
+bucati din fiecare lungime
+b)se taie cel mult o bucata de fiecare lungime
+c)numarul de bucati de fiecare lungime sa difere prin cel mult  o 
+unitate
+
+4.3.Sa se scrie cite o procedura recursiva pentru:
+a)transformarea unui intreg din baza 10 in alta baza data
+b)tiparirea nodurilor unei liste in ordine inversa
+c)analog cu b), dar pentru elementele unui tablou
+d)copierea in ordine inversa a liniilor dintr-un fisier text,  in 
+altul.
+
+4.4.Intre  n  orase  exista o retea de drumuri  care  permite  ca 
+dintr-un  oras  sa se ajunga in oricare din  celelalte.  Intre  2 
+orase  exista cel mult un drum direct, de lungime cunoscuta,  iar 
+timpul necesar pentru parcurgerea unui drum este proportional  cu 
+lungimea   sa.   Se  cere  sa  se  realizeze   programul   pentru 
+determinarea  traseului pe care se poate merge intre  doua  orase 
+date, intr-un timp minim.
+
+4.5.Se considera un set de N intrebari, fiecare avand un punctaj Pi.
+Sa se genereze toate chestionarele continand un numar de intrebari
+intre A si B si avand un punctaj total intre C si D.

@@ -1,0 +1,428 @@
+
+			       L I S P
+			       -------
+
+LISP face parte din clasa limbajelor func'tionale.
+LISP = LISt Programming.
+
+Procedurile 'si datele au aceea'si structur'a -- lista generalizat'a.
+- Obiectele fundamentale se numesc ATOMI;
+- grupe de atomi 'si liste formeaz'a LISTE;
+- atomii 'si listele sunt numite EXPRESII SIMBOLICE.
+
+				CAP. 1
+				------
+
+[LISP ^inseamn'a manipulare de simboluri]
+
+C^and o parantez'a st^ang'a 'si una dreapt'a ^inconjoar'a ceva, numim
+rezultatul o list'a 'si vorbim de elementele sale.
+
+De exemplu lista
+(+ 3.14 2.71)
+are trei elemente: +, 3.14 'si 2.71.
+
+^In LISP procedura este specificat'a ^intotdeauna ^in capul listei
+urmat'a de argumente => nota'tia prefix.
+
+- O PROCEDUR'A este o entitate de baz'a care specific'a felul ^in care
+se realizeaz'a un lucru;
+- o procedur'a predefinit'a de limbaj se nume'ste PRIMITIV'A;
+- o colec'tie de proceduri care lucreaz'a ^impreun'a se nume'ste
+PROGRAM;
+- o descriere abstract'a a unei proceduri sau a unui program,
+neexprimat'a ^in termenii unui anume limbaj de programare, se nume'ste
+ALGORITM.
+
+[Exemple LISP]
+
+LISP evalueaz'a o list'a presupun^and c'a primul element este o
+procedur'a iar restul elementelor sunt parametrii.
+
+(+ 3.14 2.71)
+  5.85
+
+(* 9 3)
+  27
+
+(/ 27 3)
+  9
+
+(MAX 2 4 3)
+  4
+
+(MIN 2 4 3)
+  2
+
+(EXPT 10 2)		; ridicare la putere
+  8
+
+(SQRT 4.0)		; r'ad'acin'a p'atrat'a
+  2.0
+
+(ABS -5)
+  5
+
+(- 8)
+  -8
+
+Consider^and expresia:
+(+ (* 2 2) (/ 2 2))
+se observ'a u'sor c'a se evalueaz'a la 5.
+
+- Atomii de tipul: 27, 3.14 se numesc ATOMI NUMERICI.
+- Atomii de tipul: +, MAX se numesc ATOMI SIMBOLICI. 
+
+
+				Expresie
+				   /\
+				 /    \
+			       /        \
+			     /            \
+			   /                \ 
+			Atom		   List'a
+			 /\
+		       /    \
+		     /        \
+		   /            \
+		Num'ar		Simbol
+		  /\
+		/    \
+	      /        \
+	    /            \
+	^Intreg		Real
+
+[Probleme]
+
+1. Identifica'ti urm'atoarele obiecte (atom, list'a, nici una):
+
+ATOM
+
+(ACESTA ESTE UN ATOM)
+
+(ACEASTA ESTE O LISTA)
+
+((A B) (C D)) 3 (3)
+
+(LIST 3)
+
+(/ (+ 3 1) (- 3 1))
+
+)(
+
+((()))
+
+(() ())
+
+((())
+
+())(
+
+((A B C
+
+2. Evalua'ti urm'atoarele forme:
+
+(/ (+ 3 1) (- 3 1))
+
+(* (MAX 3 4 5) (MIN 3 4 5))
+
+(MIN (MAX 3 1 4) (MAX 2 7 1))
+
+[Primitivele CAR 'si CDR]
+
+Av^and expresia:
+(A B C)
+
+(CAR '(A B C))		; ' == QUOTE (inhib'a evaluarea)
+returneaz'a
+  A
+iar
+(CDR '(A B C))
+returneaz'a
+  (B C)
+
+Caracterul ' inhib'a evaluarea unei liste.
+
+(CAR L)  - returneaz'a primul element al listei L
+(CDR L)  - returneaz'a lista format'a din restul elementelor
+
+(CAR '((A B) C))
+  (A B)
+
+(CDR '((A B) C))
+  (C)
+
+	        -------
+	  ----->| CAR |----> A
+ 	  |     -------
+(A B C) ==|
+	  |     -------
+	  ----->| CDR |----> (B C)
+	        -------
+
+Al doilea element al listei se ob'tine astfel:
+
+(CAR (CDR '(A B C)))
+  B
+
+'(A B C) == (QUOTE (A B C))
+
+[Probleme]
+
+3. Evalua'ti urm'atoarele forme:
+
+(CAR '(P H W))
+
+(CDR '(B K P H))
+
+(CAR '((A B) (C D)))
+
+(CDR '((A B) (C D)))
+
+(CAR (CDR '((A B) (C D))))
+
+(CDR (CAR '((A B) (C D))))
+
+(CDR (CAR (CDR '((A B) (C D)))))
+
+(CAR (CDR (CAR '((A B) (C D)))))
+
+4. Evalua'ti:
+
+(CAR (CDR (CAR (CDR '((A B) (C D) (E F))))))
+
+(CAR (CAR (CDR (CDR '((A B) (C D) (E F))))))
+
+(CAR (CAR (CDR '(CDR ((A B) (C D) (E F))))))
+
+(CAR (CAR '(CDR (CDR ((A B) (C D) (E F))))))
+
+(CAR '(CAR (CDR (CDR ((A B) (C D) (E F))))))
+
+'(CAR (CAR (CDR (CDR ((A B) (C D) (E F))))))
+
+5. Scrie'ti secven'tele de CAR 'si CDR care scot simbolul C din
+expresiile:
+
+(A B C D)
+
+((A B) (C D))
+
+(((A) (B) (C) (D)))
+
+(A (B) ((C)) (((D))))
+
+((((A))) ((B)) (C) D)
+
+((((A) B) C) D)
+
+Putem folosi primitive compuse de forma CXXR, CXXXR, unde X poate fi A
+(pentru CAR) sau D (pentru CDR).
+
+(CADR '(A B C)) == (CAR (CDR '(A B C)))
+
+[Atomii simbolici pot avea valori]
+
+Unui atom simbolic i se poate atribui o valoare (num'ar sau simbol sau
+list'a) la care acel atom simbolic va fi evaluat. Acest lucru se
+realizeaz'a cu procedura SETQ (prin efect lateral!).
+
+(SETQ L '(A B))
+
+L
+  (A B)
+
+'L
+  L
+
+(CAR L)
+  A
+
+(CDR L)
+  (B)
+
+[Procedurile APPEND, LIST 'si CONS]
+
+APPEND une'ste liste:
+
+(SETQ L '(A B))
+  (A B)
+
+(APPEND L L)
+  (A B A B)
+
+(APPEND '(A) '() '(B) '())
+  (A B)
+
+LIST construie'ste o list'a din argumentele sale:
+
+(LIST L L)
+  ((A B) (A B))
+
+(LIST 'L L)
+  (L (A B))
+
+CONS insereaz'a un nou prim element ^intr-o list'a:
+
+(CONS 'A '(B C))
+  (A B C)
+
+(CONS (CAR L) (CDR L)) == L
+
+	        -------
+	  ----->| CAR |----> A ---------
+	  |     -------                |   --------
+(A B C) ==|                            |==>| CONS |--> (A B C)
+	  |     -------                |   --------
+	  ----->| CDR |----> (B C) -----
+	        -------
+
+Urm'ari'ti evalu'arile:
+
+(APPEND '(A B) '(C D))
+  (A B C D)
+
+(LIST '(A B) '(C D))
+  ((A B) (C D))
+
+(CONS '(A B) '(C D))
+  ((A B) C D)
+
+(APPEND L L)
+  (A B A B)
+
+(LIST L L)
+  ((A B) (A B))
+
+(CONS L L)
+  ((A B) A B)
+
+(APPEND 'L L)
+  ERROR
+
+(LIST 'L L)
+  (L (A B))
+
+(CONS 'L L)
+  (L A B)
+
+[Probleme]
+
+6. Evalua'ti formele:
+
+(APPEND '(A B C) '())
+
+(LIST '(A B C) '())
+
+(CONS '(A B C) '())
+
+[Procedurile LENGTH, REVERSE, SUBST 'si LAST]
+
+LENGTH returneaz'a lungimea unei liste:
+
+(LENGTH '(A B))
+  2
+
+(LENGTH '((A B) (C D)))
+  2
+
+(LENGTH L)
+  2
+
+(LENGTH (APPEND L L))
+  4
+
+REVERSE inverseaz'a o list'a:
+
+(REVERSE '(A B))
+  (B A)
+
+(REVERSE '((A B) (C D)))
+  ((C D) (A B))
+
+SUBST ^inlocuie'ste o expresie cu alta ^intr-o list'a:
+
+(SUBST <expr. noua> <expr. veche> <lista>)
+
+(SUBST 'A 'B '(A B C))
+  (A A C)
+
+LAST returneaz'a o list'a ce con'tine ultimul element:
+
+(LAST '(A B C))
+  (C)
+
+(LAST '((A B) (C D)))
+  ((C D))
+
+[Evaluarea formelor]
+
+C^and interpretorul LISP prime'ste o form'a o trimite primitivei
+EVAL, care evaluaz'a toate argumentele dup'a care apeleaz'a procedura
+din capul listei.
+
+ --------------  Da   ----------------  Da   -----------------------
+< Este S atom? >---->< Este S num'ar? >---->| Returneaz'a num'arul. |
+ --------------       ----------------       -----------------------
+       |                     |
+       |                     | Nu
+       | Nu                  V
+       |            ----------------------  
+       |           | Ret. valoarea lui S. |
+       |            ----------------------
+       V
+ -------------------         -----------------------
+< Este QUOTE primul >  Da   | Returneaz'a al doilea |
+< atom din S?       >------>| element din S.        |
+ -------------------         -----------------------
+       |
+       | Nu
+       V
+ --------------------         ----------------
+< Indic'a primul     >  Da   | Nu evaluaz'a   |
+< element din S o    >------>| argumentele    |
+< tratare special'a? >       | - caz special. |
+ --------------------         ----------------
+       |
+       | Nu
+       V
+ --------------------------
+| Folose'ste EVAL pe toate |
+| elementele lui S ^in     |
+| afar'a de primul.        |
+ --------------------------
+       |
+       |
+       V
+ ---------------------------
+| Aplic'a primul element    |
+| al lui S valorilor        |
+| rezultate 'si returneaz'a |
+| rezultatul.               |
+ ---------------------------
+
+(SETQ ZERO 0 UNU 1 DOI 2 TREI 3 PATRU 4 CINCI 5 SASE 6 SAPTE 7 OPT 8
+NOUA 9)
+
+ZERO
+  0
+
+OPT
+  8
+
+(SETQ A 'B)
+  B
+
+(SETQ B 'C)
+  C
+
+A
+  B
+
+B
+  C
+
+(EVAL A)
+  C
+
+Procedura EVAL provoac'a ^inc'a o evaluare a argumentelor.

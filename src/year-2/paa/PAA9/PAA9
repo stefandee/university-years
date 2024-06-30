@@ -1,0 +1,399 @@
+     1.1.Traversarea grafurilor in adancime ( depth-first search )
+
+     Aceasta tehnica generalizeaza traversarea in preordine a arborilor.
+     Initial toate nodurile grafului se considera nevizitate, parcurgerea
+fiecaruia, marcandu-l ca vizitat. Algoritmul face explorarea tuturor
+nodurilor accesibile dintr-un nod initial. Daca mai raman noduri nevizitate,
+se alege un nod de pornire din acestea, algoritmul repetandu-se pana toate
+nodurile sunt marcate ca vizitate.
+
+     procedure TraversareInAdancime;
+
+       type enum=(nevizitat,vizitat);
+       var marc:array [1..maxN] of enum; { dimensiunea lui marc e data de
+                                           numarul maxim al nodurilor grafului }
+
+       procedure CautaInAdancime(x: Nod);
+
+         var y: Nod;
+
+           begin
+             marc[x] := vizitat;
+             for fiecare nod y adiacent lui x do  { A }
+             if marc[y] = nevizitat then
+               CautaInAdancime(y)
+           end; { CautaInAdancime }
+
+       begin { TraversareInAdancime }
+         for fiecare nod x din graf do
+           marc[x] := nevizitat;
+         repeat
+           alege un nod nevizitat x;
+           CautaInAdancime(x)
+         until nu mai exista noduri nevizitate
+       end; { TraversareInAdincime }
+
+     Fiecare apel din TraversareInAdancime al procedurii CautaInAdancime,
+realizeaza parcurgerea cate unei componente conexe a grafului, deci a cate unui
+arbore de acoperire. Arborii corespunzatori componentelor conexe formeaza
+o padure de arbori de acoperire. Bineanteles, padurea nu e unica, depanzand de
+alegerea nodurilor initiale de pornire pentru fiecare arbore.
+
+     a)Daca graful e reprezentat prin structuri de adiacente, prima varianta
+( tablou de noduri ce contine inceputurile listelor de adiacente ),
+procedura de traversare va fi:
+
+     procedure TraversareInAdancimeStrAdj;
+
+       var id,x: integer;
+           marc: array[1..maxN] of integer;
+
+       procedure CautaInAdancime(x: integer);
+
+         var t: legatura;
+
+         begin
+           id := id + 1; marc[x] := id;  { x e al id-lea nod parcurs }
+           t := Stradj[x];  { inceputul listei de adiacente a lui x }
+           while t <> z do { mai exista noduri adiacente cu x }
+             begin
+               if marc[t^.nume] = 0 then  { nod nevizitat ? }
+                 CautaInAdancime(t^.nume);
+                 t := t^.urm
+             end
+         end; { CautaInAdancime }
+
+       begin { TraversareInAdancimeStrAdj }
+         id := 0; { id indica al catelea nod se parcurge, in final
+                    va fi egal cu numarul de noduri }
+         for x := 1 to N do marc[x] := 0; { nodurile sunt nevizitate }
+         for x := 1 to N do
+           if marc[x] = 0 then { nod nevizitat ? }
+             CautaInAdincime(x)
+       end; { TraversareInAdancimeStrAdj }
+
+     In tabloul marc se retine ordinea in care sunt parcurse nodurile, valoarea
+0 indicand ca nodul nu a fost inca vizitat.
+     Pentru ultimele doua variante de implementare cu structuri de adiacente,
+fiecare element din lista de noduri ale grafului va contine un camp marc, ce
+va indica daca nodul e nevizitat ( 0 ) sau al catelea a fost parcurs.
+
+     b)Daca graful e reprezentat prin matrice de adiacenta, tabloul marc va fi
+un tablou paralel cu cel care retine cheile nodurilor. Nodurile adiacente
+unui nod de indice x ( vezi linia { A } din algoritmul de mai sus ) se gasesc
+parcurgand linia x a matricii. y ia pe rand valorile coloanelor pentru care
+elementul matricii de indici x,y are valoarea true ( exista arc ).
+
+     procedure TraversareInAdancimeMatrAdj;
+
+       var id,x: integer;
+           marc: array[1..maxN] of integer;
+
+       procedure CautaInAdancime(x: integer);
+
+         var t: integer;
+
+         begin
+           id := id + 1; marc[x] := id;  { x e al id-lea nod parcurs }
+           for t := 1 to N do
+             if A[x,t] then { x conectat cu t }
+               if marc[t] = 0 then CautaInAdancime(t)
+         end; { CautaInAdancime }
+
+       begin { TraversareInAdancimeMatrAdj }
+         id := 0; { id indica al catelea nod se parcurge, in final
+                    va fi egal cu numarul de noduri }
+         for x := 1 to N do marc[x] := 0; { nodurile sunt nevizitate }
+         for x := 1 to N do
+           if marc[x] = 0 then { nod nevizitat ? }
+             CautaInAdincime(x)
+       end; { TraversareInAdancimeMatrAdj }
+
+     1.2.Traversarea grafurilor prin cuprindere ( breadth-first search )
+
+     Initial toate nodurile grafului se considera nevizitate, parcurgerea
+fiecaruia, marcandu-l ca vizitat. Algoritmul viziteaza toate nodurile
+adiacente unui nod initial, apoi se revine la primul nod adiacent si se
+viziteaza nodurile adiacente acestuia, apoi la al doilea, s.a.m.d. Daca mai
+raman noduri nevizitate, se alege un nod de pornire din acestea, algoritmul
+repetandu-se pana toate nodurile sunt marcate ca vizitate. Nodurile adiacente
+celui initial vor fi trecute intr-o coada.
+     Similar cu traversarea in adancime, cea prin cuprindere, duce la gasirea
+unei paduri de arbori de acoperire ( componente conexe ) pentru graf.
+
+     procedure TraversarePrinCuprindere;
+
+       var Q: CoadaDeNoduri;
+           x: Nod;
+           marc: array[1..maxN] of integer;
+
+       procedure CautaPrinCuprindere(x: Nod);
+       { se parcurg toate nodurile adiacente lui x prin cautare prin
+         cuprindere }
+
+         var y:Nod;
+
+         begin
+           marc[x] := vizitat;
+           ADAUGA(x,Q);  { ADAUGA, VID, FATA, SCOATE, INSERTIE sunt operatori
+                           ai TDA coada }
+           while not VID(Q) do
+             begin
+               x := FATA(Q);
+               SCOATE(Q);
+               for fiecare nod y adiacent lui x do
+                 if marc[y] = nevizitat then
+                   begin
+                     marc[y] := vizitat;
+                     ADAUGA(y,Q);
+                     INSERTIE((x,y),Q)
+                   end
+             end
+         end; { CautaPrinCuprindere }
+
+       begin { TraversareInAdancime }
+         for fiecare nod x din graf do
+           marc[x] := nevizitat;
+         repeat
+           alege un nod nevizitat x;
+           CautaPrinCuprindere(x)
+         until nu mai exista noduri nevizitate
+       end; { TraversarePrinCuprindere }
+
+     a)Pentru implementarea prin structuri de adiacente a grafului:
+
+     procedure TraversarePrinCuprindereStrAdj;
+
+       var id,x: integer;
+           marc: array[1..maxN] of integer;
+           Q: CoadaDeNoduri;
+
+       procedure CautaPrinCuprindere(x: integer);
+
+         var t: legatura;
+
+         begin
+           ADAUGA(x);
+           repeat
+             x := SCOATE;
+             id := id + 1; marc[x] := id;
+             t := Stradj[x];
+             while t <> z do
+               begin
+                 if marc[t^.nume] = 0 then
+                   begin
+                     ADAUGA(t^.nume);
+                     marc[t^.nume] := -1 { apare ca marcat, dar primeste un
+                                           numar de parcurgere, id, la
+                                           scoaterea din coada }
+                   end
+                 t := t^.urm
+               end
+           until VID
+         end; { CautaPrinCuprindere }
+
+       begin { TraversarePrinCuprindereStrAdj }
+         id := 0; INITIALIZARE { coada };
+         for x := 1 to N do marc[x] := 0;
+         for x := 1 to N do
+         if marc[x] = 0 then CautaPrinCuprindere(x)
+       end; { TraversarePrinCuprindereStrAdj }
+
+     2.Aplicatii ale traversarii grafurilor
+
+     2.1.Determinarea arborilor de acoperire
+
+     Dupa cum s-a aratat la traversari, ele conduc la gasirea unei paduri
+de arbori de acoperire, cate unul pentru fiecare componenta conexa a grafului.
+Corespunzator celor doua tehnici de traversare ( CA - in adancime, CC -
+prin cuprindere ), se prezinta mai jos doua variante de construire a unui
+arbore de acoperire, pentru un graf implementat cu structuri de adiacenta
+( ultimul caz ). Pentru marcarea nodurilor vizitate, se adauga campul boolean
+marc la structura CelulaListNod. Pentru marcarea arcelor arborelui de cautare,
+se adauga campul boolean marc_Arb la CelulaListArc, valoarea true indicand ca
+arcul e din arbore.
+
+     procedure ArboreDeAcoperireCA(G: GRAF);
+
+       var p: POZITIE;
+           e: PointListArc;
+
+       procedure ConstructieCA(p: POZITIE);
+
+         var arcCurent: PointListArc;
+             q: POZITIE;
+
+         begin
+           p^.marc := TRUE;
+           arcCurent := p^.incep;
+           while arcCurent <> NIL do
+             begin
+               q := arcCurent^.nod;
+               if not q^.marc then
+                 begin
+                   arcCurent^.marcArb := TRUE;
+                     { arcul arboreluiCA poate fi tiparit de asemenea }
+                     { poate fi marcata si cealalta copie a lui }
+                     { arcCurent, deoarece in aceasta implementare }
+                     { fiecare arc e reprezentat de doua ori }
+                   ConstructieCA(q)
+                 end;
+               arcCurent := arcCurent^.urm
+             end
+         end; { ConstructieCA }
+
+       begin { ArboreDeAcoperireCA }
+         p := G;
+         while p <> NIL do
+           begin
+             p^.marc := FALSE;
+             e := p^.incep;
+             while e <> NIL do
+               begin
+                 e^.marcArb := FALSE;
+                 e := e^.urm
+               end;
+             p := p^.urm
+           end;
+         p := G;
+         ConstructieCA(p)
+       end; { ArboreDeAcoperireCA }
+
+     procedure ArboreDeAcoperireCC(G: GRAF);
+
+       var C:COADA; { de pozitii }
+           n,m: POZITIE;
+           arcCurent: PointListArc;
+
+       begin
+         n := G;
+         while n <> NIL do
+           begin
+             n^.marc := false;
+             n := n^.urm
+           end;
+         INITIALIZARE(C);
+         n := G;
+         ADAUGA(n,C);
+         n^.marc := TRUE;
+         while not VID(C) do
+           begin
+             n := FATA(C);
+             SCOATE(C);
+             arcCurent := n^.incep;
+             while arcCurent <> NIL do
+               begin
+                 m := arcCurent^.nod;
+                 if not m^.marc then
+                   begin
+                     ADAUGA(m,C);
+                     arcCurent^.marcArc := TRUE
+                       { se poate afisa arcul de arbore }
+                       { se poate marca si cealalta copie }
+                       { a lui arcCurent }
+                   end;
+                 arcCurent := arcCurent^.urm
+               end
+           end
+       end; { ArboreDeAcoperireCC }
+
+     2.1. Determinarea componentelor conexe
+
+     S-a aratat la traversari, ca fiecare apel Cauta pentru cate un nod initial,
+nevizitat, gaseste cate o componenta conexa. Pentru evidentierea componentelor
+conexe se poate proceda:
+
+     a)Se pot tipari pe cate un rand cheile nodurilor fiecarei componente
+conexe daca fiecare apel din Traversare la Cauta e precedat de un writeln,
+iar fiecare marcare ca vizitat a unui nod, e urmata de tiparirea cheii nodului.
+
+     b)Pentru prelucrarea ulterioara a componenetelor conexe, se introduce
+tabloul invmarc, paralel cu marc. La marcarea cu marc[x]:=id in Traversare,
+se va face invmarc[x]:=-id, iar in Cauta, invmarc[x]:=id ca marc. In urma
+traversarii, ordinea de parcurgere a nodurilor este data de valoarea absoluta
+din invmarc, valoarea negativa semnaland trecerea la o componenta conexa noua.
+
+     2.3.Puncte de articulatie si componente biconexe
+
+     Un punct de articulatie intr-un graf conex este un nod care daca este
+suprimat, graful se divide in mai multe componente conexe. Un graf conex care
+nu contine puncte de articulatie se numeste biconex - orice pereche de noduri
+e conectata prin cel putin doua drumuri distincte.
+     Punctele de articulatie se pot determina la parcurgerea in adancime.
+
+     function Articulatie(x: integer): integer;
+
+       var t: legatura;
+           m,min: integer;
+
+       begin
+         id := id + 1; marc[x] := id; min := id;
+         t := Stradj[x];
+         while t <> z do
+           begin
+             if marc[t^.nume] = 0 then
+               begin
+                 m := Articulatie(t^.nume);
+                 if m < min then min := m;
+                 if m  >= marc[x] then writeln(x)
+               end
+             else
+               if marc[t^.nume] < min then min := marc[t^.nume];
+               t := t^.urm
+           end;
+         Articulatie := min
+       end; { Articulatie }
+
+     3.Aplicatii
+
+{     3.1. Sa se scrie un program interactiv care realizeaza prelucrarea unui
+graf neorientat,cu nodurile caracterizate prin cate o cheie alfanumerica unica,
+prin urmatoarele comenzi:
+      V - face graful vid ( cu eliberarea spatiului ocupat, daca e cazul )
+      I - creaza nodul cu cheia data
+      N - suprima nodul cu cheia data
+      A - creaza arcul dintre doua noduri cu cheile precizate
+      S - suprima arcul dat
+      L - listeaza nodurile si arcele grafului ( multimile corespunzatoare )
+      T - traverseaza graful in adancime, listand nodurile in ordinea
+          parcurgerii
+      C - similar cu T, dar pentru traversarea prin cuprindere
+      B - determina componentele conexe ale grafului
+      D - evidenteaza o padure de arbori de acoperire ai grafului.
+      P - verifica daca graful e biconex, daca nu, determina punctele de
+          articulatie ale componentei conexe care contine cele mai multe noduri
+      X - terminare.
+
+      Parametrii comenzilor se furnizeaza interactiv si se valideaza.
+      Graful se va implementa folosind - o matrice de adiacente
+                                       - structuri de adiacente ( cazul 3 ).
+      Se vor compara cele doua implementari dpdv al timpilor de executie ( O )
+si al spatiului de memorie utilizat.  }
+
+program matricad;
+       const maxN = 50;
+       var j,x,y,N,A: integer;
+           graf: array[1..maxN,1..maxN] of boolean;
+
+       function index(n:Tip_Cheie):integer;
+         begin  { daca cheile sunt primele N litere mici }
+           index:=ord(n)-ord('a')
+         end;
+
+       procedure constr_matrice_de_adiacente;
+         begin {N=nr.de noduri,A=nr.de arce}
+           readln(N,A);
+           for x := 1 to N do
+             for y := 1 to N do graf[x,y] := false;
+           for x := 1 to N do graf[x,x] := true;
+           for j := 1 to A do
+             begin
+               readln(n1,n2);
+               x := index(n1); y := index(n2);
+               graf[x,y] := true; graf[y,x] := true
+             end
+         end; {constr_matrice_de_adiacente}
+
+  
+
+

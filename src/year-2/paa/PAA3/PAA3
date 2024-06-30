@@ -1,0 +1,394 @@
+
+				Lucrarea nr.3
+	
+			ARBORI BINARI ECHILIBRATI AVL
+
+
+	1.Definitie
+
+	Arborele perfect echilibrat e cel in care, pentru fiecare nod, numarul
+de noduri ale subarborelui sting difera de cel pentru subarborele drept cu cel
+mult o unitate.
+	Procedura de inserare care restaureaza structura de arbore, astfel
+incit aceasta sa fie tot timpul echilibrata, nu e viabila, activitatea de
+restructurare fiind foarte complexa. Se accepta unele criterii de echilibrare
+"imperfecta" care conduc la tehnici mai simple de reorganizare.
+	O astfel de definitie a echilibrarii este cea propusa de
+Adelson-Velskii si Landis in 1962, arborii ce satisfac criteriul, numindu-se
+arbori AVL.
+	Un arbore este echilibrat daca si numai daca inaltimile celor doi
+subarbori ai sai difera cu cel mult 1.
+	Definitia e foarte simpla si conduce la o procedura viabila de
+reechilibrare si la o lungime medie a drumului de cautare practic egala cu
+cea a unui arbore perfect echilibrat.
+	Operatiile de cautare, insertie, stergere a unui nod cu cheia data in
+arbori echilibrati, se fac cu un efort de calcul de O(log n) unitati de timp,
+consecinta directa a teoremei demonstrate de Adelson-Velskii si Landis ce
+garanteaza ca un arbore echilibrat nu va fi niciodata cu mai mult de 45% mai
+inalt decit omologul sau perfect echilibrat, oricare ar fi numarul sau de
+noduri.
+	Daca he(n) e inaltimea unui arbore echilibrat cu n noduri, atunci:
+	log(n+1)<=he(n)<=1.4404*log(n+2)-0.328,
+optimul fiind atins de arbori perfect echilibrati cu n=2^k-1.
+
+
+	2.Arbori Fibonacci
+
+	Pentru a gasi inaltimea maxima h a tuturor arborilor echilibrati cu n
+noduri, se considera o anumita inaltime h si se incearca construirea arborelui
+echilibrat cu numar minim de noduri.
+	Se definesc astfel:
+	1.arborele vid e arborele Fibonacci de inaltime 0;
+	2.arborele cu un singur nod e arborele Fibonacci de inaltime 1;
+	3.daca Ah-1 si Ah-2 sint arbori Fibonacci de inaltime h-1 si h-2,
+atunci Ah=<Ah-1,x,Ah-2> e un arbore Fibonacci de inaltime h;
+	4.nici un alt arbore nu e arbore Fibonacci.
+	Numarul de noduri ale lui Ah e definit de urmatoarea relatie simpla de
+recurenta:
+	N0=0, N1=1, Nh=Nh-1 + 1 + Nh-2.
+
+
+	3.Tehnica insertiei nodurilor in arbori echilibrati AVL
+
+	Dindu-se un arbore cu radacina R si avind subarborii sting si drept
+notati cu S si D, la insertia unui nod in S se disting trei cazuri:
+	1.hs=hd - in urma insertiei, S si D devin de inaltimi inegale,
+verificind insa criteriul echilibrului;
+	2.hs<hd - in urma insertiei S si D devin de inaltimi egale, deci
+echilibrul se imbunatateste;
+	3.hs>hd - criteriul echilibrului nu se mai verifica, arborele trebuie
+reechilibrat.
+	Cazurile posibile pentru structura inainte si dupa insertie se pot
+reduce la doua.	Un algoritm pentru insertie si reechilibrare depinde de
+maniera in care e memorata informatia referitoare la situatia echilibrului
+arborelui.
+	O solutie e cea in care aceasta informatie e inclusa in structura
+arborelui, atunci insa, factorul de echilibrare al unui nod afectat de
+insertie, trebuind sa fie determinat de fiecare data, ducind la marirea regiei.
+	O alta solutie e cea in care se atribuie fiecarui nod, un factor
+explicit de echilibrare:
+
+	type nod=record cheie:integer;
+		           contor:integer;
+				 sting,drept:ref; 
+				 ech:-1..1
+					{diferenta dintre inaltimile                
+                          subarborelui sting si drept}
+		    end;
+
+	Cu solutia a doua, insertia unui nod presupune etapele:
+	1.parcurgerea arborelui binar pentru determinarea locului de insertie
+sau a existentei deja a cheii de inserat;
+	2.insertia noului nod si determinarea factorului de echilibrare
+corespunzator;
+	3.revenirea pe drumul de cautare si verificarea factorului de
+echilibru pentru fiecare nod - presupune unele verificari redundante: daca
+echilibrul e stabilit, nu ar mai fi necesara verificarea factorului de
+echilibru pentru stramosii nodului.
+	Operatia de reechilibrare consta dintr-o secventa de reasignari de
+pointeri ( pointerii sint de fapt schimbati ciclic, rezultind fie o simpla,
+fie o dubla rotatie a doua sau trei noduri implicate) si reajustari ale
+factorilor de echilibru.
+
+PROCEDURE InsertEchilibrat(x:TipCheie; VAR p:TipRef;
+                           VAR h:BOOLEAN);
+  VAR p1,p2:TipRef; {h=fals}
+
+  BEGIN
+    IF p=NIL THEN
+        BEGIN {cuvintul nu e arbore; se insereaza}
+          new(p); h:=TRUE;
+          WITH p^ DO
+            BEGIN
+              cheie:=x; contor:=1;
+              stang:=NIL; drept:=NIL; ech:=0
+            END
+        END
+      ELSE
+        IF x<p^.cheie THEN
+            BEGIN
+              InsertEchilibrat(x,p^.stang,h);
+              IF h THEN {ramura stinga a crescut in inaltime}
+                CASE p^.ech OF
+                  +1: BEGIN
+                        p^.ech:=0; h:=FALSE
+                      END;
+                   0: p^.ech:=-1;
+                  -1: BEGIN {reechilibrare}
+                        p1:=p^.stang;
+                        IF p1^.ech=-1 THEN
+                            BEGIN {cazul 1 stinga}
+                              p^.stang:=p1^.drept; p1^.drept:=p;
+                              p^.ech:=0; p:=p1
+                            END
+                          ELSE
+                            BEGIN { cazul 2 stinga}
+                              p2:=p1^.drept;
+                              p1^.drept:=p2^.stang;
+                              p2^.stang:=p1;
+                              p^.stang:=p2^.drept;
+                              p2^.drept:=p;
+                              IF p2^.ech=-1 THEN
+                                  p^.ech:=+1
+                                ELSE
+                                  p^.ech:=0;
+                              IF p2^.ech:=+1 THEN
+                                  p1^.ech:=-1
+                                ELSE
+                                  p1^.ech:=0;
+                              p:=p2
+                            END;
+                        p^.ech:=0; h:=FALSE
+                      END
+                END {CASE}
+	    END
+	  ELSE
+	    IF x>p^.cheie THEN
+		BEGIN
+		  InsertEchilibrat(x,p^.drept,h);
+		  IF h THEN {ramura dreapta a crescut in inaltime}
+		    CASE p^.ech OF
+		      -1: BEGIN
+			    p^.ech:=0; h:=FALSE
+			  END;
+		       0: p^.ech:=+1;
+		      +1: BEGIN {reechilibrare}
+			    p1:=p^.drept;
+			    IF p1^.ech=+1 THEN
+				BEGIN {cazul 1 dreapta}
+				  p^.drept:=p1^.stang; p1^.stang:=p
+				  p^.ech:=0; p:=p1
+				END
+			      ELSE
+				BEGIN {cazul 2 dreapta}
+				  p2:=p1^.stang;
+				  p1^.stang:=p2^.drept;
+				  p2^.drept:=p1;
+				  p^.drept:=p2^.stang;
+				  p2^.stang:=p;
+				  IF p2^.ech=+1 THEN
+				      p^.ech:=-1
+				    ELSE
+				      p^.ech:=0;
+				  IF p2^.ech=-1 THEN
+				      p1^.ech:=+1
+				    ELSE
+				      p1^.ech:=0;
+				  p:=p2
+				END;
+			    p^.ech:=0; h:=FALSE
+			  END
+		    END {CASE}
+		END
+	      ELSE
+		BEGIN
+		  p^.contor:=p^.contor+1;
+		END
+  END; {InsertEchilibrat}
+
+
+	Analiza matematica a algoritmului de insertie in arbori binari nu e
+inca rezolvata. Teste empirice ale inaltimilor arborilor generati la insertie, duc la valori h= log(n) + c, c=0,25, deci arborii AVL se comporta la fel de bine ca cei perfect echilibrati, fiind insa mai usor de realizat. Testele empirice sugereaza ca in medie, reechilibrarea e necesara aproximativ la fiecare doua insertii, rotatiile simple si duble fiind echiprobabile.
+	Arborii echilibrati trebuie utilizati numai cind operatiile de cautare
+sint mult mai frecvente decit cele de inserare.
+
+
+	4.Suprimarea nodurilor in arbori echilibrati
+
+	Suprimarea este mai complicata decit insertia, reechilibrarea raminind
+insa aceeasi, reducindu-se la una sau doua rotatii la stinga sau la dreapta.
+Tehnica ce sta la baza suprimarii este cea prezentata la lucrarea anterioara.
+
+PROCEDURE SuprimEchilibrat(x:TipCheie; VAR p:TipRef; 
+                           VAR h:BOOLEAN);
+  VAR q:TipRef; {h=fals}
+
+  PROCEDURE Echilibru1(VAR p:TipRef: VAR h:BOOLEAN);
+    VAR p1,p2:TipRef; e1,e2:(-1,0,+1);
+    BEGIN {h=adevarat,ramura stinga a devenit mai mica}
+      CASE p^.ech OF
+        -1: p^.ech:=0;
+         0: BEGIN
+              p^.ech:=+1; h:=FALSE
+            END;
+        +1: BEGIN {reechilibrare}
+              p1:=p^.drept; e1:=p1^.ech;
+              IF e1>=0 THEN
+                  BEGIN {cazul 1 dreapta}
+                    p^.drept:=p1^.stang; p1^.stang:=p;
+                    IF e1=0 THEN
+                        BEGIN
+                          p^.ech:=+1; p1^.ech:=-1;
+                          h:=FALSE
+                        END
+                      ELSE
+                        BEGIN
+                          p^.ech:=0; p1^.ech:=0
+                        END;
+                    p:=p1
+                  END
+                ELSE
+                  BEGIN {cazul 2 dreapta}
+                    p2:=p1^.stang; e2:=p2^.ech;
+                    p1^.stang:=p2^.drept; p2^.drept:=p1;
+                    p^.drept:=p2^.sting;
+                    p2^.stang:=p;
+                    IF e2=+1 THEN
+                        p^.ech:=-1
+                      ELSE
+                        p^.ech:=0;
+                    IF e2=-1 THEN
+                        p1^.ech:=+1
+                      ELSE
+                        p1^.ech:=0;
+                    p:=p2; p2^.ech:=0
+                  END
+            END
+      END  {CASE}
+    END; {Echilibru1}
+
+  PROCEDURE Echilibru2(VAR p:TipRef; VAR h:BOOLEAN);
+    VAR p1,p2:TipRef; e1,e2:(-1,0,+1);
+    BEGIN {h=adevarat,ramura dreapta a devenit mai mica}
+      CASE p^.ech OF
+        +1: p^.ech:=0;
+         0: BEGIN
+              p^.ech:=-1; h:=FALSE
+            END;
+        +1: BEGIN  {reechilibrare}
+              p1:=p^.stang; e1:=p1^.ech;
+              IF e1<=0 THEN
+                  BEGIN {cazul 1 stinga}
+                    p^.stang:=p1^.drept; p1^.drept:=p;
+                    IF e1=0 THEN
+                        BEGIN
+                          p^.ech:=-1; p1^.ech:=+1;
+                          h:=FALSE
+                        END
+                      ELSE
+                        BEGIN
+                          p^.ech:=0; p1^.ech:=0
+                        END;
+                    p:=p1
+                  END
+                ELSE
+                  BEGIN {cazul 2 stinga}
+                    p2:=p1^.drept; e2:=p2^.ech;
+                    p1^.drept:=p2^.stang; p2^.stang:=p1;
+                    p^.stang:=p2^.drept;
+                    p2^.drept:=p;
+                    IF e2=-1 THEN
+                        p^.ech:=+1
+                      ELSE
+                        p^.ech:=0;
+                    IF e2=+1 THEN
+                        p1^.ech:=-1
+                      ELSE
+                        p1^.ech:=0;
+                    p:=p2; p2^.ech:=0
+                  END
+            END
+      END {CASE}
+    END; {Echilibru2}
+
+  PROCEDURE Suprima(VAR r:TipRef; VAR h:BOOLEAN);
+    BEGIN {h=false}
+      IF r^.drept<>NIL THEN
+          BEGIN
+            Suprima(r^.drept,h);
+            IF h THEN Echilibru2(r,h)
+          END
+        ELSE
+          BEGIN
+            q^.cheie:=r^.cheie;
+            q^.contor:=r^.contor;
+            r:=r^.stang; h:=TRUE
+          END
+    END; {Suprima}
+
+  BEGIN {SuprimaEchilibrat}
+    IF p=NIL THEN
+        BEGIN
+	  WRITE('cheia nu e IN arbore'); h:=FALSE
+	END
+      ELSE
+        IF x<p^.cheie THEN
+            BEGIN
+              SuprimaEchilibrat(x,p^.stang,h);
+              IF h THEN Echilibru1(p,h)
+            END
+          ELSE
+            IF x>p^.cheie THEN
+                BEGIN
+                  SuprimaEchilibrat(x,p^.drept,h);
+                  IF h THEN Echilibru2(p,h)
+                END
+              ELSE
+                BEGIN {suprima p^}
+                  q:=p;
+                  IF q^.drept=NIL THEN
+                      BEGIN
+                        p:=q^.stang; h:=TRUE
+                      END
+                    ELSE
+                      IF q^.stang=NIL THEN
+                          BEGIN
+                            p:=q^.drept; h:=TRUE
+                          END
+                        ELSE
+                          BEGIN
+                            Suprima(q^.stang,h);
+                            IF h THEN Echilibru1(p,h)
+                          END;
+                  {DISPOSE(q)}
+                END
+  END; {SuprimaEchilibrat}
+
+
+	In cazul cel mai defavorabil, suprimarea unui nod se realizeaza in
+O(log n) operatii. Diferenta esentiala dintre insertie si suprimare in cazul
+arborilor echilibrati consta in faptul ca daca in urma unei insertii,
+reechilibrarea se realizeaza prin una sau doua rotatii, a doua sau trei
+noduri, suprimarea poate necesita o rotatie a fiecarui nod situat pe drumul
+de cautare.
+	In realitate, testele experimentale indica faptul ca reechilibrarea
+devine necesara aproximativ la fiecare a doua insertie si la fiecare a cincea
+suprimare.
+
+
+        5.Aplicatii
+
+	5.1.Sa se redacteze un program interactiv care implementeaza
+urmatoarele functii pentru prelucrarea unui arbore AVL, avand chei numerice:
+	C - initializeaza arborele AVL ( il face vid, cu recuperarea zonei
+de memorie corespunzatoare.)
+	I - insereaza un nod cu o cheie precizata, semnaland reechilibrarea;
+	S - suprima un nod cu o cheie precizata, semnaland reechilibrarea;
+	V - vizualizeaza arborele pe niveluri;
+	P - pentru o secventa aleatoare de chei care vor fi inserate in
+arborele AVL, determina raportul intre numarul de reechilibrari si numarul
+total de insertii. Analog pentru suprimare.
+	X - terminare.
+
+	5.2.Pentru un N citit de la tastatura, sa se genereze toate
+permutarile numerelor de la 1 la N, fiecare secventa constituind cheile
+ce se insereaza in cate un arbore AVL. Sa se vizualizeze arborii, pentru
+fiecare discutindu-se inaltimea si numarul de reechilibrari necesare
+generarii.
+
+         5.3.Pornind de la o secventa oarecare de chei numerice, sa se
+construiasca ABO si AB AVL corespunzatori. Se cere:
+         - sa se masoare timpii de construire ai celor doi arbori
+	 - sa se tipareasca, pe niveluri, arborii
+         - sa se masoare timpii de cautare in cei doi arbori, ai unei
+secvente de chei
+         - sa se masoare timpii de suprimare din cei doi arbori, ai unei
+secvente de chei.
+
+         5.4.Pentru o inaltime H care se citeste de la tastatura, sa se 
+construiasca arborele AVL cu numar minim de noduri (arbore Fibonacci).
+         a. Sa se precizeze care este numarul de noduri, N din acest arbore.
+         b. Se va construi si arborele binar perfect echilibrat cu N noduri 
+(lucrarea paa2, problema 6.3), precum si arborele AVL corespunzator unei
+secvente aleatoare de N chei. Sa se discute performantele operatiilor
+de cautare in cei 3 arbori.

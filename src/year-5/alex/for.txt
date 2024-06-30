@@ -1,0 +1,9 @@
+program fort;
+var
+  i : integer;
+begin
+  for i:=1 to 8 do
+  begin
+    print(" i = ", i);
+  end;
+end.

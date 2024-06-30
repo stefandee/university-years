@@ -1,0 +1,27 @@
+Lucrul cu matricile
+
+(aref matrice indici)
+ex.
+ (aref m 120 71)
+ (aref m 0)
+
+Creare matrice:
+(make-array lista-indici)
+ex.
+ (setq tab (make-array '(512 336)))
+
+Modificare element:
+(setf pozitie valoare)
+ex.
+(setf
+
+(array-dimension matrice indice-dimensiune)
+ex.
+ (array-dimension tab 0)
+ 512
+
+Probleme:
+1. (print-array m) unde m este bidimensionala.
+
+2. (stuff-array l) care returneaza o matrice primind o lista de liste.
+

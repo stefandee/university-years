@@ -1,0 +1,104 @@
+
+[Parametri op'tionali]
+
+La definirea unei func'tii putem specifica faptul c'a un parametru
+este op'tional:
+
+(defun putere (x &optional y)
+  (cond ((not y) x)			; y = 1
+	(t (expt x y))))
+
+Func'tia de mai sus dac'a prime'ste un singur argument, consider'a c'a
+cel de al doilea este 1.
+
+Putere da 'si o valoare implicit'a parametrului op'tional:
+
+(defun putere (x &optional (y 1))
+  (expt x y))
+
+Pot exista oric^a'ti parametri op'tionali.
+
+Poate exista 'si un singur parametru semnalat de &rest, a c'arui
+valoare devine o list'a cu toate argumentele ^in plus fa't'a de cele
+specificate la definirea func'tiei.
+
+(defun my-or (&rest r)
+  (cond ((null r) nil)
+	((car r))
+	(t (apply 'my-or (cdr r)))))
+
+[Macrouri]
+
+Macrourile sunt definite ca 'si func'tiile dar ele nu ^i'si evalueaz'a
+niciodat'a argumentele.
+
+Urm'ari'ti cu aten'tie exemplul urm'ator:
+
+(defmacro demo (par)
+  (print par))
+
+(setq this 'value-of-this)
+
+(demo this)
+  this
+  value-of-this
+
+La apelul macroului nu se ^incearc'a evaluarea lui this, deci chiar
+this devine valoarea lui par 'si se afi'seaz'a this. La returnare
+^ins'a this se evalueaz'a.
+
+^In exeplul urm'ator se implementeaz'a un macro our-if.
+
+(defmacro our-if (test success failure)
+  (subst test 'test
+	 (subst success 'success
+		(subst failure 'failure
+		       '(cond (test success) (t failure))))))
+
+Parametrul failure poate fi declarat op'tional.
+
+[Backquote]
+
+Mecanismul backquote permite u'sor generarea de expresii a c'aror mare
+parte este fixat'a 'si doar c^ateva variabile trebuie ^inlocuite.
+Caracterul backquote ` ac'tioneaz'a asem'an'ator cu quote ' cu
+observa'tia c'a orice virgule ce apar ^in interior au efect de
+"unquoting" pentru expresia urm'atoare.
+
+(setq variable 'example)
+  example
+
+`(this is an ,variable)
+  (this is an example)
+
+Folosind mecanismul backquote our-if devine:
+
+(defmacro our-if (test success &optional failure)
+  `(cond (,test ,success) (t ,failure)))
+
+[Probleme]
+
+1. Defini'ti un macro define care define'ste o func'tie dar av^and
+sintaxa:
+
+(define (<nume functie> <param 1> ... <param n>)
+  <corp>)
+
+2. Defini'ti un macro dotimes cu sintaxa:
+
+(dotimes (<var> <count> <rezultat>) <corp>)
+
+Prima dat'a se evalueaz'a <count> care trebuie s'a dea un ^intreg.
+Apoi <var> este succesiv legat'a la ^intregi de la 0 la
+valoarea lui <count> minus 1. Corpul este evaluat de fiecare dat'a iar
+<rezultat> este returnat la sf^ar'sit.
+
+Obs. c'auta'ti o form'a folosind do care este echivalent'a 'si apoi
+scrie'ti macroul dotimes.
+
+
+(defun depth (l)
+  (cond ((null l) 1)
+	((atom l) 0)
+	(t (max (+ 1 (depth (car l))) (+ 1 (depth (cdr l)))))))
+  

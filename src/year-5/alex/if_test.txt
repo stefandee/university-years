@@ -1,0 +1,12 @@
+program hola;
+
+var
+  z : integer;
+  
+begin
+  z := 15;
+  if z > 10 then print(" z mai mare ca 10 ")
+  else print("z mai mic ca 10");
+  z := z + 1;
+  print("gata", z);
+end.                

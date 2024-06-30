@@ -1,0 +1,120 @@
+Lucrarea 6
+----------
+
+		Problema drumurilor minime corespunzatoare tuturor
+		--------------------------------------------------
+		   perechilor de noduri. Algoritmul lui Floyd.
+		   -------------------------------------------
+
+
+1. Prezentarea algoritmului
+---------------------------
+
+ Intrare: Se da matricea de costuri Cost, unde Cost(x,y) reprezinta ponderea
+	  arcului x->y
+ Iesire : Rezulta matricea A, unde A(i,j) este lungimea minima a drumurilor
+	  de la nodul i la nodul j
+ Metoda :
+	Fie graful G=(N,A). Consideram nodurile multimii n numerotate de la
+1 la n. Algoritmul utilizeaza o matrice A de dimensiuni n*n cu ajutorul careia
+determina lungimile drumurilor minime.
+  Pas 1: - A(i,j) = Cost(i,j) , pentru toti i!=j
+	 - daca nu exista arc de la i la j, Cost(i,j) = ì
+	 - A(i,i) = 0
+  Pas 2: Pentru k:=1 la n executa:
+			   Ú A   (i,j)
+	    A  (i,j) = min ´  k-1
+	     k             À A   (i,k)+ A   (k,j)
+			      k-1        k-1
+   Dupa ce de-a k iteratie, A(i,j) va contine lungimea minima a oricarui drum
+   de la nodul i la nodul j, care nu trece prin nici un nod mai mare ca si k.
+   Deoarece A (i,k) = A   (i,k) si A (k,j) = A   (k,j) se poate utiliza o sin-
+	     k         k-1          k         k-1
+   gura copie a lui A.
+
+2. Exemplu de implementare
+--------------------------
+
+  Fie un graf orientat ponderat care contine timpii de zbor pentru anumite
+trasee aeriene, care conecteaza orase. Se cere o tabela cu cei mai scurti
+timpi necesari pentru a zbura intre oricare doua orase.
+  Ex: Se considera urmatoarea matrice de costuri:
+	2    8    5
+	3    ì    ì
+	ì    2    ì
+
+# include <stdio.h>
+# define N   20
+# define MAX   32767
+
+float Cost[N][N],A[N][N];
+
+void Floyd(int n){
+  int i,j,k;
+  for(i=0;i<n;i++)
+    for(j=0;j<n;j++)
+      A[i][j] = Cost[i][j];
+  for(i=0;i<n;i++)
+    A[i][i] = 0;
+  for(k=0;k<n;k++)
+    for(i=0;i<n;i++)
+      for(j=0;j<n;j++)
+	A[i][j]=(A[i][j]<A[i][k]+A[k][j])?A[i][j]:A[i][k]+A[k][j];
+}
+
+void Afis_Drum_Min(int n){
+  int i,j;
+  for(i=0;i<n;i++){
+    for(j=0;j<n;j++)
+      if(A[i][j]>=MAX)
+	printf(" INF ");
+      else
+	printf("%5.0f",A[i][j]);
+    printf("\n");
+  }
+}
+
+void main(){
+  int i,j,n;
+  char s[12];
+  FILE *fp;
+  printf("introduceti numele fisierului de date:");
+  scanf("%s",s);
+  if((fp=fopen(s,"r"))==NULL){
+    printf("\nnu exista fisierul %s ",s);
+    exit(1);
+  }
+  fscanf(fp,"%d",&n);
+  for(i=0;i<n;i++)
+    for(j=0;j<n;j++){
+      fscanf(fp,"%f",&Cost[i][j]);
+    }
+  fclose(fp);
+  Floyd(n);
+  Afis_Drum_Min(n);
+}
+
+3. Probleme propuse
+-------------------
+ 1) Sa se dezvolte algoritmul lui Floyd astfel incit sa se determine traseul
+drumurilor minime.
+Ind: Se va utiliza o matrice Drum, unde Drum(i,j) memoreaza acel nod k care
+conduce in cadrul algoritmului la cea mai mica valoare pentru A(i,j). Daca
+Drum(i,j)=0,  atunci cel mai scurt drum de la i la j este cel direct.
+
+ 2) Sa se determine cel mai central nod dintr-un graf G=(N,A). Nodul central
+este acela pentru care excentricitatea este minima.
+  Excentricitatea unui nod x din N este:
+    max { drumurile minime de la y la x, pentru toti y din N}
+
+ Ex: Fie urmatoarea matrice de costuri:
+       ì  1  ì  ì  ì
+       ì  ì  2  ì  ì
+       ì  ì  ì  2  4
+       ì  1  3  ì  ì
+       ì  ì  ì  5  ì
+
+ 3) Sa se implementeze algoritmul lui Prim de determinare al unui arbore de
+acoperire minima.
+Ex: Sa se proiecteze o retea de comunicatii pentru legarea cu un cost minim
+a tuturor oraselor considerate.

@@ -1,0 +1,246 @@
+
+LUCRAREA 13
+
+
+
+                Construirea arborilor pentru expresii
+               Obtinerea formei poloneze a expresiilor
+                       Evaluarea expresiilor
+
+
+
+
+1. Aplicatie:
+
+ De la tastatura se citesc expresii formate din numere , paranteze rotunde
+si operatorii + , - , *  si /. Semnificatia lor este cea cunoscuta din
+matematica. Sa se realizeze un program care afiseaza forma poloneza a
+expresiilor citite , dupa care le evalueaza si tipareste valoarea obtinuta.
+
+
+2. Rezolvare:
+
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <conio.h>
+
+#define numar  0
+
+typedef struct n
+{
+   int val;
+   struct n *left,*right;
+}nod;
+
+int atom,valoare;
+
+int gettop(void);
+nod *expresie(void);
+nod *termen(void);
+nod *factor(void);
+
+nod *mknode( int a, nod *b, nod *c )
+{
+  nod *v;
+
+ if( ( v = ( nod* )malloc(sizeof( nod ))) == NULL )
+  {
+    printf( " Eroare: memorie insuficienta\n" );
+    exit( 1 );
+  }
+ else
+ {
+     v->val=a;
+     v->left=b;
+     v->right=c;
+
+     return v;
+  }
+}
+
+void evaluare( nod *a )
+{
+
+ if( a != NULL )
+ {
+     evaluare( a->left );
+     evaluare( a->right );
+     if( a->val == '+' )
+       a->val = a->left->val + a->right->val;
+     else
+       if( a->val == '-' )
+	 a->val = a->left->val - a->right->val;
+      else
+       if( a->val == '*' )
+	a->val = a->left->val * a->right->val;
+       else
+	if( a->val == '/' )
+	  if( a->right->val != 0 )
+	   a->val = a->left->val / a->right->val;
+	   else
+	   {
+	     printf(" Impartire la 0\n");
+	     exit( 1 );
+	   }
+  }
+}
+
+int gettop( void )
+{
+char c;
+
+ while(( c = getchar() ) == ' ' || c == '\t');
+ if( !isdigit( c ) ) return c;
+ else
+ {
+    valoare = c - '0';
+    while( isdigit( c=getchar() ) ) valoare = valoare * 10 + c - '0';
+    ungetc( c,stdin );
+    return  numar;
+  }
+}
+
+void tipareste( nod *r )
+{
+
+   if( r != NULL )
+   {
+    tipareste( r->left );
+    tipareste( r->right );
+    if( r->val == '+' || r->val == '-' || r->val == '*' || r->val == '/' )
+      printf(" %c  ",r->val);
+     else  printf(" %d ",r->val );
+   }
+}
+
+
+nod *expresie( void )
+{
+ char op;
+ nod *b, *a;
+
+ a = termen();
+ while ( atom == '+' || atom == '-')
+ {
+       op = atom;
+       atom = gettop();
+       b = termen();
+       a = mknode( op, a, b );
+ }
+  return a;
+ }
+
+nod *termen( void )
+{
+  char op;
+  nod *b,*a;
+
+  a = factor();
+  while ( atom == '*' || atom == '/' )
+  {
+	op=atom;
+        atom=gettop();
+	b = factor();
+        a = mknode( op , a , b );
+   }
+   return a;
+  }
+
+nod *factor( void )
+{
+ nod *v;
+
+  if( atom == numar )
+  {
+	v = mknode( valoare , NULL , NULL );
+	atom = gettop();
+	return v;
+   }
+   else
+     if( atom == '(' )
+     {
+	 atom = gettop();
+	 v = expresie();
+	 if( atom == ')' ) atom = gettop();
+	 return v;
+     }
+    else return NULL;
+   }
+
+void main( void )
+{
+ nod *root = NULL;
+
+
+  clrscr();
+  printf("========se introduce o expresie========\n\n\n");
+  atom = gettop();
+  while( atom !=EOF )
+  {
+     printf("************expresia in notatie poloneza*************\n");
+     root = expresie();
+     tipareste( root );
+     printf("\n\n");
+     evaluare( root );
+     printf("************valoarea expresiei= %d  \n\n",root->val);
+     getchar() ; clrscr();
+     printf("=======se introduce o expresie========\n\n\n");
+     atom = gettop();
+  }
+}
+
+
+ 3. Prezentarea programului
+
+
+    In prima etapa se construieste arborele binar atasat expresiilor.
+Acesta are ca si noduri interne nodurile atasate operatorilor , iar
+ca noduri frunza cele atasate numerelor din expresie. Din punct de
+vedere teoretic structura expresiilor este descrisa de urmatoarele 
+reguli:
+
+       expresie : expresie + expresie +...... + expresie
+                 | expresie - expresie - ..... - expresie
+                 | termen
+
+       termen    : termen * termen * ...... * termen
+                  | termen / termen / ....... / termen 
+                  | factor
+
+       factor    : numar
+                  | ( expresie )
+
+   Aceste reguli ( numite in literatura de specialitate productii )
+sint stabilite de regulile de precedenta a operatorilor. Astfel
+primele productii corespund operatorilor aditivi + si - , care
+au precedenta minima; urmatoarele reguli sint stabilite de operatorii
+multiplicativi * si / , iar ultimele doua productii trateaza numerele
+si expresiile intre paranteze.
+   Procedura factor analizeaza un numar sau o expresie intre paranteze
+si returneaza fie nodul frunza construit pentru numar, fie radacina
+arborelui asociat expresiei intre paranteze.
+   Procedura termen va analiza subexpresiile continind operatorii *
+si / si returneaza radacina arborelui construit pentru subexpresiile
+formate cu operatorii multiplicativi.
+   Procedura expresie trateaza expresiile formate cu operatorii +
+si - , iar valoarea returnata este radacina arborelui global.
+   Dupa construirea arborelui atasat expresiei , acesta este parcurs
+in postordine , obtinindu-se forma poloneza a expresiei initiale.
+   O noua parcurgere in postordine a arborelui va evalua expresia.
+In momentul in care analizam un nod, valorile  fiilor sting si drept
+sint disponibile, deci expresiile asociate subarborilor sting si drept
+sint evaluate, astfel ca operatia asociata nodului poate fi efectuata.
+
+
+
+
+
+4. Probleme propuse
+
+
+1. Se considera expresii aritmetice formate din numere, paranteze rotun-
+de si operatorii +, - , * , / si ^ . Sa se transforme o expresie furni-
+zata la intrare in una echivalenta, dar fara paranteze redundante.
+
+    ex.   ((2 + 1) + 5 + ( 8 * 5 )) trece in 2 + 1 + 5 + 8 * 5

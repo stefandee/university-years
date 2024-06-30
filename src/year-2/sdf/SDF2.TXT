@@ -1,0 +1,190 @@
+LUCRAREA 2
+----------
+
+
+			Operatii cu siruri de caractere
+			-------------------------------
+Tipul char
+----------
+
+	char lista_de_variabile ;
+
+Variabilele de tipul caracter ocupa in memorie un octet . 
+Sint implicit cu semn, corespunzind intervalului -128:127. Daca
+sint declarate fara semn, intervalul se intinde de la 0 la 255.
+Precizarea unui caracter se face intre apostrofuri (ex:'a','q'). Unele carac-
+tere sint precedate de caracterul \(backshlash)
+     ex: \n  = linie noua
+	 \t  = tab orizontal
+	 \b  = backspace
+
+Functii (sau macrodefinitii) ce opereaza cu caractere (definite in CTYPE.H)
+-----------------------------------------------------
+- isalpha(c)  - returneaza o valoare diferita de 0 ( adevarat ) daca caracte-
+rul e litera ('A'..'Z', 'a'..'z') si 0 in caz contrar
+   ex: int isalpha(int c)
+       {
+	 return ( c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' ) ;
+       }
+- isdigit(c)  - returneaza adevarat daca caracterul e cifra ('0'..'9')
+- isalnum(c)  - returneaza adevarat daca caracterul e litera sau cifra
+- isupper(c)  - returneaza adevarat daca caracterul e litera mare
+- islower(c)  - returneaza adevarat daca caracterul e litera mica
+- isspace(c)  - returneaza adevarat daca caracterul e un caracter spatiu
+		(' ', \t, \n, \f, \v)
+- isascii(c)  - returneaza adevarat daca caracterul are codul ASCII <128
+- ispunct(c)  - returneaza adevarat daca caracterul e semn de punctuatie
+- toupper(c)  - converteste caracterul in litera mare
+   ex: int toupper( int c )
+       {
+	 return ( islower(c) ? c - 'a' + 'A' : c );
+       }
+- tolower(c)  - converteste caracterul in litera mica
+
+Siruri de caractere
+-------------------
+	Limbajul C nu permite tipul de data sir, dar exista doua posibili-
+tati de folosire a sirurilor:- tabele de caractere  (ex: char sir[30];)
+			     - pointer la caractere (ex: char *sir;)
+Sirul de caractere se reprezinta intre ghilimele. Ultimul caracter din sir
+este caracterul nul ('\0'). Ex: "Anul 2C" contine 8 caractere (inclusiv '\0')
+
+Functii ce opereaza cu siruri de caractere
+------------------------------------------
+- declarate in STDIO.H
+
+   - getchar()  - returneaza un caracter din fisierul de intrare ( tastatura )
+   - putchar( c ) - transmite un caracter la fisierul de iesire ( monitor )
+   - gets( s )    - citeste un sir de caractere din intrare pina la intilnirea
+       caracterului \n, care nu se adauga la sir. Returneaza adresa primului
+       caracter din sir
+   - puts( s )    - transmite sirul de caractere la iesire
+
+- declarate in STRING.H
+
+   - strcmp( s1 , s2 ) - returneaza o valoare < 0, daca sirul s1< sirul s2
+		  	                        0, daca s1  egal s2
+				              > 0, daca s1  > s2
+     ex: int strcmp( char *s1, char *s2)
+         {
+	  int i;
+	  for(i=0; s1[i] || s2[i]; i++)    sau  for(i=0; s1[i] || s2[i]; i++)
+	     if( s1[i] < s2[i] )		      if( s1[i] != s2[i] )
+	       return -1;			break;
+	     else                           return ( s1[i]-s2[i] );
+	       if( s1[i]>s2[i] )
+		 return 1;
+	  return 0;
+	 }
+   - strncmp( s1 , s2 ,n ) - compara doua siruri pe lungimea n
+   - strcpy( d , s )      - copiaza sirul sursa in sirul destinatie. Returneaza
+      adresa sirului destinatie.
+
+     ex: char *strcpy( char *d, char *s)
+         {
+	  int i=0;
+	  while( s[i] )
+          {
+	    d[i]=s[i];i++;
+	  }
+	  d[i]='\0';
+	  return d;
+	 }
+   - strncpy( d , s , n )   - copiaza maxim n caractere de la sursa la 
+    destinatie. Returneaza adresa sirului destinatie.
+   - strlen( s )        - returneaza lungimea sirului fara a numara caracterul
+	terminator
+   - strcat( d , s )      - concateneaza cele doua siruri si returneaza adresa
+       sirului rezultat.
+
+     ex: char *strcat( char *d , char *s )
+         {
+	   int i=0,j=0;
+	   while( d[i] ) i++;
+	   while( d[i++] = s[j++] );
+	   return d;
+	 }
+   - strchr( s , c )      - returneaza pozitia primei aparitii a caracterului c 
+in  sirul s, respectiv 0 daca c nu e in s
+
+Exemple
+-------
+1. Se citesc siruri de caractere din intrare, pina la intilnirea caracteru-
+ lui sfirsit de fisier EOF . Sa se afiseze sirurile in ordine inversa.
+
+# include <stdio.h>
+# include <string.h>
+
+void main( void )
+{
+  char sir[80],c;
+  short i,j;
+  while ( gets( sir ) != NULL )
+  {
+    for(i=0,j=strlen(sir)-1;i<j;++i,--j)
+    {
+      c=sir[i];sir[i]=sir[j];sir[j]=c;
+    }
+    puts(sir);
+  }
+}
+
+2. Se da un text care se incheie cu EOF. Sa se gaseasca de cite ori apar cu-
+vintele  ARRAY, RECORD si SET in text.
+
+# include <stdio.h>
+# include <ctype.h>
+# include <string.h>
+# define Max   10
+
+char buf[Max];
+char tab[][Max]={"array","set","record"};
+
+void main(void){
+  char c;
+  int i,j;
+  int m[]={0,0,0};
+  c=getchar();
+  while(c != EOF)
+    if ( isalpha(c) )
+    {
+      i=0;
+      while( isalnum(c) ) 
+      {
+	buf[i++]=c;
+	c=getchar();
+      }
+      buf[i]='\0';
+      for(j=0;j<3;j++)
+	if( strcmp( buf,tab[j] )==0 ) m[j]++;
+    }
+    else c=getchar();
+  for(j=0;j<3;j++)
+    printf("%d\n",m[j]);
+}
+
+
+Probleme propuse
+----------------
+1. Implementati urmatoarele functii:
+ isdigit, tolower, isupper, isalnum,
+ strncpy, strncat, strncmp, strlen
+
+2. Sa se caute un caracter intr-un sir dat si sa se returneze indexul primei
+aparitii a caracterului in sir.
+
+3. Se da un sir de caractere care se termina cu caracterul EOF. Sa se scrie un
+program C care converteste un sir de caractere cifra in intregul corespunzator.
+Restul caracterelor sint neglijate.
+ex:-sirul ",ab 15 cd1;489$%"
+   -nrele:     15   1 489
+
+4. Se da un sir de cuvinte separate prin blancuri, sir care e terminat  cu
+caracterul EOF. Sa se tipareasca toate palindroamele care apar in text. Un pa-
+lindrom este un cuvint care e identic citit de la inceput si de la sfirsit.
+Obs: Sa se afiseze palindroamele in ordine crescatoare.
+
+5. Se da un text care se termina cu EOF. Sa se prelucreze textul astfel: se
+elimina toate caracterele nealfanumerice. Identificatorii si numerele sint
+tiparite separat. Intii numerele in ordinea aparitiei lor, dupa care identifi-
+catorii in ordine alfabetica.
